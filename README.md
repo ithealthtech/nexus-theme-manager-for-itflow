@@ -21,7 +21,34 @@ ITFlow 26.08 does not expose a native plugin or theme-hook loader. This manager 
 
 The manager validates all 12 upstream template hashes before installation. A newer or locally modified ITFlow checkout is refused without changing files. Build a new compatibility package for that revision instead of forcing this package.
 
-Download the signed-off ZIP and checksum from the [latest release](https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/latest). GitHub's automatically generated source archives are also available, but the versioned release ZIP is the tested installation artifact.
+Download the versioned ZIP and checksum from the [latest release](https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/latest). GitHub's automatically generated source archives are also available, but the versioned release ZIP is the tested installation artifact.
+
+### Download from Debian
+
+Install the command-line prerequisites, set `nexus_version` to the release you want, then download and verify the packaged release:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl unzip
+
+nexus_version="2.0.0"
+nexus_asset="Nexus-Theme-Manager-for-ITFlow-${nexus_version}"
+nexus_download_dir="$HOME/Downloads/nexus-theme-manager"
+
+mkdir -p "$nexus_download_dir"
+cd "$nexus_download_dir"
+
+curl --fail --location --remote-name \
+  "https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/download/v${nexus_version}/${nexus_asset}.zip"
+curl --fail --location --remote-name \
+  "https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/download/v${nexus_version}/${nexus_asset}.zip.sha256.txt"
+
+sha256sum --check "${nexus_asset}.zip.sha256.txt"
+sudo unzip -q "${nexus_asset}.zip" -d /opt
+cd "/opt/${nexus_asset}"
+```
+
+Continue only if `sha256sum` reports `OK`. The final `cd` places the shell in the verified package directory so the installation commands below can be run as written.
 
 ## Package layout
 
@@ -35,7 +62,7 @@ Download the signed-off ZIP and checksum from the [latest release](https://githu
 ## Install
 
 1. Create and verify an ITFlow application/database backup.
-2. Extract this ZIP outside the ITFlow document root, for example `/opt/nexus-theme-manager-2.0.0`.
+2. Extract this ZIP outside the ITFlow document root, for example `/opt/Nexus-Theme-Manager-for-ITFlow-2.0.0`.
 3. Run the non-mutating preflight:
 
 ```bash
