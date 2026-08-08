@@ -1,0 +1,23 @@
+# Local manager state and release artifacts
+.itdr-theme-manager-state/
+*.zip
+*.tar
+*.tar.gz
+
+# Runtime configuration and secrets
+.env
+.env.*
+config.php
+*.pem
+*.key
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Test scratch space
+tmp/
+temp/
+coverage/

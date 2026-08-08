@@ -1,0 +1,379 @@
+<?php
+/*
+ * Client Portal
+ * Ticket detail page
+ */
+
+require_once "includes/inc_all.php";
+
+//Initialize the HTML Purifier to prevent XSS
+require "../libs/htmlpurifier/HTMLPurifier.standalone.php";
+
+$purifier_config = HTMLPurifier_Config::createDefault();
+$purifier_config->set('Cache.DefinitionImpl', null); // Disable cache by setting a non-existent directory or an invalid one
+$purifier_config->set('URI.AllowedSchemes', ['data' => true, 'src' => true, 'http' => true, 'https' => true]);
+$purifier = new HTMLPurifier($purifier_config);
+
+$allowed_extensions = array('jpg', 'jpeg', 'gif', 'png', 'webp', 'pdf', 'txt', 'md', 'doc', 'docx', 'csv', 'xls', 'xlsx', 'xlsm', 'zip', 'tar', 'gz');
+
+if (isset($_GET['id']) && intval($_GET['id'])) {
+    $ticket_id = intval($_GET['id']);
+
+    $ticket_contact_snippet = "AND ticket_contact_id = $session_contact_id";
+    // Bypass ticket contact being session_id for a primary / technical contact viewing all tickets
+    if ($session_contact_primary == 1 || $session_contact_is_technical_contact) {
+        $ticket_contact_snippet = '';
+    }
+
+    $ticket_sql = mysqli_query($mysqli,
+        "SELECT * FROM tickets
+            LEFT JOIN users on ticket_assigned_to = user_id
+            LEFT JOIN ticket_statuses ON ticket_status = ticket_status_id
+            LEFT JOIN categories ON ticket_category = category_id
+            WHERE ticket_id = $ticket_id AND ticket_client_id = $session_client_id
+             $ticket_contact_snippet"
+    );
+
+    $ticket_row = mysqli_fetch_assoc($ticket_sql);
+
+    if ($ticket_row) {
+
+        $ticket_prefix = escapeHtml($ticket_row['ticket_prefix']);
+        $ticket_number = intval($ticket_row['ticket_number']);
+        $ticket_status = escapeHtml($ticket_row['ticket_status_name']);
+        $ticket_priority = escapeHtml($ticket_row['ticket_priority']);
+        $ticket_subject = escapeHtml($ticket_row['ticket_subject']);
+        $ticket_details = $purifier->purify($ticket_row['ticket_details']);
+        $ticket_assigned_to = escapeHtml($ticket_row['user_name']);
+        $ticket_resolved_at = escapeHtml($ticket_row['ticket_resolved_at']);
+        $ticket_closed_at = escapeHtml($ticket_row['ticket_closed_at']);
+        $ticket_feedback = escapeHtml($ticket_row['ticket_feedback']);
+        $ticket_category = escapeHtml($ticket_row['category_name']);
+
+        // Get Ticket Attachments (not associated with a specific reply)
+        $sql_ticket_attachments = mysqli_query(
+            $mysqli,
+            "SELECT * FROM ticket_attachments
+            WHERE ticket_attachment_reply_id IS NULL
+            AND ticket_attachment_ticket_id = $ticket_id"
+        );
+
+        // Get Tasks
+        $sql_tasks = mysqli_query( $mysqli, "SELECT * FROM tasks WHERE task_ticket_id = $ticket_id ORDER BY task_order ASC, task_id ASC");
+        $task_count = mysqli_num_rows($sql_tasks);
+
+        // Get Completed Task Count
+        $sql_tasks_completed = mysqli_query($mysqli,
+            "SELECT * FROM tasks
+            WHERE task_ticket_id = $ticket_id
+            AND task_completed_at IS NOT NULL"
+        );
+        $completed_task_count = mysqli_num_rows($sql_tasks_completed);
+
+        // Get pending task approvals
+        $sql_task_approvals = mysqli_query($mysqli,"
+            SELECT task_id, task_name, approval_id, approval_scope, approval_type, approval_required_user_id, approval_status, approval_url_key
+            FROM tasks
+            LEFT JOIN task_approvals ON task_id = task_approvals.approval_task_id
+            WHERE task_ticket_id = $ticket_id AND task_completed_at IS NULL AND approval_scope = 'client' AND approval_status = 'pending'
+        ");
+        ?>
+
+        <ol class="breadcrumb d-print-none">
+            <li class="breadcrumb-item">
+                <a href="index.php">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="tickets.php">Tickets</a>
+            </li>
+            <li class="breadcrumb-item active">Ticket <?= $ticket_prefix . $ticket_number ?></li>
+        </ol>
+
+        <div class="card itdr-ticket-thread">
+            <div class="card-header bg-dark my-2">
+                <h1 class="card-title h4 mt-1">
+                    Ticket <?= $ticket_prefix, $ticket_number ?>
+                </h1>
+                <div class="card-tools">
+                    <?php
+                    if (empty($ticket_resolved_at) && $task_count == $completed_task_count) { ?>
+                        <a href="post.php?resolve_ticket=<?= $ticket_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" class="btn btn-sm btn-outline-success float-right text-white confirm-link"><i class="fas fa-fw fa-check text-success"></i> Resolve ticket</a>
+                    <?php } ?>
+                </div>
+            </div>
+
+            <div class="card-body prettyContent">
+                <h5><strong>Subject:</strong> <?= $ticket_subject ?></h5>
+                <p>
+                    <strong>State:</strong> <?= $ticket_status ?><br>
+                    <strong>Priority:</strong> <?= $ticket_priority ?><br>
+                    <?php if (!empty($ticket_category)) { ?>
+                        <strong>Category:</strong> <?= $ticket_category ?><br>
+                    <?php } ?>
+
+                    <?php if (empty($ticket_closed_at)) { ?>
+
+                        <?php if ($task_count) { ?>
+                            <strong>Tasks: </strong> <?= $completed_task_count . " / " .$task_count ?>
+                            <br>
+                        <?php } ?>
+
+                        <?php if (!empty($ticket_assigned_to)) { ?>
+                            <strong>Assigned to: </strong> <?= $ticket_assigned_to ?>
+                        <?php } ?>
+
+                    <?php } ?>
+                </p>
+                <hr>
+                <?= $ticket_details ?>
+
+                <table class="table-sm">
+
+                <?php
+                while ($ticket_attachment = mysqli_fetch_assoc($sql_ticket_attachments)) {
+                    $ticket_attachment_id = intval($ticket_attachment['ticket_attachment_id']);
+                    $name = escapeHtml($ticket_attachment['ticket_attachment_name']);
+
+                    ?>
+
+                    <tr>
+                        <td><i class='fas fa-fw fa-paperclip text-secondary mr-1'></i><?= $name ?></td>
+                        <td>
+                            <a target='_blank' class='mr-1 ml-1' href='ticket_attachment.php?attachment_id=<?= $ticket_attachment_id; ?>&action=view'>[View]</a><a href='ticket_attachment.php?attachment_id=<?= $ticket_attachment_id; ?>'>[Download]</a>
+                        </td>
+                    </tr>
+                    
+                 <?php  
+                }
+                ?>
+                </table>
+            </div>
+        </div>
+
+        <!-- Approvals -->
+        <?php if (mysqli_num_rows($sql_task_approvals) > 0) { ?>
+            <div class="card">
+                <div class="card-body">
+                    <h5>Approvals</h5>
+                    This ticket has tasks requiring approval:
+
+                    <ul>
+                        <?php
+
+                        while ($approvals = mysqli_fetch_assoc($sql_task_approvals)) {
+                            $task_id = intval($approvals['task_id']);
+                            $approval_id = intval($approvals['approval_id']);
+                            $task_name = escapeHtml($approvals['task_name']);
+                            $approval_type = escapeHtml($approvals['approval_type']);
+                            $approval_url_key = escapeHtml($approvals['approval_url_key']);
+
+                            $contact_can_approve = false; // Default
+
+                            if ($approval_type == 'any') {
+                                $contact_can_approve = true;
+                            }
+
+                            if ($session_contact_primary) {
+                                $contact_can_approve = true;
+                            }
+
+                            if ($approval_type == 'technical' && $session_contact_is_technical_contact) {
+                                $contact_can_approve = true;
+                            }
+
+                            if ($approval_type == 'billing' && $session_contact_is_billing_contact) {
+                                $contact_can_approve = true;
+                            }
+
+                            ?>
+
+                            <li>
+                                <?php echo $task_name;
+                                if ($contact_can_approve) { ?> - <a href="post.php?approve_ticket_task=<?= $task_id ?>&approval_id=<?= $approval_id ?>&approval_url_key=<?= $approval_url_key ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" class="confirm-link">Approve task</a> <?php }
+                                else {?> - Please ask your <?= $approval_type ?> contact to approve this task <?php } ?>
+                            </li>
+
+                        <?php } ?>
+
+                    </ul>
+
+
+
+                </div>
+            </div>
+        <?php } ?>
+
+        <hr>
+
+        <!-- Either show the reply comments box, option to re-open ticket, show ticket smiley feedback or thanks for feedback -->
+
+        <?php if (empty($ticket_resolved_at)) { ?>
+            <!-- Reply -->
+
+            <form action="post.php" enctype="multipart/form-data" method="post" class="card">
+                <div class="card-body">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                <input type="hidden" name="ticket_id" value="<?= $ticket_id ?>">
+                <div class="form-group">
+                    <label for="ticket-comment">Reply to this request</label>
+                    <textarea class="form-control tinymce" id="ticket-comment" name="comment" placeholder="Add an update"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="fileInput">Attachments</label>
+                    <input type="file" class="form-control-file" name="file[]" multiple id="fileInput" accept=".jpg, .jpeg, .gif, .png, .webp, .pdf, .txt, .md, .doc, .docx, .odt, .csv, .xls, .xlsx, .ods, .pptx, .odp, .zip, .tar, .gz, .xml, .msg, .json, .wav, .mp3, .ogg, .mov, .mp4, .av1, .ovpn">
+                </div>
+                <button type="submit" class="btn btn-primary" name="add_ticket_comment"><i class="fas fa-reply mr-2" aria-hidden="true"></i>Send reply</button>
+                </div>
+            </form>
+
+        <?php } elseif (empty($ticket_closed_at)) { ?>
+            <!-- Re-open -->
+
+            <h4>Your ticket has been resolved</h4>
+
+            <div class="col-6">
+                <div class="row">
+                    <div class="col">
+                        <a href="post.php?reopen_ticket=<?= $ticket_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" class="btn btn-secondary btn-lg"><i class="fas fa-fw fa-redo text-white"></i> Reopen ticket</a>
+                    </div>
+
+                    <div class="col">
+                        <a href="post.php?close_ticket=<?= $ticket_id ?>&csrf_token=<?= $_SESSION['csrf_token'] ?>" class="btn btn-success btn-lg confirm-link"><i class="fas fa-fw fa-gavel text-white"></i> Close ticket</a>
+                    </div>
+                </div>
+            </div>
+            <br>
+
+        <?php } elseif (empty($ticket_feedback)) { ?>
+
+            <h4>Ticket closed. Please rate your ticket</h4>
+
+            <form action="post.php" method="post">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                <input type="hidden" name="ticket_id" value="<?= $ticket_id ?>">
+
+                <button type="submit" class="btn btn-primary btn-lg" name="add_ticket_feedback" value="Good" onclick="this.form.submit()">
+                    <span class="fa fa-smile" aria-hidden="true"></span> Good
+                </button>
+
+                <button type="submit" class="btn btn-danger btn-lg" name="add_ticket_feedback" value="Bad" onclick="this.form.submit()">
+                    <span class="fa fa-frown" aria-hidden="true"></span> Bad
+                </button>
+            </form>
+
+        <?php } else { ?>
+
+            <h4>Rated <?= $ticket_feedback ?> -- Thanks for your feedback!</h4>
+
+        <?php } ?>
+
+        <!-- End comments/reopen/feedback -->
+
+        <hr>
+        <br>
+
+        <?php
+        $sql = mysqli_query($mysqli, "SELECT * FROM ticket_replies LEFT JOIN users ON ticket_reply_by = user_id LEFT JOIN contacts ON ticket_reply_by = contact_id WHERE ticket_reply_ticket_id = $ticket_id AND ticket_reply_archived_at IS NULL AND ticket_reply_type != 'Internal' ORDER BY ticket_reply_id DESC");
+
+        while ($row = mysqli_fetch_assoc($sql)) {
+            $ticket_reply_id = intval($row['ticket_reply_id']);
+            $ticket_reply = $purifier->purify($row['ticket_reply']);
+            $ticket_reply_created_at = escapeHtml($row['ticket_reply_created_at']);
+            $ticket_reply_updated_at = escapeHtml($row['ticket_reply_updated_at']);
+            $ticket_reply_by = intval($row['ticket_reply_by']);
+            $ticket_reply_type = $row['ticket_reply_type'];
+
+            if ($ticket_reply_type == "Client") {
+                $ticket_reply_by_display = escapeHtml($row['contact_name']);
+                $user_initials = initials($row['contact_name']);
+                $user_avatar = $row['contact_photo'];
+                $avatar_link = "../uploads/clients/$session_client_id/$user_avatar";
+            } else {
+                $ticket_reply_by_display = escapeHtml($row['user_name']);
+                $user_id = intval($row['user_id']);
+                $user_avatar = $row['user_avatar'];
+                $user_initials = initials($row['user_name']);
+                $avatar_link = "../uploads/users/$user_id/$user_avatar";
+            }
+
+            // Get attachments for this reply
+            $sql_ticket_reply_attachments = mysqli_query(
+                $mysqli,
+                "SELECT * FROM ticket_attachments
+                        WHERE ticket_attachment_reply_id = $ticket_reply_id
+                        AND ticket_attachment_ticket_id = $ticket_id"
+            );
+            ?>
+
+            <div class="card card-outline <?php if ($ticket_reply_type == 'Client') { echo "card-warning"; } else { echo "card-info"; } ?> mb-3">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <div class="media">
+                            <?php
+                            if (!empty($user_avatar)) {
+                                ?>
+                                <img src="<?= $avatar_link ?>" alt="Support conversation participant" class="img-size-50 mr-3 img-circle">
+                                <?php
+                            } else {
+                                ?>
+                                <span class="fa-stack fa-2x">
+                                    <i class="fa fa-circle fa-stack-2x text-secondary"></i>
+                                    <span class="fa fa-stack-1x text-white"><?= $user_initials ?></span>
+                                </span>
+                                <?php
+                            }
+                            ?>
+
+                            <div class="media-body">
+                                <?= $ticket_reply_by_display ?>
+                                <br>
+                                <small class="text-muted"><?= $ticket_reply_created_at ?> <?php if (!empty($ticket_reply_updated_at)) { echo "(edited: $ticket_reply_updated_at)"; } ?></small>
+                            </div>
+                        </div>
+                    </h3>
+                </div>
+
+                <div class="card-body prettyContent">
+                    <?= $ticket_reply ?>
+
+                    <table class="table-sm">
+
+                    <?php
+                    while ($ticket_attachment = mysqli_fetch_assoc($sql_ticket_reply_attachments)) {
+                        $ticket_attachment_id = intval($ticket_attachment['ticket_attachment_id']);
+                        $name = escapeHtml($ticket_attachment['ticket_attachment_name']);
+
+                        ?>
+
+                        <tr>
+                            <td><i class='fas fa-fw fa-paperclip text-secondary mr-1'></i><?= $name ?></td>
+                            <td>
+                                <a target='_blank' class='mr-1 ml-1' href='ticket_attachment.php?attachment_id=<?= $ticket_attachment_id; ?>&action=view'>[View]</a><a href='ticket_attachment.php?attachment_id=<?= $ticket_attachment_id; ?>'>[Download]</a>
+                            </td>
+                        </tr>
+                        
+                     <?php  
+                    }
+                    ?>
+                    </table>
+                </div>
+            </div>
+
+            <?php
+
+        }
+
+        ?>
+
+        <script src="../js/pretty_content.js"></script>
+
+        <?php
+    } else {
+        echo "Ticket ID not found!";
+    }
+
+} else {
+    header("Location: index.php");
+}
+
+require_once "includes/footer.php";

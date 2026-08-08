@@ -1,0 +1,897 @@
+/*
+ * IT Done Right LLC theme for ITFlow 26.08 / AdminLTE 3.2 / Bootstrap 4.6.
+ * Loaded after AdminLTE. All application overrides are scoped to .itdr-theme.
+ * No remote assets or fonts are required.
+ */
+
+.itdr-theme {
+    --itdr-ink: #0b0a17;
+    --itdr-night: #121124;
+    --itdr-elevated: #25284a;
+    --itdr-border-dark: #343858;
+    --itdr-cyan: #69bff5;
+    --itdr-cyan-strong: #49aee9;
+    --itdr-violet: #7888ff;
+    --itdr-white: #ffffff;
+    --itdr-cloud: #d9d9e5;
+    --itdr-muted-dark: #aeb3ca;
+    --itdr-gradient: linear-gradient(110deg, #7285f4 0%, #69c9ee 100%);
+    --itdr-focus: 0 0 0 4px rgba(105, 191, 245, 0.32);
+    --itdr-danger: #df4254;
+    --itdr-danger-soft: #ff7d8b;
+    --itdr-warning: #f0b54d;
+    --itdr-success: #38b889;
+    --itdr-info: #69bff5;
+    --itdr-radius: 0.25rem;
+    --itdr-radius-lg: 0.5rem;
+    --itdr-shadow: 0 18px 50px rgba(8, 8, 20, 0.16);
+    --itdr-font-interface: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --itdr-font-display: "Aptos Display", "Space Grotesk", Inter, ui-sans-serif, system-ui, sans-serif;
+    --itdr-font-data: "IBM Plex Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+    --itdr-page: #f3f4fa;
+    --itdr-surface: #ffffff;
+    --itdr-surface-2: #f8f8fc;
+    --itdr-border: #d7d9e7;
+    --itdr-text: #121124;
+    --itdr-copy: #53566a;
+    --itdr-muted: #6f7288;
+    color: var(--itdr-text);
+    font-family: var(--itdr-font-interface);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+.itdr-theme.dark-mode,
+.itdr-theme.itdr-auth,
+.itdr-theme.itdr-client {
+    color-scheme: dark;
+    --itdr-page: var(--itdr-ink);
+    --itdr-surface: var(--itdr-night);
+    --itdr-surface-2: #18172e;
+    --itdr-border: var(--itdr-border-dark);
+    --itdr-text: var(--itdr-white);
+    --itdr-copy: var(--itdr-cloud);
+    --itdr-muted: var(--itdr-muted-dark);
+}
+
+.itdr-theme *,
+.itdr-theme *::before,
+.itdr-theme *::after {
+    box-sizing: border-box;
+}
+
+.itdr-theme a {
+    color: #1677ad;
+    text-underline-offset: 0.18em;
+}
+
+.itdr-theme.dark-mode a,
+.itdr-theme.itdr-auth a,
+.itdr-theme.itdr-client a {
+    color: var(--itdr-cyan);
+}
+
+.itdr-theme a:hover {
+    color: var(--itdr-violet);
+}
+
+.itdr-theme :focus-visible {
+    border-radius: 0.15rem;
+    box-shadow: var(--itdr-focus);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+}
+
+.itdr-theme h1,
+.itdr-theme h2,
+.itdr-theme h3,
+.itdr-theme h4,
+.itdr-theme h5,
+.itdr-theme h6,
+.itdr-theme .card-title {
+    color: var(--itdr-text);
+    font-family: var(--itdr-font-display);
+    font-weight: 650;
+    letter-spacing: -0.015em;
+}
+
+.itdr-theme code,
+.itdr-theme kbd,
+.itdr-theme pre,
+.itdr-theme .itdr-data,
+.itdr-theme td:first-child a {
+    font-family: var(--itdr-font-data);
+}
+
+.itdr-theme .text-muted {
+    color: var(--itdr-muted) !important;
+}
+
+.itdr-theme .text-secondary {
+    color: var(--itdr-copy) !important;
+}
+
+.itdr-theme hr {
+    border-color: var(--itdr-border);
+}
+
+/* Buttons */
+.itdr-theme .btn {
+    border-radius: var(--itdr-radius);
+    font-weight: 650;
+    letter-spacing: 0.005em;
+    min-height: 2.5rem;
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.itdr-theme .btn:hover {
+    transform: translateY(-1px);
+}
+
+.itdr-theme .btn:active {
+    transform: translateY(0);
+}
+
+.itdr-theme .btn-primary {
+    background: var(--itdr-cyan);
+    border-color: var(--itdr-cyan);
+    color: var(--itdr-ink);
+}
+
+.itdr-theme .btn-primary:hover,
+.itdr-theme .btn-primary:focus {
+    background: var(--itdr-cyan-strong);
+    border-color: var(--itdr-cyan-strong);
+    color: var(--itdr-ink);
+}
+
+.itdr-theme .btn-outline-primary {
+    border-color: #278bc3;
+    color: #1677ad;
+}
+
+.itdr-theme.dark-mode .btn-outline-primary,
+.itdr-theme.itdr-client .btn-outline-primary {
+    border-color: var(--itdr-cyan);
+    color: var(--itdr-cyan);
+}
+
+.itdr-theme .btn-secondary,
+.itdr-theme .btn-dark {
+    background: var(--itdr-elevated);
+    border-color: #4b5077;
+    color: var(--itdr-white);
+}
+
+.itdr-theme .btn-success {
+    background: #16845f;
+    border-color: #16845f;
+    color: var(--itdr-white);
+}
+
+.itdr-theme .btn-danger {
+    background: #c73547;
+    border-color: #c73547;
+    color: var(--itdr-white);
+}
+
+.itdr-theme .btn-warning {
+    background: var(--itdr-warning);
+    border-color: var(--itdr-warning);
+    color: var(--itdr-ink);
+}
+
+.itdr-theme .btn-default,
+.itdr-theme .btn-light,
+.itdr-theme .btn-outline-dark,
+.itdr-theme .btn-outline-secondary {
+    background: var(--itdr-surface-2);
+    border-color: var(--itdr-border);
+    color: var(--itdr-text);
+}
+
+.itdr-theme .btn-sm {
+    min-height: 2.125rem;
+}
+
+/* Anchor buttons need explicit colors because portal links use cyan by default. */
+.itdr-theme a.btn-primary,
+.itdr-theme a.btn-warning {
+    color: var(--itdr-ink);
+}
+
+.itdr-theme a.btn-secondary,
+.itdr-theme a.btn-dark,
+.itdr-theme a.btn-success,
+.itdr-theme a.btn-danger {
+    color: var(--itdr-white);
+}
+
+.itdr-theme a.btn-default,
+.itdr-theme a.btn-light,
+.itdr-theme a.btn-outline-dark,
+.itdr-theme a.btn-outline-secondary {
+    color: var(--itdr-text);
+}
+
+/* Forms */
+.itdr-theme label {
+    color: var(--itdr-text);
+    font-weight: 650;
+}
+
+.itdr-theme .form-control,
+.itdr-theme .custom-select,
+.itdr-theme .input-group-text,
+.itdr-theme .select2-container--default .select2-selection--single,
+.itdr-theme .select2-container--default .select2-selection--multiple {
+    background: var(--itdr-surface-2);
+    border-color: var(--itdr-border);
+    border-radius: var(--itdr-radius);
+    color: var(--itdr-text);
+    min-height: 2.75rem;
+}
+
+.itdr-theme .form-control::placeholder {
+    color: var(--itdr-muted);
+    opacity: 1;
+}
+
+.itdr-theme .form-control:focus,
+.itdr-theme .custom-select:focus,
+.itdr-theme .select2-container--focus .select2-selection {
+    background: var(--itdr-surface);
+    border-color: var(--itdr-cyan);
+    box-shadow: var(--itdr-focus);
+    color: var(--itdr-text);
+}
+
+.itdr-theme .input-group-text {
+    color: var(--itdr-cyan);
+    min-width: 2.75rem;
+    justify-content: center;
+}
+
+.itdr-theme .custom-control-label::before {
+    background: var(--itdr-surface-2);
+    border-color: var(--itdr-border);
+}
+
+.itdr-theme .custom-control-input:checked ~ .custom-control-label::before {
+    background: var(--itdr-cyan);
+    border-color: var(--itdr-cyan);
+}
+
+.itdr-theme .form-text {
+    color: var(--itdr-muted);
+}
+
+.itdr-theme .select2-dropdown,
+.itdr-theme .daterangepicker,
+.itdr-theme .dropdown-menu {
+    background: var(--itdr-surface);
+    border: 1px solid var(--itdr-border);
+    border-radius: var(--itdr-radius);
+    box-shadow: var(--itdr-shadow);
+    color: var(--itdr-text);
+}
+
+.itdr-theme .dropdown-item,
+.itdr-theme .select2-results__option {
+    color: var(--itdr-text);
+}
+
+.itdr-theme .dropdown-item:hover,
+.itdr-theme .dropdown-item:focus,
+.itdr-theme .select2-results__option--highlighted[aria-selected] {
+    background: rgba(105, 191, 245, 0.14);
+    color: var(--itdr-text);
+}
+
+/* Cards, tables and status */
+.itdr-theme .card,
+.itdr-theme .modal-content,
+.itdr-theme .info-box,
+.itdr-theme .small-box {
+    background: var(--itdr-surface);
+    border: 1px solid var(--itdr-border);
+    border-radius: var(--itdr-radius-lg);
+    box-shadow: 0 8px 24px rgba(8, 8, 20, 0.07);
+    color: var(--itdr-copy);
+}
+
+.itdr-theme .card-header,
+.itdr-theme .modal-header,
+.itdr-theme .modal-footer {
+    background: var(--itdr-surface-2);
+    border-color: var(--itdr-border);
+}
+
+.itdr-theme .card-dark > .card-header,
+.itdr-theme .bg-dark,
+.itdr-theme .thead-dark th {
+    background: var(--itdr-elevated) !important;
+    border-color: var(--itdr-border) !important;
+    color: var(--itdr-white) !important;
+}
+
+.itdr-theme .card-primary.card-outline,
+.itdr-theme .card-info.card-outline {
+    border-top-color: var(--itdr-cyan);
+}
+
+.itdr-theme .card-warning.card-outline {
+    border-top-color: var(--itdr-warning);
+}
+
+.itdr-theme .table {
+    color: var(--itdr-text);
+}
+
+.itdr-theme .table th {
+    border-color: var(--itdr-border);
+    color: var(--itdr-copy);
+    font-size: 0.75rem;
+    font-weight: 750;
+    letter-spacing: 0.075em;
+    text-transform: uppercase;
+}
+
+.itdr-theme .table td {
+    border-color: var(--itdr-border);
+    vertical-align: middle;
+}
+
+.itdr-theme .table-hover tbody tr:hover,
+.itdr-theme .table-striped tbody tr:nth-of-type(odd) {
+    background: rgba(120, 136, 255, 0.055);
+}
+
+.itdr-theme .badge {
+    border-radius: 999px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.itdr-theme .badge-primary,
+.itdr-theme .badge-info {
+    background: #176f9f;
+    color: var(--itdr-white);
+}
+
+.itdr-theme .badge-success {
+    background: #147a58;
+    color: var(--itdr-white);
+}
+
+.itdr-theme .badge-danger {
+    background: #bd3042;
+    color: var(--itdr-white);
+}
+
+.itdr-theme .badge-warning {
+    background: var(--itdr-warning);
+    color: var(--itdr-ink);
+}
+
+.itdr-theme .badge-light {
+    background: var(--itdr-surface-2);
+    border: 1px solid var(--itdr-border);
+    color: var(--itdr-text);
+}
+
+.itdr-theme .alert {
+    background: var(--itdr-surface-2);
+    border: 1px solid var(--itdr-border);
+    border-left-width: 4px;
+    border-radius: var(--itdr-radius);
+    color: var(--itdr-text);
+}
+
+.itdr-theme .alert-info,
+.itdr-theme .alert-primary {
+    border-left-color: var(--itdr-info);
+}
+
+.itdr-theme .alert-success {
+    border-left-color: var(--itdr-success);
+}
+
+.itdr-theme .alert-warning {
+    border-left-color: var(--itdr-warning);
+}
+
+.itdr-theme .alert-danger {
+    border-left-color: var(--itdr-danger-soft);
+}
+
+.itdr-theme .breadcrumb {
+    background: transparent;
+    padding-left: 0;
+}
+
+.itdr-theme .page-link {
+    background: var(--itdr-surface);
+    border-color: var(--itdr-border);
+    color: #1677ad;
+}
+
+.itdr-theme.dark-mode .page-link,
+.itdr-theme.itdr-client .page-link {
+    color: var(--itdr-cyan);
+}
+
+.itdr-theme .page-item.active .page-link {
+    background: var(--itdr-cyan);
+    border-color: var(--itdr-cyan);
+    color: var(--itdr-ink);
+}
+
+/* Authentication */
+body.itdr-auth {
+    background:
+        radial-gradient(circle at 12% 10%, rgba(120, 136, 255, 0.18), transparent 30rem),
+        radial-gradient(circle at 88% 88%, rgba(105, 191, 245, 0.15), transparent 30rem),
+        var(--itdr-ink);
+    color: var(--itdr-copy);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    position: relative;
+}
+
+body.itdr-auth::before {
+    background-image: linear-gradient(rgba(105, 191, 245, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(105, 191, 245, 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    content: "";
+    inset: 0;
+    mask-image: linear-gradient(to bottom, black, transparent 80%);
+    pointer-events: none;
+    position: fixed;
+}
+
+.itdr-auth .login-box {
+    max-width: 27rem;
+    position: relative;
+    width: 100%;
+    z-index: 1;
+}
+
+.itdr-auth .login-logo {
+    margin-bottom: 1.25rem;
+}
+
+.itdr-auth .login-logo img {
+    max-height: 5.5rem;
+    object-fit: contain;
+    width: auto;
+}
+
+.itdr-auth .login-logo .itdr-fallback-logo {
+    color: var(--itdr-white);
+    font-family: var(--itdr-font-display);
+    font-size: 1.35rem;
+    font-style: italic;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+.itdr-auth .login-logo .itdr-fallback-logo i {
+    color: var(--itdr-cyan);
+}
+
+.itdr-auth .card {
+    backdrop-filter: blur(16px);
+    background: rgba(18, 17, 36, 0.94);
+    border-color: rgba(105, 191, 245, 0.24);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.42);
+    overflow: hidden;
+}
+
+.itdr-auth .login-card-body {
+    background: transparent;
+    color: var(--itdr-copy);
+    padding: 2rem;
+}
+
+.itdr-theme .itdr-eyebrow {
+    color: var(--itdr-cyan);
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    margin-bottom: 0.6rem;
+    text-transform: uppercase;
+}
+
+.itdr-auth .itdr-auth-title {
+    font-size: clamp(1.65rem, 5vw, 2.25rem);
+    line-height: 1.15;
+    margin-bottom: 0.65rem;
+}
+
+.itdr-auth .itdr-auth-copy {
+    color: var(--itdr-copy);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.itdr-auth .itdr-field-label {
+    display: block;
+    font-size: 0.875rem;
+    margin-bottom: 0.45rem;
+}
+
+.itdr-auth .btn-primary,
+.itdr-client .itdr-portal-cta {
+    background: var(--itdr-gradient);
+    border-color: transparent;
+    color: var(--itdr-ink);
+}
+
+.itdr-auth .btn-primary:hover,
+.itdr-client .itdr-portal-cta:hover {
+    background: linear-gradient(110deg, #8291f7 0%, #7bd2f1 100%);
+    border-color: transparent;
+    color: var(--itdr-ink);
+}
+
+.itdr-auth .itdr-security-note {
+    align-items: flex-start;
+    border-top: 1px solid var(--itdr-border);
+    color: var(--itdr-muted);
+    display: flex;
+    font-size: 0.78rem;
+    gap: 0.55rem;
+    line-height: 1.5;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+}
+
+.itdr-auth .itdr-security-note i {
+    color: var(--itdr-cyan);
+    margin-top: 0.18rem;
+}
+
+.itdr-auth .itdr-auth-footer {
+    color: var(--itdr-muted);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 0.82rem;
+    gap: 0.35rem 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+/* Customer portal */
+body.itdr-client {
+    background:
+        radial-gradient(circle at 90% 0%, rgba(120, 136, 255, 0.11), transparent 30rem),
+        var(--itdr-page);
+    color: var(--itdr-copy);
+    min-height: 100vh;
+}
+
+.itdr-client .itdr-client-nav {
+    background: rgba(18, 17, 36, 0.96);
+    border-bottom: 1px solid var(--itdr-border);
+    min-height: 4.75rem;
+}
+
+.itdr-client .navbar-brand {
+    color: var(--itdr-white);
+    font-family: var(--itdr-font-display);
+    font-style: italic;
+    font-weight: 800;
+    letter-spacing: 0.015em;
+}
+
+.itdr-client .navbar-brand::before {
+    border: 2px solid var(--itdr-cyan);
+    content: "";
+    display: inline-block;
+    height: 0.78rem;
+    margin-right: 0.5rem;
+    transform: skew(-14deg);
+    width: 0.95rem;
+}
+
+.itdr-client .navbar-dark .navbar-nav .nav-link {
+    color: var(--itdr-cloud);
+    font-size: 0.875rem;
+    font-weight: 650;
+}
+
+.itdr-client .navbar-dark .navbar-nav .active > .nav-link,
+.itdr-client .navbar-dark .navbar-nav .nav-link.active,
+.itdr-client .navbar-dark .navbar-nav .nav-link:hover {
+    color: var(--itdr-white);
+}
+
+.itdr-client .navbar-dark .navbar-nav .nav-link.active {
+    box-shadow: inset 0 -2px var(--itdr-cyan);
+}
+
+.itdr-client .itdr-client-shell {
+    max-width: 76rem;
+    padding-bottom: 2.5rem;
+    padding-top: 1.75rem;
+}
+
+.itdr-client .itdr-client-welcome {
+    align-items: center;
+    background: linear-gradient(110deg, rgba(120, 136, 255, 0.11), rgba(105, 191, 245, 0.07));
+    border: 1px solid var(--itdr-border);
+    border-radius: var(--itdr-radius-lg);
+    margin-bottom: 2rem;
+    padding: 1rem 1.25rem;
+}
+
+.itdr-client .itdr-client-welcome h1 {
+    font-size: 1.35rem;
+    margin: 0;
+}
+
+.itdr-client .itdr-client-welcome .itdr-avatar {
+    flex: 0 0 auto;
+}
+
+.itdr-client .itdr-client-logo {
+    max-height: 3rem;
+    max-width: 9rem;
+    object-fit: contain;
+}
+
+.itdr-client .card {
+    transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.itdr-client a.card:hover,
+.itdr-client a .card:hover {
+    border-color: rgba(105, 191, 245, 0.55);
+    transform: translateY(-2px);
+}
+
+.itdr-client .text-dark {
+    color: var(--itdr-text) !important;
+}
+
+.itdr-client .table-bordered,
+.itdr-client .border-dark {
+    border-color: var(--itdr-border) !important;
+}
+
+.itdr-client .itdr-ticket-title {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.itdr-client .itdr-client-footer {
+    border-top: 1px solid var(--itdr-border);
+    color: var(--itdr-muted);
+    font-size: 0.85rem;
+    margin-top: 3rem;
+    padding: 1.5rem 0 2rem;
+    text-align: center;
+}
+
+/* Agent and administrator shell */
+.itdr-agent .content-wrapper {
+    background: var(--itdr-page);
+    color: var(--itdr-copy);
+}
+
+.itdr-agent .main-header {
+    background: var(--itdr-night) !important;
+    border-bottom: 1px solid var(--itdr-border-dark);
+}
+
+.itdr-agent .main-header .nav-link,
+.itdr-agent .main-header .navbar-nav .nav-link {
+    color: var(--itdr-cloud);
+}
+
+.itdr-agent .main-header .form-control-navbar {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: var(--itdr-white);
+}
+
+.itdr-agent .main-header .btn-navbar {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: var(--itdr-cyan);
+}
+
+.itdr-agent .main-sidebar {
+    background: var(--itdr-night);
+    border-right: 1px solid var(--itdr-border-dark);
+}
+
+.itdr-agent .brand-link {
+    background: var(--itdr-ink);
+    border-bottom: 1px solid var(--itdr-border-dark);
+    color: var(--itdr-white);
+    min-height: 4.15rem;
+}
+
+.itdr-agent .brand-link .brand-image {
+    border: 2px solid var(--itdr-cyan);
+    height: 1rem;
+    margin: 0.65rem 0.75rem 0 0.35rem;
+    opacity: 1;
+    transform: skew(-14deg);
+    width: 1.15rem;
+}
+
+.itdr-agent .brand-link .brand-text {
+    font-family: var(--itdr-font-display);
+    font-style: italic;
+    font-weight: 800 !important;
+    letter-spacing: 0.01em;
+}
+
+.itdr-agent .nav-sidebar .nav-header {
+    color: #8f96b5;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+}
+
+.itdr-agent .nav-sidebar .nav-link {
+    border-radius: var(--itdr-radius);
+    color: #c8cad8;
+    margin-bottom: 0.15rem;
+}
+
+.itdr-agent .nav-sidebar .nav-link:hover {
+    background: rgba(105, 191, 245, 0.09);
+    color: var(--itdr-white);
+}
+
+.itdr-agent .nav-sidebar > .nav-item > .nav-link.active {
+    background: var(--itdr-gradient);
+    box-shadow: none;
+    color: var(--itdr-ink);
+    font-weight: 700;
+}
+
+.itdr-agent .nav-sidebar > .nav-item > .nav-link.active .nav-icon {
+    color: var(--itdr-ink);
+}
+
+.itdr-agent .content-header h1,
+.itdr-agent .content h1 {
+    font-size: clamp(1.65rem, 3vw, 2.25rem);
+}
+
+.itdr-agent .user-menu .user-header {
+    background: var(--itdr-elevated) !important;
+}
+
+.itdr-agent .navbar-badge {
+    background: var(--itdr-cyan);
+    color: var(--itdr-ink);
+}
+
+.itdr-agent .dataTables_wrapper .dataTables_filter input,
+.itdr-agent .dataTables_wrapper .dataTables_length select {
+    background: var(--itdr-surface-2);
+    border: 1px solid var(--itdr-border);
+    color: var(--itdr-text);
+}
+
+.itdr-agent.dark-mode .content-wrapper,
+.itdr-agent.dark-mode .main-footer {
+    background: var(--itdr-page);
+    color: var(--itdr-copy);
+}
+
+.itdr-agent.dark-mode .card,
+.itdr-agent.dark-mode .modal-content {
+    background: var(--itdr-surface);
+    color: var(--itdr-copy);
+}
+
+/* Responsive behavior */
+@media (max-width: 991.98px) {
+    .itdr-client .navbar-collapse {
+        background: var(--itdr-night);
+        border: 1px solid var(--itdr-border);
+        border-radius: var(--itdr-radius-lg);
+        margin-top: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .itdr-client .navbar-dark .navbar-nav .nav-link.active {
+        box-shadow: inset 3px 0 var(--itdr-cyan);
+        padding-left: 0.75rem;
+    }
+
+    .itdr-client .itdr-portal-cta {
+        display: inline-flex;
+        margin: 0.5rem 0;
+    }
+}
+
+@media (max-width: 767.98px) {
+    body.itdr-auth {
+        justify-content: flex-start;
+        padding-top: 1.25rem;
+    }
+
+    .itdr-auth .login-card-body {
+        padding: 1.35rem;
+    }
+
+    .itdr-client .itdr-client-shell {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .itdr-client .itdr-client-welcome {
+        align-items: flex-start;
+    }
+
+    .itdr-client .itdr-client-logo {
+        display: none;
+    }
+
+    .itdr-client .table-responsive {
+        border: 1px solid var(--itdr-border);
+        border-radius: var(--itdr-radius);
+    }
+
+    .itdr-agent .content.mt-3 {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .itdr-theme .btn:not(.btn-sm):not(.dropdown-toggle-split) {
+        min-height: 2.75rem;
+    }
+
+    .itdr-auth .login-logo img {
+        max-height: 4rem;
+    }
+
+    .itdr-client .itdr-client-welcome h1 {
+        font-size: 1.15rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .itdr-theme *,
+    .itdr-theme *::before,
+    .itdr-theme *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+@media print {
+    .itdr-theme {
+        --itdr-page: #ffffff;
+        --itdr-surface: #ffffff;
+        --itdr-surface-2: #ffffff;
+        --itdr-border: #b8b8b8;
+        --itdr-text: #000000;
+        --itdr-copy: #222222;
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    .itdr-theme .card,
+    .itdr-theme .table,
+    .itdr-theme .content-wrapper {
+        box-shadow: none !important;
+    }
+}
