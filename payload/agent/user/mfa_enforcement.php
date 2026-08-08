@@ -46,21 +46,21 @@ $data = "otpauth://totp/ITFlow:$session_email?secret=$token";
     <!-- Theme style -->
     <link rel="stylesheet" href="../../libs/adminlte/css/adminlte.min.css">
     <link href="../../libs/toastr/toastr.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../css/itdoneright-theme.css">
+    <link rel="stylesheet" href="../../css/nexus-theme.css">
 
     <!-- jQuery -->
     <script src="../../libs/jquery/jquery.min.js"></script>
     <script src="../../libs/toastr/toastr.min.js"></script>
 
 </head>
-<body class="hold-transition login-page itdr-theme itdr-auth">
+<body class="hold-transition login-page nexus-theme nexus-auth">
     <?php require_once "../../includes/inc_alert_feedback.php"; ?>
     <div class="login-box">
         <div class="login-logo">
             <?php if (!empty($company_logo)) { ?>
                 <img alt="<?= escapeHtml($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?= "../../uploads/settings/$company_logo" ?>">
             <?php } else { ?>
-                <span class="itdr-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml($session_company_name) ?></span>
+                <span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml($session_company_name) ?></span>
             <?php } ?>
         </div>
 
@@ -68,9 +68,9 @@ $data = "otpauth://totp/ITFlow:$session_email?secret=$token";
         <div class="card">
             <div class="card-body login-card-body text-center">
 
-                <span class="itdr-eyebrow">Account protection</span>
-                <h1 class="itdr-auth-title">Set up multi-factor authentication</h1>
-                <p class="itdr-auth-copy">Scan the QR code with your authenticator app, then enter the six-digit code to confirm setup.</p>
+                <span class="nexus-eyebrow">Account protection</span>
+                <h1 class="nexus-auth-title">Set up multi-factor authentication</h1>
+                <p class="nexus-auth-copy">Scan the QR code with your authenticator app, then enter the six-digit code to confirm setup.</p>
 
                 <form action="post.php" method="post" autocomplete="off">
                     <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
@@ -82,7 +82,7 @@ $data = "otpauth://totp/ITFlow:$session_email?secret=$token";
                         <button type="button" class='btn btn-sm clipboardjs' data-clipboard-text='<?= $token ?>'><i class='far fa-copy text-secondary'></i></button>
                     </p>
 
-                    <label class="itdr-field-label text-left" for="verify-code">Authentication code</label>
+                    <label class="nexus-field-label text-left" for="verify-code">Authentication code</label>
                     <div class="input-group mb-3">
                         <input type="text" class="form-control" id="verify-code" inputmode="numeric" pattern="[0-9]*" minlength="6" maxlength="6" name="verify_code" autocomplete="one-time-code" placeholder="6-digit code" required>
                         <div class="input-group-append">

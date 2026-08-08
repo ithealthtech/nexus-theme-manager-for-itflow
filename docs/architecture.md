@@ -13,10 +13,10 @@ References:
 
 ## State model
 
-The default state root is `/var/lib/itdr-itflow-theme`. Each ITFlow document root receives a deterministic instance ID derived from the canonical path.
+The default state root is `/var/lib/nexus-itflow-theme`. Each ITFlow document root receives a deterministic instance ID derived from the canonical path.
 
 ```text
-/var/lib/itdr-itflow-theme/
+/var/lib/nexus-itflow-theme/
   <instance-id>.lock
   <instance-id>/
     state.json

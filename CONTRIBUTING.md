@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for helping improve the IT Done Right theme manager.
+Thank you for helping improve the Nexus Theme Manager for IT Flow.
 
 ## Before opening a change
 

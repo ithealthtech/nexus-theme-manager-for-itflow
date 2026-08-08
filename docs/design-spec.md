@@ -1,13 +1,13 @@
-# IT Done Right LLC / ITFlow Theme Design Specification
+# Nexus Theme Manager for IT Flow Design Specification
 
 - Date: 2026-08-08
 - Implementation baseline: ITFlow 26.08, commit `ccaa45b0ae9900ad731a6491559f65ff8d87a8f3`
 
 ## Design intent
 
-The support portal is the operational continuation of `itdonerightnc.com`: dark, direct, technically capable, and reassuring. Customer surfaces are dark-first and spacious. Technician surfaces retain a light, high-density work area with a dark branded shell; ITFlow's existing user-selectable dark mode remains supported.
+Nexus provides a dark, direct, technically capable, and reassuring support experience without hard-coding an operator's company identity. Customer surfaces are dark-first and spacious. Technician surfaces retain a light, high-density work area with a cohesive dark shell; ITFlow's existing user-selectable dark mode remains supported.
 
-No Northstar copy, fictional marketing metrics, remote fonts, trackers, or hotlinked website assets are included. Company name, logo, favicon, user, client, module, permission, and white-label values remain dynamic.
+No company-specific copy, fictional marketing metrics, remote fonts, trackers, or hotlinked website assets are included. Company name, logo, favicon, user, client, module, permission, and white-label values remain dynamic.
 
 ## Central tokens
 
@@ -18,7 +18,7 @@ No Northstar copy, fictional marketing metrics, remote fonts, trackers, or hotli
 | Elevated dark | `#25284A` | Secondary controls and selected utility surfaces |
 | Dark border | `#343858` | Dividers and component outlines |
 | Cyan | `#69BFF5` | Links, focus, informational states, standard actions |
-| Violet | `#7888FF` | Hover and limited brand accent |
+| Violet | `#7888FF` | Hover and limited interface accent |
 | Gradient | `linear-gradient(110deg, #7285F4, #69C9EE)` | Major calls to action and active navigation only |
 | White | `#FFFFFF` | Dark-surface headings |
 | Soft copy | `#D9D9E5` | Dark-surface body copy |
@@ -39,17 +39,17 @@ Typography uses local/system fallbacks only:
 
 ### Unified authentication
 
-1. Dynamic company brand/fallback
+1. Dynamic company identity/fallback
 2. Context eyebrow and state-specific heading
 3. Persistent labels and existing controls
 4. Existing feedback region
 5. Existing password reset, role choice, MFA, remember-me, and Entra paths
 6. Security reassurance
-7. Back-to-website and ITFlow attribution
+7. Optional ITFlow attribution when white-label mode is disabled
 
 ### Customer portal
 
-1. Company brand
+1. Dynamic company identity
 2. Home and tickets
 3. Permission-controlled finance and technical sections
 4. Unmistakable create-request action
@@ -57,7 +57,7 @@ Typography uses local/system fallbacks only:
 6. Account/profile/sign-out menu
 7. Welcome and request context
 8. Page-specific dashboard, list, conversation, form, or profile content
-9. Branded footer with return link
+9. Company footer without a hard-coded external destination
 
 ### Technician and administrator UI
 
@@ -73,7 +73,7 @@ Typography uses local/system fallbacks only:
 |---|---|
 | Primary action | Cyan for normal actions; gradient for authentication and the customer create-request CTA |
 | Secondary action | Elevated neutral surface with visible border |
-| Destructive action | Conventional red; never replaced by brand colors |
+| Destructive action | Conventional red; never replaced by theme accent colors |
 | Focus | Four-pixel translucent cyan ring plus transparent outline fallback |
 | Form controls | Persistent labels, 44px height, clear focus border/ring, system autofill-compatible |
 | Cards | Thin border, 4–8px radius, restrained shadow, no decorative glass effects in technician work areas |
@@ -96,38 +96,11 @@ Typography uses local/system fallbacks only:
 
 ## Annotated preview notes
 
-### Authentication
+### Visual review checklist
 
-![Branded login, desktop](../screenshots/login-after-desktop.png)
-
-- Brand moment is concentrated at the logo, eyebrow, and gradient submit action.
-- Labels persist independently of placeholders.
-- The security note and return link support trust without adding marketing clutter.
-
-![Branded login, 375px](../screenshots/login-after-mobile-375.png)
-
-### Customer portal
-
-![Customer portal, desktop](../screenshots/client-after-desktop.png)
-
-- Create support request is visible in the global portal header and in contextual content.
+- Authentication labels remain visible independently of placeholders.
+- Security reassurance is present without organization-specific marketing copy or links.
+- The customer portal keeps the create-request action prominent at desktop and mobile widths.
 - Ticket number, subject, status text, and update time form the primary scan path.
-
-![Customer portal, 375px](../screenshots/client-after-mobile-375.png)
-
-### Technician interface
-
-![Technician interface, desktop](../screenshots/agent-after-desktop.png)
-
-- Brand treatment is kept in the shell; operational content remains dense and light by default.
+- Technician operational content remains dense and light by default while the shell uses Nexus tokens.
 - Priority and status badges retain conventional semantics and text labels.
-
-![Technician interface, 375px](../screenshots/agent-after-mobile-375.png)
-
-## Baseline comparison
-
-The baseline screenshots are representative static renders of the pinned AdminLTE 3.2 shell, not production screenshots and not a copy of real client data.
-
-![AdminLTE login baseline](../screenshots/login-before-adminlte.png)
-
-![AdminLTE technician baseline](../screenshots/agent-before-adminlte.png)

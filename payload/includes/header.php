@@ -36,15 +36,15 @@ header("X-Frame-Options: DENY");
     <link rel="stylesheet" href="/libs/intl-tel-input/css/intlTelInput.min.css">
     <link rel="stylesheet" href="/css/itflow_custom.css">
     <link rel="stylesheet" href="/libs/adminlte/css/adminlte.min.css">
-    <!-- IT Done Right theme: intentionally loaded after AdminLTE -->
-    <link rel="stylesheet" href="/css/itdoneright-theme.css">
+    <!-- Nexus theme: intentionally loaded after AdminLTE -->
+    <link rel="stylesheet" href="/css/nexus-theme.css">
 
     <!-- Scripts -->
     <script src="/libs/jquery/jquery.min.js"></script>
     <script src="/libs/toastr/toastr.min.js"></script>
 </head>
 <body class="
-    hold-transition sidebar-mini layout-fixed layout-navbar-fixed itdr-theme itdr-agent
+    hold-transition sidebar-mini layout-fixed layout-navbar-fixed nexus-theme nexus-agent
     accent-<?= escapeHtml($config_theme) ?>
     <?php if ($user_config_theme_dark) echo 'dark-mode'; ?>
 ">

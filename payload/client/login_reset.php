@@ -186,19 +186,19 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     <!-- Theme style -->
     <link rel="stylesheet" href="../libs/adminlte/css/adminlte.min.css">
-    <link rel="stylesheet" href="../css/itdoneright-theme.css">
+    <link rel="stylesheet" href="../css/nexus-theme.css">
 
 </head>
 
-<body class="hold-transition login-page itdr-theme itdr-auth">
+<body class="hold-transition login-page nexus-theme nexus-auth">
 <div class="login-box">
-    <div class="login-logo"><span class="itdr-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml($company_name_display) ?></span></div>
+    <div class="login-logo"><span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml($company_name_display) ?></span></div>
     <div class="card">
         <div class="card-body login-card-body">
 
-            <span class="itdr-eyebrow">Secure account recovery</span>
-            <h1 class="itdr-auth-title">Reset your password</h1>
-            <p class="itdr-auth-copy">Enter your registered email address, or choose a new password when using a valid recovery link.</p>
+            <span class="nexus-eyebrow">Secure account recovery</span>
+            <h1 class="nexus-auth-title">Reset your password</h1>
+            <p class="nexus-auth-copy">Enter your registered email address, or choose a new password when using a valid recovery link.</p>
 
             <form method="post">
 
@@ -218,7 +218,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                     // Sanity check
                     if (sha1($user_row['user_password_reset_token']) == sha1($token)) { ?>
 
-                        <label class="itdr-field-label" for="reset-password">New password</label>
+                        <label class="nexus-field-label" for="reset-password">New password</label>
                         <div class="input-group mb-3">
                             <input type="password" class="form-control" id="reset-password" placeholder="At least 8 characters" name="new_password" autocomplete="new-password" required minlength="8">
                             <div class="input-group-append">
@@ -247,7 +247,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                      */
                 } else { ?>
 
-                    <label class="itdr-field-label" for="reset-email">Registered email address</label>
+                    <label class="nexus-field-label" for="reset-email">Registered email address</label>
                     <div class="input-group mb-3">
                         <input type="email" class="form-control" id="reset-email" placeholder="you@company.com" name="email" autocomplete="email" required autofocus>
                         <div class="input-group-append">
@@ -276,7 +276,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
             <a href="/login.php"><i class="fas fa-arrow-left mr-2" aria-hidden="true"></i>Back to login</a>
 
-            <div class="itdr-security-note">
+            <div class="nexus-security-note">
                 <i class="fas fa-shield-alt" aria-hidden="true"></i>
                 <span>For your security, recovery links can expire and should not be shared.</span>
             </div>
@@ -290,8 +290,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 </div>
 <!-- /.login-box -->
-
-<div class="itdr-auth-footer"><a href="https://itdonerightnc.com/">Back to IT Done Right</a></div>
 
 <!-- jQuery -->
 <script src="../libs/jquery/jquery.min.js"></script>

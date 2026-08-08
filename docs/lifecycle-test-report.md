@@ -1,9 +1,9 @@
 # Lifecycle test report
 
 - Date: 2026-08-08
-- Manager version: 1.0.0
-- Payload version: 26.08.1
-- PHP runtime: 8.4.16 CLI
+- Manager version: 2.0.0
+- Payload version: 26.08.2
+- PHP runtime: 8.4.24 CLI
 
 ## Syntax validation
 
@@ -11,6 +11,7 @@
 - `tests/lifecycle.php`: Pass
 - Payload PHP files: 12/12 pass
 - Baseline PHP files: 12/12 pass
+- Total PHP files: 26/26 pass
 
 ## Automated lifecycle simulation
 
@@ -28,28 +29,20 @@ The test creates isolated initialized ITFlow fixtures and state roots, then runs
 | Duplicate install refusal | Pass |
 | Invalid enable/disable state refusal | Pass |
 | Disable restores 12 originals | Pass |
-| Disable removes theme-owned CSS | Pass |
+| Disable removes theme-owned `css/nexus-theme.css` | Pass |
 | Enable reapplies and verifies payload | Pass |
 | Post-install drift detection | Pass |
 | Uninstall refuses to overwrite drift | Pass |
 | Normal uninstall restores originals | Pass |
 | Normal uninstall archives recovery state | Pass |
 | Purge uninstall removes active state | Pass |
-| Incompatible baseline refusal | Pass |
-| Incompatible baseline remains unmodified | Pass |
+| Incompatible baseline refusal without mutation | Pass |
 | Payload checksum tamper detection | Pass |
 | Exact existing-payload adoption | Pass |
 | Adopted installation verification | Pass |
 | Adopted-install uninstall/restore | Pass |
 | Non-exact adoption refusal | Pass |
 
-## Existing theme QA retained
-
-- Static request/markup/theme checks: 110 passed, 0 failed
-- Responsive preview matrix: 21/21 page/viewport combinations passed
-- Production PHP lint during the original deployment: 12/12 before and after installation
-- Production installed-file integrity during the original deployment: 13/13
-
 ## Platform coverage
 
-The automated lifecycle suite ran on Windows to exercise cross-platform path and replacement behavior. The payload itself previously passed PHP 8.4.16 lint and live activation on Debian 12 with Apache. A final operator should still run `doctor`, take an application backup, and perform a staging install on each new server before production promotion.
+The lifecycle suite ran on Windows to exercise cross-platform path and replacement behavior. GitHub CI repeats linting and lifecycle tests on PHP 8.2, 8.3, and 8.4 under Linux. Run `doctor`, take verified backups, and perform a staging migration before promoting the package to production.

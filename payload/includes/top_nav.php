@@ -14,8 +14,8 @@
         <!-- SEARCH FORM -->
         <form class="form-inline" action="/agent/global_search.php">
             <div class="input-group input-group-sm">
-                <label class="sr-only" for="itdr-global-search">Search everywhere</label>
-                <input class="form-control form-control-navbar" id="itdr-global-search" type="search" placeholder="Search everywhere" name="query"
+                <label class="sr-only" for="nexus-global-search">Search everywhere</label>
+                <input class="form-control form-control-navbar" id="nexus-global-search" type="search" placeholder="Search everywhere" name="query"
                     value="<?php if (isset($_GET['query'])) { echo escapeHtml($_GET['query']); } ?>">
                 <div class="input-group-append">
                     <button class="btn btn-navbar" type="submit" aria-label="Submit global search">
@@ -28,12 +28,6 @@
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
-
-        <li class="nav-item" title="IT Done Right website">
-            <a class="nav-link" href="https://itdonerightnc.com/" aria-label="Open the IT Done Right website">
-                <i class="fas fa-external-link-alt" aria-hidden="true"></i>
-            </a>
-        </li>
 
         <!--Custom Nav Link -->
         <?php

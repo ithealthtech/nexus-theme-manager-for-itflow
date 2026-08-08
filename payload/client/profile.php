@@ -10,7 +10,7 @@ require_once 'includes/inc_all.php';
 
 ?>
 
-    <span class="itdr-eyebrow">Account settings</span>
+    <span class="nexus-eyebrow">Account settings</span>
     <h1 class="h2">Profile</h1>
 
     <p>Name: <?= stripslashes(escapeHtml($session_contact_name)) ?></p>

@@ -28,15 +28,15 @@ header("X-Frame-Options: DENY"); // Legacy
 
     <!-- Theme style -->
     <link rel="stylesheet" href="/libs/adminlte/css/adminlte.min.css">
-    <link rel="stylesheet" href="/css/itdoneright-theme.css">
+    <link rel="stylesheet" href="/css/nexus-theme.css">
 
 </head>
-<body class="hold-transition itdr-theme itdr-client">
+<body class="hold-transition nexus-theme nexus-client">
 <a class="sr-only sr-only-focusable" href="#main-content">Skip to main content</a>
 
 <!-- Navbar -->
 
-<nav class="navbar navbar-expand-lg navbar-dark itdr-client-nav">
+<nav class="navbar navbar-expand-lg navbar-dark nexus-client-nav">
     <div class="container">
         <a class="navbar-brand" href="index.php"><?= escapeHtml($session_company_name) ?></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle portal navigation">
@@ -109,10 +109,7 @@ header("X-Frame-Options: DENY"); // Legacy
 
             <ul class="nav navbar-nav pull-right">
                 <li class="nav-item mr-lg-2">
-                    <a class="btn itdr-portal-cta" href="/client/ticket_add.php"><i class="fas fa-plus mr-2" aria-hidden="true"></i>Create support request</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="https://itdonerightnc.com/"><i class="fas fa-external-link-alt mr-2" aria-hidden="true"></i>IT Done Right</a>
+                    <a class="btn nexus-portal-cta" href="/client/ticket_add.php"><i class="fas fa-plus mr-2" aria-hidden="true"></i>Create support request</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -132,10 +129,10 @@ header("X-Frame-Options: DENY"); // Legacy
 <br>
 
 <!-- Page content container -->
-<main id="main-content" class="container itdr-client-shell">
+<main id="main-content" class="container nexus-client-shell">
 
-    <div class="row itdr-client-welcome">
-        <div class="col-md-1 text-center itdr-avatar">
+    <div class="row nexus-client-welcome">
+        <div class="col-md-1 text-center nexus-avatar">
             <?php if (!empty($session_contact_photo)) { ?>
                 <img src="/uploads/clients/<?= $session_client_id ?>/<?= $session_contact_photo ?>" alt="<?= escapeHtml($session_contact_name) ?> profile photo" height="50" width="50" class="img-circle img-responsive">
 
@@ -149,7 +146,7 @@ header("X-Frame-Options: DENY"); // Legacy
 
         <div class="col-md-11 p-0">
                 <?php if ($session_company_logo) { ?>
-                    <img height="48" width="142" class="img-fluid float-right itdr-client-logo" src="<?= "/uploads/settings/$session_company_logo" ?>" alt="<?= escapeHtml($session_company_name) ?> logo">
+                    <img height="48" width="142" class="img-fluid float-right nexus-client-logo" src="<?= "/uploads/settings/$session_company_logo" ?>" alt="<?= escapeHtml($session_company_name) ?> logo">
                 <?php } ?>
             <p class="h4 mb-1">Welcome, <strong><?= stripslashes(escapeHtml($session_contact_name)) ?></strong></p>
             <p class="mb-0 text-muted">Request support and follow your latest updates.</p>

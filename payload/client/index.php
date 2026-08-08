@@ -168,13 +168,13 @@ $sql_assigned_assets = mysqli_query(
 );
 
 ?>
-<div class="itdr-ticket-title">
+<div class="nexus-ticket-title">
     <div>
-        <span class="itdr-eyebrow">Support overview</span>
+        <span class="nexus-eyebrow">Support overview</span>
         <h1 class="h2 mb-1">How can we help?</h1>
         <p class="text-muted mb-0">Start a request or review your account and technology information.</p>
     </div>
-    <a href="ticket_add.php" class="btn itdr-portal-cta"><i class="fas fa-plus mr-2" aria-hidden="true"></i>Create support request</a>
+    <a href="ticket_add.php" class="btn nexus-portal-cta"><i class="fas fa-plus mr-2" aria-hidden="true"></i>Create support request</a>
 </div>
 <?php
 // Billing Cards

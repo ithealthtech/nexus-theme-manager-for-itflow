@@ -89,7 +89,7 @@ if (isset($_GET['id']) && intval($_GET['id'])) {
             <li class="breadcrumb-item active">Ticket <?= $ticket_prefix . $ticket_number ?></li>
         </ol>
 
-        <div class="card itdr-ticket-thread">
+        <div class="card nexus-ticket-thread">
             <div class="card-header bg-dark my-2">
                 <h1 class="card-title h4 mt-1">
                     Ticket <?= $ticket_prefix, $ticket_number ?>
