@@ -42,13 +42,13 @@ $total_tickets = intval($row['total_tickets']);
 
 ?>
 
-<div class="itdr-ticket-title">
+<div class="nexus-ticket-title">
     <div>
-        <span class="itdr-eyebrow">Support history</span>
+        <span class="nexus-eyebrow">Support history</span>
         <h1 class="h2 mb-1">Your support requests</h1>
         <p class="text-muted mb-0">Review open requests and recent updates from our team.</p>
     </div>
-    <a href="ticket_add.php" class="btn itdr-portal-cta"><i class="fas fa-plus mr-2" aria-hidden="true"></i>Create support request</a>
+    <a href="ticket_add.php" class="btn nexus-portal-cta"><i class="fas fa-plus mr-2" aria-hidden="true"></i>Create support request</a>
 </div>
 <div class="row">
 

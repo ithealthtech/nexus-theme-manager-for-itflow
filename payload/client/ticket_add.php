@@ -21,7 +21,7 @@ $sql_assets = mysqli_query($mysqli, "SELECT asset_id, asset_name, asset_type FRO
         <li class="breadcrumb-item active">New Ticket</li>
     </ol>
 
-    <span class="itdr-eyebrow">Tell us what is happening</span>
+    <span class="nexus-eyebrow">Tell us what is happening</span>
     <h1 class="h2">Create a support request</h1>
     <p class="text-muted mb-4">Share the impact and relevant details so we can route your request quickly.</p>
 

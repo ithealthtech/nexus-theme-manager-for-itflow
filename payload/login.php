@@ -548,7 +548,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
                         unset($_SESSION['pending_dual_login']);
 
                         $token_field = "
-                            <label class='itdr-field-label' for='current_code'>Authentication code</label>
+                            <label class='nexus-field-label' for='current_code'>Authentication code</label>
                             <div class='input-group mb-3'>
                                 <input type='text' inputmode='numeric' pattern='[0-9]*' maxlength='6'
                                        class='form-control' id='current_code' autocomplete='one-time-code' placeholder='6-digit code'
@@ -701,27 +701,27 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
     <?php } ?>
 
     <link rel="stylesheet" href="libs/adminlte/css/adminlte.min.css">
-    <link rel="stylesheet" href="css/itdoneright-theme.css">
+    <link rel="stylesheet" href="css/nexus-theme.css">
 </head>
-<body class="hold-transition login-page itdr-theme itdr-auth">
+<body class="hold-transition login-page nexus-theme nexus-auth">
 
 <div class="login-box">
     <div class="login-logo">
         <?php if (!empty($company_logo)) { ?>
             <img alt="<?=escapeHtml($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?= "uploads/settings/$company_logo" ?>">
         <?php } else { ?>
-            <span class="itdr-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml($company_name) ?></span>
+            <span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml($company_name) ?></span>
         <?php } ?>
     </div>
 
     <div class="card">
         <div class="card-body login-card-body">
 
-            <span class="itdr-eyebrow">Secure support portal</span>
-            <h1 class="itdr-auth-title">
+            <span class="nexus-eyebrow">Secure support portal</span>
+            <h1 class="nexus-auth-title">
                 <?php if ($show_role_choice) { ?>Choose your workspace<?php } elseif ($show_mfa_form) { ?>Verify your identity<?php } else { ?>Welcome back<?php } ?>
             </h1>
-            <p class="itdr-auth-copy">
+            <p class="nexus-auth-copy">
                 <?php if ($show_role_choice) { ?>Select the workspace you need for this session.<?php } elseif ($show_mfa_form) { ?>Enter the code from your authenticator to continue securely.<?php } else { ?>Sign in to request support, follow updates, or manage your ITFlow workspace.<?php } ?>
             </p>
 
@@ -742,7 +742,7 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
 
                 <?php if ($show_login_form): ?>
                     <!-- STEP 1: Email + Password -->
-                    <label class="itdr-field-label" for="login-email">Email address</label>
+                    <label class="nexus-field-label" for="login-email">Email address</label>
                     <div class="input-group mb-3">
                         <input type="email" class="form-control"
                             id="login-email"
@@ -758,7 +758,7 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
                         </div>
                     </div>
 
-                    <label class="itdr-field-label" for="login-password">Password</label>
+                    <label class="nexus-field-label" for="login-password">Password</label>
                     <div class="input-group mb-3">
                         <input type="password" class="form-control" id="login-password" placeholder="Password" name="password" autocomplete="current-password" required>
                         <div class="input-group-append">
@@ -817,7 +817,7 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
                 <?php } ?>
             <?php } ?>
 
-            <div class="itdr-security-note">
+            <div class="nexus-security-note">
                 <i class="fas fa-shield-alt" aria-hidden="true"></i>
                 <span>Your connection to this support portal is protected. Never share your password or authentication code.</span>
             </div>
@@ -825,12 +825,9 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
         </div>
     </div>
 
-    <div class="itdr-auth-footer">
-        <a href="https://itdonerightnc.com/">Back to IT Done Right</a>
-        <?php if (!$config_whitelabel_enabled) { ?>
-            <span aria-hidden="true"> &middot; </span>Powered by ITFlow
-        <?php } ?>
-    </div>
+    <?php if (!$config_whitelabel_enabled) { ?>
+        <div class="nexus-auth-footer">Powered by ITFlow</div>
+    <?php } ?>
 </div>
 
 <script src="libs/jquery/jquery.min.js"></script>

@@ -7,15 +7,15 @@ if (PHP_SAPI !== 'cli') {
     exit;
 }
 
-const ITDR_EXIT_OK = 0;
-const ITDR_EXIT_USAGE = 2;
-const ITDR_EXIT_CONFLICT = 3;
-const ITDR_EXIT_VERIFY = 4;
-const ITDR_EXIT_OPERATION = 5;
+const NEXUS_EXIT_OK = 0;
+const NEXUS_EXIT_USAGE = 2;
+const NEXUS_EXIT_CONFLICT = 3;
+const NEXUS_EXIT_VERIFY = 4;
+const NEXUS_EXIT_OPERATION = 5;
 
 final class ThemeManagerException extends RuntimeException
 {
-    public function __construct(string $message, public readonly int $exitCode = ITDR_EXIT_OPERATION)
+    public function __construct(string $message, public readonly int $exitCode = NEXUS_EXIT_OPERATION)
     {
         parent::__construct($message);
     }
@@ -38,10 +38,10 @@ final class ThemeManager
         $resolvedRoot = realpath($root);
 
         if ($resolvedPackage === false || !is_dir($resolvedPackage)) {
-            throw new ThemeManagerException("Package directory does not exist: $packageRoot", ITDR_EXIT_USAGE);
+            throw new ThemeManagerException("Package directory does not exist: $packageRoot", NEXUS_EXIT_USAGE);
         }
         if ($resolvedRoot === false || !is_dir($resolvedRoot)) {
-            throw new ThemeManagerException("ITFlow root does not exist: $root", ITDR_EXIT_USAGE);
+            throw new ThemeManagerException("ITFlow root does not exist: $root", NEXUS_EXIT_USAGE);
         }
 
         $this->packageRoot = rtrim($resolvedPackage, DIRECTORY_SEPARATOR);
@@ -49,8 +49,8 @@ final class ThemeManager
         $this->json = $json;
 
         $defaultStateRoot = PHP_OS_FAMILY === 'Windows'
-            ? $this->root . DIRECTORY_SEPARATOR . '.itdr-theme-manager-state'
-            : '/var/lib/itdr-itflow-theme';
+            ? $this->root . DIRECTORY_SEPARATOR . '.nexus-theme-manager-state'
+            : '/var/lib/nexus-itflow-theme';
         $this->stateRoot = rtrim($stateRoot ?: $defaultStateRoot, DIRECTORY_SEPARATOR);
         $this->instanceId = substr(hash('sha256', $this->root), 0, 16);
         $this->stateDir = $this->stateRoot . DIRECTORY_SEPARATOR . $this->instanceId;
@@ -96,13 +96,13 @@ final class ThemeManager
             if (is_file($this->stateFile)) {
                 throw new ThemeManagerException(
                     'Theme manager state already exists. Use status, verify, enable, disable, or uninstall.',
-                    ITDR_EXIT_CONFLICT
+                    NEXUS_EXIT_CONFLICT
                 );
             }
 
             $this->assertBaselineCompatible();
             $this->lintPhpFiles($this->packageRoot . DIRECTORY_SEPARATOR . 'payload');
-            $this->confirm('Install the IT Done Right theme into ' . $this->root . '?', $yes);
+            $this->confirm('Install the Nexus theme into ' . $this->root . '?', $yes);
 
             $state = $this->createStateAndBackup();
 
@@ -122,10 +122,10 @@ final class ThemeManager
                     throw new ThemeManagerException(
                         "Install failed and automatic rollback also failed. Install error: {$error->getMessage()} " .
                         "Rollback error: {$rollbackError->getMessage()}. Backups remain at {$this->stateDir}.",
-                        ITDR_EXIT_OPERATION
+                        NEXUS_EXIT_OPERATION
                     );
                 }
-                throw new ThemeManagerException('Install failed and was rolled back: ' . $error->getMessage(), ITDR_EXIT_OPERATION);
+                throw new ThemeManagerException('Install failed and was rolled back: ' . $error->getMessage(), NEXUS_EXIT_OPERATION);
             }
 
             $this->emit([
@@ -146,7 +146,7 @@ final class ThemeManager
             if (is_file($this->stateFile)) {
                 throw new ThemeManagerException(
                     'Theme manager state already exists. Use status or verify instead of adopt.',
-                    ITDR_EXIT_CONFLICT
+                    NEXUS_EXIT_CONFLICT
                 );
             }
 
@@ -161,7 +161,7 @@ final class ThemeManager
                 if (is_dir($this->stateDir)) {
                     $this->removeTree($this->stateDir);
                 }
-                throw new ThemeManagerException('Adoption failed without changing ITFlow files: ' . $error->getMessage(), ITDR_EXIT_OPERATION);
+                throw new ThemeManagerException('Adoption failed without changing ITFlow files: ' . $error->getMessage(), NEXUS_EXIT_OPERATION);
             }
 
             $this->emit([
@@ -180,7 +180,7 @@ final class ThemeManager
         if (!is_file($this->stateFile)) {
             $this->emit([
                 'status' => 'not-installed',
-                'message' => 'No active IT Done Right theme-manager installation was found.',
+                'message' => 'No active Nexus theme-manager installation was found.',
                 'root' => $this->root,
             ]);
             return;
@@ -222,7 +222,7 @@ final class ThemeManager
             $this->assertITFlowRoot();
             $state = $this->loadState();
             if (($state['mode'] ?? null) !== 'enabled') {
-                throw new ThemeManagerException('Theme is not enabled.', ITDR_EXIT_CONFLICT);
+                throw new ThemeManagerException('Theme is not enabled.', NEXUS_EXIT_CONFLICT);
             }
             $this->verifyState($state, false);
             $this->confirm('Disable the theme and restore the pre-theme templates?', $yes);
@@ -243,11 +243,11 @@ final class ThemeManager
             $this->assertITFlowRoot();
             $state = $this->loadState();
             if (($state['mode'] ?? null) !== 'disabled') {
-                throw new ThemeManagerException('Theme is not disabled.', ITDR_EXIT_CONFLICT);
+                throw new ThemeManagerException('Theme is not disabled.', NEXUS_EXIT_CONFLICT);
             }
             $this->verifyState($state, false);
             $this->lintPhpFiles($this->packageRoot . DIRECTORY_SEPARATOR . 'payload');
-            $this->confirm('Enable the IT Done Right theme?', $yes);
+            $this->confirm('Enable the Nexus theme?', $yes);
             $this->applyPayload($state);
             $state['mode'] = 'enabled';
             $state['status'] = 'installed';
@@ -305,7 +305,7 @@ final class ThemeManager
     private function disableInternal(array &$state): void
     {
         if (($state['mode'] ?? null) !== 'enabled') {
-            throw new ThemeManagerException('Cannot disable: recorded mode is not enabled.', ITDR_EXIT_CONFLICT);
+            throw new ThemeManagerException('Cannot disable: recorded mode is not enabled.', NEXUS_EXIT_CONFLICT);
         }
         $this->verifyState($state, false);
         $this->restoreOriginals($state, true);
@@ -320,7 +320,7 @@ final class ThemeManager
     {
         $this->ensureDirectory($this->stateRoot, 0700);
         if (file_exists($this->stateDir)) {
-            throw new ThemeManagerException("State directory already exists: {$this->stateDir}", ITDR_EXIT_CONFLICT);
+            throw new ThemeManagerException("State directory already exists: {$this->stateDir}", NEXUS_EXIT_CONFLICT);
         }
         $this->ensureDirectory($this->stateDir, 0700);
         $backupRoot = $this->stateDir . DIRECTORY_SEPARATOR . 'original';
@@ -376,7 +376,7 @@ final class ThemeManager
     {
         $this->ensureDirectory($this->stateRoot, 0700);
         if (file_exists($this->stateDir)) {
-            throw new ThemeManagerException("State directory already exists: {$this->stateDir}", ITDR_EXIT_CONFLICT);
+            throw new ThemeManagerException("State directory already exists: {$this->stateDir}", NEXUS_EXIT_CONFLICT);
         }
         $this->ensureDirectory($this->stateDir, 0700);
         $backupRoot = $this->stateDir . DIRECTORY_SEPARATOR . 'original';
@@ -438,11 +438,11 @@ final class ThemeManager
             $target = $this->targetPath($relative);
             $metadata = $state['files'][$relative] ?? null;
             if (!is_array($metadata)) {
-                throw new ThemeManagerException("State metadata is missing for $relative.", ITDR_EXIT_VERIFY);
+                throw new ThemeManagerException("State metadata is missing for $relative.", NEXUS_EXIT_VERIFY);
             }
             $this->atomicCopy($source, $target, $metadata);
             if ($this->hashFile($target) !== $entry['payload_sha256']) {
-                throw new ThemeManagerException("Installed hash verification failed for $relative.", ITDR_EXIT_VERIFY);
+                throw new ThemeManagerException("Installed hash verification failed for $relative.", NEXUS_EXIT_VERIFY);
             }
         }
     }
@@ -455,20 +455,20 @@ final class ThemeManager
             $target = $this->targetPath($relative);
             $metadata = $state['files'][$relative] ?? null;
             if (!is_array($metadata)) {
-                throw new ThemeManagerException("State metadata is missing for $relative.", ITDR_EXIT_VERIFY);
+                throw new ThemeManagerException("State metadata is missing for $relative.", NEXUS_EXIT_VERIFY);
             }
 
             if ($conflictSafe && is_file($target) && $this->hashFile($target) !== $entry['payload_sha256']) {
                 throw new ThemeManagerException(
                     "Refusing to overwrite a changed managed file during restore: $relative",
-                    ITDR_EXIT_CONFLICT
+                    NEXUS_EXIT_CONFLICT
                 );
             }
 
             if ($metadata['original_exists']) {
                 $backup = $backupRoot . DIRECTORY_SEPARATOR . $this->nativePath((string)$metadata['backup_relative']);
                 if (!is_file($backup) || $this->hashFile($backup) !== $metadata['original_sha256']) {
-                    throw new ThemeManagerException("Original backup is missing or corrupt for $relative.", ITDR_EXIT_VERIFY);
+                    throw new ThemeManagerException("Original backup is missing or corrupt for $relative.", NEXUS_EXIT_VERIFY);
                 }
                 $this->atomicCopy($backup, $target, $metadata);
             } elseif (is_file($target)) {
@@ -483,7 +483,7 @@ final class ThemeManager
     {
         $issues = $this->stateIssues($state);
         if ($issues !== []) {
-            throw new ThemeManagerException("Managed-state verification failed:\n- " . implode("\n- ", $issues), ITDR_EXIT_VERIFY);
+            throw new ThemeManagerException("Managed-state verification failed:\n- " . implode("\n- ", $issues), NEXUS_EXIT_VERIFY);
         }
 
         if ($lint) {
@@ -566,7 +566,7 @@ final class ThemeManager
         if ($issues !== []) {
             throw new ThemeManagerException(
                 "Compatibility check failed. No files were changed:\n- " . implode("\n- ", $issues),
-                ITDR_EXIT_CONFLICT
+                NEXUS_EXIT_CONFLICT
             );
         }
     }
@@ -586,7 +586,7 @@ final class ThemeManager
         if ($issues !== []) {
             throw new ThemeManagerException(
                 "Adoption check failed. No files were changed:\n- " . implode("\n- ", $issues),
-                ITDR_EXIT_CONFLICT
+                NEXUS_EXIT_CONFLICT
             );
         }
     }
@@ -610,7 +610,7 @@ final class ThemeManager
         }
 
         if ($issues !== []) {
-            throw new ThemeManagerException("Package integrity check failed:\n- " . implode("\n- ", $issues), ITDR_EXIT_VERIFY);
+            throw new ThemeManagerException("Package integrity check failed:\n- " . implode("\n- ", $issues), NEXUS_EXIT_VERIFY);
         }
     }
 
@@ -618,11 +618,11 @@ final class ThemeManager
     {
         foreach (['config.php', 'login.php', 'includes/header.php', 'client/includes/header.php'] as $required) {
             if (!is_file($this->targetPath($required))) {
-                throw new ThemeManagerException("Not an initialized ITFlow root; missing $required.", ITDR_EXIT_USAGE);
+                throw new ThemeManagerException("Not an initialized ITFlow root; missing $required.", NEXUS_EXIT_USAGE);
             }
         }
         if (!is_dir($this->root . DIRECTORY_SEPARATOR . 'css')) {
-            throw new ThemeManagerException('Not an initialized ITFlow root; css directory is missing.', ITDR_EXIT_USAGE);
+            throw new ThemeManagerException('Not an initialized ITFlow root; css directory is missing.', NEXUS_EXIT_USAGE);
         }
     }
 
@@ -634,11 +634,11 @@ final class ThemeManager
             }
             $path = $base . DIRECTORY_SEPARATOR . $this->nativePath($entry['path']);
             if (!is_file($path)) {
-                throw new ThemeManagerException("Cannot lint missing PHP file: $path", ITDR_EXIT_VERIFY);
+                throw new ThemeManagerException("Cannot lint missing PHP file: $path", NEXUS_EXIT_VERIFY);
             }
             [$exitCode, $output] = $this->runProcess([PHP_BINARY, '-l', $path]);
             if ($exitCode !== 0) {
-                throw new ThemeManagerException("PHP lint failed for {$entry['path']}: $output", ITDR_EXIT_VERIFY);
+                throw new ThemeManagerException("PHP lint failed for {$entry['path']}: $output", NEXUS_EXIT_VERIFY);
             }
         }
     }
@@ -651,7 +651,7 @@ final class ThemeManager
         ];
         $process = proc_open($command, $descriptors, $pipes);
         if (!is_resource($process)) {
-            throw new ThemeManagerException('Could not start PHP lint process.', ITDR_EXIT_VERIFY);
+            throw new ThemeManagerException('Could not start PHP lint process.', NEXUS_EXIT_VERIFY);
         }
         $stdout = stream_get_contents($pipes[1]);
         $stderr = stream_get_contents($pipes[2]);
@@ -665,16 +665,16 @@ final class ThemeManager
     {
         $path = $this->packageRoot . DIRECTORY_SEPARATOR . 'manifest.json';
         if (!is_file($path)) {
-            throw new ThemeManagerException('manifest.json is missing.', ITDR_EXIT_VERIFY);
+            throw new ThemeManagerException('manifest.json is missing.', NEXUS_EXIT_VERIFY);
         }
         $manifest = json_decode((string)file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
         foreach (['schema', 'package_id', 'package_version', 'theme_version', 'compatible_itflow', 'files'] as $key) {
             if (!array_key_exists($key, $manifest)) {
-                throw new ThemeManagerException("Manifest key is missing: $key", ITDR_EXIT_VERIFY);
+                throw new ThemeManagerException("Manifest key is missing: $key", NEXUS_EXIT_VERIFY);
             }
         }
         if ($manifest['schema'] !== 1 || !is_array($manifest['files']) || count($manifest['files']) !== 13) {
-            throw new ThemeManagerException('Manifest schema or file count is invalid.', ITDR_EXIT_VERIFY);
+            throw new ThemeManagerException('Manifest schema or file count is invalid.', NEXUS_EXIT_VERIFY);
         }
 
         $seen = [];
@@ -684,10 +684,10 @@ final class ThemeManager
                 !preg_match('#^[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*$#', $entry['path']) ||
                 !preg_match('/^[a-f0-9]{64}$/', $entry['payload_sha256']) ||
                 ($entry['baseline_sha256'] !== null && !preg_match('/^[a-f0-9]{64}$/', $entry['baseline_sha256']))) {
-                throw new ThemeManagerException('Manifest contains an invalid file entry.', ITDR_EXIT_VERIFY);
+                throw new ThemeManagerException('Manifest contains an invalid file entry.', NEXUS_EXIT_VERIFY);
             }
             if (isset($seen[$entry['path']])) {
-                throw new ThemeManagerException('Manifest contains a duplicate path: ' . $entry['path'], ITDR_EXIT_VERIFY);
+                throw new ThemeManagerException('Manifest contains a duplicate path: ' . $entry['path'], NEXUS_EXIT_VERIFY);
             }
             $seen[$entry['path']] = true;
         }
@@ -697,12 +697,12 @@ final class ThemeManager
     private function loadState(): array
     {
         if (!is_file($this->stateFile)) {
-            throw new ThemeManagerException('Theme manager is not installed for this ITFlow root.', ITDR_EXIT_CONFLICT);
+            throw new ThemeManagerException('Theme manager is not installed for this ITFlow root.', NEXUS_EXIT_CONFLICT);
         }
         try {
             return json_decode((string)file_get_contents($this->stateFile), true, 512, JSON_THROW_ON_ERROR);
         } catch (Throwable $error) {
-            throw new ThemeManagerException('State file is unreadable or corrupt: ' . $error->getMessage(), ITDR_EXIT_VERIFY);
+            throw new ThemeManagerException('State file is unreadable or corrupt: ' . $error->getMessage(), NEXUS_EXIT_VERIFY);
         }
     }
 
@@ -725,10 +725,10 @@ final class ThemeManager
     private function atomicCopy(string $source, string $destination, array $metadata): void
     {
         if (!is_file($source)) {
-            throw new ThemeManagerException("Source file is missing: $source", ITDR_EXIT_VERIFY);
+            throw new ThemeManagerException("Source file is missing: $source", NEXUS_EXIT_VERIFY);
         }
         $this->ensureDirectory(dirname($destination), 0755);
-        $temporary = tempnam(dirname($destination), '.itdr-');
+        $temporary = tempnam(dirname($destination), '.nexus-');
         if ($temporary === false) {
             throw new ThemeManagerException("Could not allocate a temporary file for $destination.");
         }
@@ -793,7 +793,7 @@ final class ThemeManager
         @chmod($lockPath, 0600);
         if (!flock($handle, LOCK_EX | LOCK_NB)) {
             fclose($handle);
-            throw new ThemeManagerException('Another theme-manager operation is already running.', ITDR_EXIT_CONFLICT);
+            throw new ThemeManagerException('Another theme-manager operation is already running.', NEXUS_EXIT_CONFLICT);
         }
         try {
             $operation();
@@ -810,12 +810,12 @@ final class ThemeManager
         }
         $interactive = function_exists('stream_isatty') && stream_isatty(STDIN);
         if (!$interactive) {
-            throw new ThemeManagerException('Mutation requires --yes in a non-interactive session.', ITDR_EXIT_USAGE);
+            throw new ThemeManagerException('Mutation requires --yes in a non-interactive session.', NEXUS_EXIT_USAGE);
         }
         fwrite(STDOUT, $question . ' [y/N] ');
         $answer = strtolower(trim((string)fgets(STDIN)));
         if (!in_array($answer, ['y', 'yes'], true)) {
-            throw new ThemeManagerException('Operation cancelled.', ITDR_EXIT_USAGE);
+            throw new ThemeManagerException('Operation cancelled.', NEXUS_EXIT_USAGE);
         }
     }
 
@@ -861,7 +861,7 @@ final class ThemeManager
     private function targetPath(string $relative): string
     {
         if (!preg_match('#^[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*$#', $relative)) {
-            throw new ThemeManagerException("Unsafe relative path: $relative", ITDR_EXIT_VERIFY);
+            throw new ThemeManagerException("Unsafe relative path: $relative", NEXUS_EXIT_VERIFY);
         }
         return $this->root . DIRECTORY_SEPARATOR . $this->nativePath($relative);
     }
@@ -875,7 +875,7 @@ final class ThemeManager
     {
         $hash = hash_file('sha256', $path);
         if ($hash === false) {
-            throw new ThemeManagerException("Could not hash file: $path", ITDR_EXIT_VERIFY);
+            throw new ThemeManagerException("Could not hash file: $path", NEXUS_EXIT_VERIFY);
         }
         return $hash;
     }
@@ -901,10 +901,10 @@ final class ThemeManager
     }
 }
 
-function itdrUsage(): void
+function nexusUsage(): void
 {
     $usage = <<<'TEXT'
-IT Done Right theme manager 1.0.0
+Nexus Theme Manager for IT Flow 2.0.0
 
 Usage:
   php manager.php <command> --root /path/to/itflow [options]
@@ -922,7 +922,7 @@ Commands:
 
 Options:
   --root PATH        Required ITFlow document root
-  --state-root PATH  Override state storage (default: /var/lib/itdr-itflow-theme)
+  --state-root PATH  Override state storage (default: /var/lib/nexus-itflow-theme)
   --yes              Approve a mutating command without an interactive prompt
   --purge            With uninstall, delete recovery state instead of archiving it
   --json             Emit machine-readable JSON
@@ -932,7 +932,7 @@ TEXT;
     fwrite(STDOUT, $usage . "\n");
 }
 
-function itdrParseArguments(array $argv): array
+function nexusParseArguments(array $argv): array
 {
     $command = $argv[1] ?? 'help';
     $options = [
@@ -953,25 +953,25 @@ function itdrParseArguments(array $argv): array
             $options['json'] = true;
         } elseif (in_array($argument, ['--root', '--state-root'], true)) {
             if (!isset($argv[$index + 1])) {
-                throw new ThemeManagerException("Missing value for $argument.", ITDR_EXIT_USAGE);
+                throw new ThemeManagerException("Missing value for $argument.", NEXUS_EXIT_USAGE);
             }
             $value = $argv[++$index];
             $options[$argument === '--root' ? 'root' : 'state_root'] = $value;
         } else {
-            throw new ThemeManagerException("Unknown argument: $argument", ITDR_EXIT_USAGE);
+            throw new ThemeManagerException("Unknown argument: $argument", NEXUS_EXIT_USAGE);
         }
     }
     return [$command, $options];
 }
 
 try {
-    [$command, $options] = itdrParseArguments($argv);
+    [$command, $options] = nexusParseArguments($argv);
     if (in_array($command, ['help', '--help', '-h'], true)) {
-        itdrUsage();
-        exit(ITDR_EXIT_OK);
+        nexusUsage();
+        exit(NEXUS_EXIT_OK);
     }
     if ($options['root'] === null) {
-        throw new ThemeManagerException('--root is required.', ITDR_EXIT_USAGE);
+        throw new ThemeManagerException('--root is required.', NEXUS_EXIT_USAGE);
     }
 
     $manager = new ThemeManager(__DIR__, $options['root'], $options['state_root'], $options['json']);
@@ -984,13 +984,13 @@ try {
         'disable' => $manager->disable($options['yes']),
         'enable' => $manager->enable($options['yes']),
         'uninstall' => $manager->uninstall($options['yes'], $options['purge']),
-        default => throw new ThemeManagerException("Unknown command: $command", ITDR_EXIT_USAGE),
+        default => throw new ThemeManagerException("Unknown command: $command", NEXUS_EXIT_USAGE),
     };
-    exit(ITDR_EXIT_OK);
+    exit(NEXUS_EXIT_OK);
 } catch (ThemeManagerException $error) {
     fwrite(STDERR, 'ERROR: ' . $error->getMessage() . "\n");
     exit($error->exitCode);
 } catch (Throwable $error) {
     fwrite(STDERR, 'ERROR: Unexpected failure: ' . $error->getMessage() . "\n");
-    exit(ITDR_EXIT_OPERATION);
+    exit(NEXUS_EXIT_OPERATION);
 }

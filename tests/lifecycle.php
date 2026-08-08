@@ -9,7 +9,7 @@ if (PHP_SAPI !== 'cli') {
 $packageRoot = dirname(__DIR__);
 $manager = $packageRoot . DIRECTORY_SEPARATOR . 'manager.php';
 $manifest = json_decode((string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'manifest.json'), true, 512, JSON_THROW_ON_ERROR);
-$testRoot = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'itdr-theme-manager-tests-' . bin2hex(random_bytes(6));
+$testRoot = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'nexus-theme-manager-tests-' . bin2hex(random_bytes(6));
 $passes = 0;
 
 function copyTree(string $source, string $destination): void
@@ -111,7 +111,7 @@ try {
     $common = ['--root', $fixture, '--state-root', $stateRoot];
 
     runManager($manager, array_merge(['doctor'], $common), 0);
-    expect(!file_exists($fixture . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'itdoneright-theme.css'), 'doctor is non-mutating');
+    expect(!file_exists($fixture . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'nexus-theme.css'), 'doctor is non-mutating');
 
     runManager($manager, array_merge(['install'], $common, ['--yes']), 0);
     foreach ($manifest['files'] as $entry) {
@@ -171,7 +171,7 @@ try {
     makeFixture($packageRoot, $incompatible);
     file_put_contents($incompatible . DIRECTORY_SEPARATOR . 'login.php', "\n// incompatible local change\n", FILE_APPEND);
     runManager($manager, ['doctor', '--root', $incompatible, '--state-root', $testRoot . DIRECTORY_SEPARATOR . 'incompatible-state'], 3);
-    expect(!file_exists($incompatible . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'itdoneright-theme.css'), 'incompatible checkout is refused without mutation');
+    expect(!file_exists($incompatible . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'nexus-theme.css'), 'incompatible checkout is refused without mutation');
 
     $adoptFixture = $testRoot . DIRECTORY_SEPARATOR . 'adopt-fixture';
     $adoptState = $testRoot . DIRECTORY_SEPARATOR . 'adopt-state';
@@ -216,9 +216,13 @@ try {
     expect($purgeStatus['status'] === 'not-installed', 'purge uninstall removes active state');
 
     $tamperedPackage = $testRoot . DIRECTORY_SEPARATOR . 'tampered-package';
-    copyTree($packageRoot, $tamperedPackage);
+    mkdir($tamperedPackage, 0777, true);
+    copy($manager, $tamperedPackage . DIRECTORY_SEPARATOR . 'manager.php');
+    copy($packageRoot . DIRECTORY_SEPARATOR . 'manifest.json', $tamperedPackage . DIRECTORY_SEPARATOR . 'manifest.json');
+    copyTree($packageRoot . DIRECTORY_SEPARATOR . 'baseline', $tamperedPackage . DIRECTORY_SEPARATOR . 'baseline');
+    copyTree($packageRoot . DIRECTORY_SEPARATOR . 'payload', $tamperedPackage . DIRECTORY_SEPARATOR . 'payload');
     file_put_contents(
-        $tamperedPackage . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'itdoneright-theme.css',
+        $tamperedPackage . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'nexus-theme.css',
         "\n/* tampered */\n",
         FILE_APPEND
     );

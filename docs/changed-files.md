@@ -1,4 +1,4 @@
-# IT Done Right / ITFlow Theme File Manifest
+# Nexus Theme Manager for IT Flow File Manifest
 
 Baseline: ITFlow 26.08 at `ccaa45b0ae9900ad731a6491559f65ff8d87a8f3`
 
@@ -6,7 +6,7 @@ Baseline: ITFlow 26.08 at `ccaa45b0ae9900ad731a6491559f65ff8d87a8f3`
 
 | File | Purpose | Upgrade conflict risk |
 |---|---|---|
-| `css/itdoneright-theme.css` | Scoped tokens and styles for authentication, customer, agent, admin, light/dark, responsive, reduced-motion, and print states | Low |
+| `css/nexus-theme.css` | Scoped tokens and styles for authentication, customer, agent, admin, light/dark, responsive, reduced-motion, and print states | Low |
 
 ## Edited
 
@@ -15,8 +15,8 @@ Baseline: ITFlow 26.08 at `ccaa45b0ae9900ad731a6491559f65ff8d87a8f3`
 | `login.php` | Loads theme last; adds auth scope, state-aware headings/copy, persistent labels, accessible feedback, security note, Entra treatment, website return link | Preserved |
 | `includes/header.php` | Loads theme after AdminLTE; adds agent scope while preserving accent and user dark mode | Preserved |
 | `includes/top_nav.php` | Adds accessible names/label associations, meaningful image alt text, and discreet company website link | Preserved |
-| `client/includes/header.php` | Adds explicit body/main landmarks, theme scope, branded responsive navigation, primary create-request action, return link, welcome treatment, and accessible feedback | Module/permission conditions preserved |
-| `client/includes/footer.php` | Closes main/body/html correctly and adds a branded footer; existing scripts and TinyMCE initialization preserved | Preserved |
+| `client/includes/header.php` | Adds explicit body/main landmarks, theme scope, responsive navigation, primary create-request action, welcome treatment, and accessible feedback | Module/permission conditions preserved |
+| `client/includes/footer.php` | Closes main/body/html correctly and adds a dynamic company footer; existing scripts and TinyMCE initialization preserved | Preserved |
 | `client/index.php` | Clarifies support overview hierarchy and primary create-request action | Queries and permission branches preserved |
 | `client/tickets.php` | Adds scan-friendly heading/CTA, responsive table container, hover state, and explicit textual status badge | Queries and routes preserved |
 | `client/ticket_add.php` | Adds semantic card/heading, persistent labels, IDs, help association, responsive columns, cancel action, and clearer submit copy | Field names, CSRF, action, and handler preserved |

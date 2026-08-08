@@ -1,0 +1,897 @@
+/*
+ * Nexus theme for ITFlow 26.08 / AdminLTE 3.2 / Bootstrap 4.6.
+ * Loaded after AdminLTE. All application overrides are scoped to .nexus-theme.
+ * No remote assets or fonts are required.
+ */
+
+.nexus-theme {
+    --nexus-ink: #0b0a17;
+    --nexus-night: #121124;
+    --nexus-elevated: #25284a;
+    --nexus-border-dark: #343858;
+    --nexus-cyan: #69bff5;
+    --nexus-cyan-strong: #49aee9;
+    --nexus-violet: #7888ff;
+    --nexus-white: #ffffff;
+    --nexus-cloud: #d9d9e5;
+    --nexus-muted-dark: #aeb3ca;
+    --nexus-gradient: linear-gradient(110deg, #7285f4 0%, #69c9ee 100%);
+    --nexus-focus: 0 0 0 4px rgba(105, 191, 245, 0.32);
+    --nexus-danger: #df4254;
+    --nexus-danger-soft: #ff7d8b;
+    --nexus-warning: #f0b54d;
+    --nexus-success: #38b889;
+    --nexus-info: #69bff5;
+    --nexus-radius: 0.25rem;
+    --nexus-radius-lg: 0.5rem;
+    --nexus-shadow: 0 18px 50px rgba(8, 8, 20, 0.16);
+    --nexus-font-interface: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --nexus-font-display: "Aptos Display", "Space Grotesk", Inter, ui-sans-serif, system-ui, sans-serif;
+    --nexus-font-data: "IBM Plex Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+    --nexus-page: #f3f4fa;
+    --nexus-surface: #ffffff;
+    --nexus-surface-2: #f8f8fc;
+    --nexus-border: #d7d9e7;
+    --nexus-text: #121124;
+    --nexus-copy: #53566a;
+    --nexus-muted: #6f7288;
+    color: var(--nexus-text);
+    font-family: var(--nexus-font-interface);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+}
+
+.nexus-theme.dark-mode,
+.nexus-theme.nexus-auth,
+.nexus-theme.nexus-client {
+    color-scheme: dark;
+    --nexus-page: var(--nexus-ink);
+    --nexus-surface: var(--nexus-night);
+    --nexus-surface-2: #18172e;
+    --nexus-border: var(--nexus-border-dark);
+    --nexus-text: var(--nexus-white);
+    --nexus-copy: var(--nexus-cloud);
+    --nexus-muted: var(--nexus-muted-dark);
+}
+
+.nexus-theme *,
+.nexus-theme *::before,
+.nexus-theme *::after {
+    box-sizing: border-box;
+}
+
+.nexus-theme a {
+    color: #1677ad;
+    text-underline-offset: 0.18em;
+}
+
+.nexus-theme.dark-mode a,
+.nexus-theme.nexus-auth a,
+.nexus-theme.nexus-client a {
+    color: var(--nexus-cyan);
+}
+
+.nexus-theme a:hover {
+    color: var(--nexus-violet);
+}
+
+.nexus-theme :focus-visible {
+    border-radius: 0.15rem;
+    box-shadow: var(--nexus-focus);
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+}
+
+.nexus-theme h1,
+.nexus-theme h2,
+.nexus-theme h3,
+.nexus-theme h4,
+.nexus-theme h5,
+.nexus-theme h6,
+.nexus-theme .card-title {
+    color: var(--nexus-text);
+    font-family: var(--nexus-font-display);
+    font-weight: 650;
+    letter-spacing: -0.015em;
+}
+
+.nexus-theme code,
+.nexus-theme kbd,
+.nexus-theme pre,
+.nexus-theme .nexus-data,
+.nexus-theme td:first-child a {
+    font-family: var(--nexus-font-data);
+}
+
+.nexus-theme .text-muted {
+    color: var(--nexus-muted) !important;
+}
+
+.nexus-theme .text-secondary {
+    color: var(--nexus-copy) !important;
+}
+
+.nexus-theme hr {
+    border-color: var(--nexus-border);
+}
+
+/* Buttons */
+.nexus-theme .btn {
+    border-radius: var(--nexus-radius);
+    font-weight: 650;
+    letter-spacing: 0.005em;
+    min-height: 2.5rem;
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+.nexus-theme .btn:hover {
+    transform: translateY(-1px);
+}
+
+.nexus-theme .btn:active {
+    transform: translateY(0);
+}
+
+.nexus-theme .btn-primary {
+    background: var(--nexus-cyan);
+    border-color: var(--nexus-cyan);
+    color: var(--nexus-ink);
+}
+
+.nexus-theme .btn-primary:hover,
+.nexus-theme .btn-primary:focus {
+    background: var(--nexus-cyan-strong);
+    border-color: var(--nexus-cyan-strong);
+    color: var(--nexus-ink);
+}
+
+.nexus-theme .btn-outline-primary {
+    border-color: #278bc3;
+    color: #1677ad;
+}
+
+.nexus-theme.dark-mode .btn-outline-primary,
+.nexus-theme.nexus-client .btn-outline-primary {
+    border-color: var(--nexus-cyan);
+    color: var(--nexus-cyan);
+}
+
+.nexus-theme .btn-secondary,
+.nexus-theme .btn-dark {
+    background: var(--nexus-elevated);
+    border-color: #4b5077;
+    color: var(--nexus-white);
+}
+
+.nexus-theme .btn-success {
+    background: #16845f;
+    border-color: #16845f;
+    color: var(--nexus-white);
+}
+
+.nexus-theme .btn-danger {
+    background: #c73547;
+    border-color: #c73547;
+    color: var(--nexus-white);
+}
+
+.nexus-theme .btn-warning {
+    background: var(--nexus-warning);
+    border-color: var(--nexus-warning);
+    color: var(--nexus-ink);
+}
+
+.nexus-theme .btn-default,
+.nexus-theme .btn-light,
+.nexus-theme .btn-outline-dark,
+.nexus-theme .btn-outline-secondary {
+    background: var(--nexus-surface-2);
+    border-color: var(--nexus-border);
+    color: var(--nexus-text);
+}
+
+.nexus-theme .btn-sm {
+    min-height: 2.125rem;
+}
+
+/* Anchor buttons need explicit colors because portal links use cyan by default. */
+.nexus-theme a.btn-primary,
+.nexus-theme a.btn-warning {
+    color: var(--nexus-ink);
+}
+
+.nexus-theme a.btn-secondary,
+.nexus-theme a.btn-dark,
+.nexus-theme a.btn-success,
+.nexus-theme a.btn-danger {
+    color: var(--nexus-white);
+}
+
+.nexus-theme a.btn-default,
+.nexus-theme a.btn-light,
+.nexus-theme a.btn-outline-dark,
+.nexus-theme a.btn-outline-secondary {
+    color: var(--nexus-text);
+}
+
+/* Forms */
+.nexus-theme label {
+    color: var(--nexus-text);
+    font-weight: 650;
+}
+
+.nexus-theme .form-control,
+.nexus-theme .custom-select,
+.nexus-theme .input-group-text,
+.nexus-theme .select2-container--default .select2-selection--single,
+.nexus-theme .select2-container--default .select2-selection--multiple {
+    background: var(--nexus-surface-2);
+    border-color: var(--nexus-border);
+    border-radius: var(--nexus-radius);
+    color: var(--nexus-text);
+    min-height: 2.75rem;
+}
+
+.nexus-theme .form-control::placeholder {
+    color: var(--nexus-muted);
+    opacity: 1;
+}
+
+.nexus-theme .form-control:focus,
+.nexus-theme .custom-select:focus,
+.nexus-theme .select2-container--focus .select2-selection {
+    background: var(--nexus-surface);
+    border-color: var(--nexus-cyan);
+    box-shadow: var(--nexus-focus);
+    color: var(--nexus-text);
+}
+
+.nexus-theme .input-group-text {
+    color: var(--nexus-cyan);
+    min-width: 2.75rem;
+    justify-content: center;
+}
+
+.nexus-theme .custom-control-label::before {
+    background: var(--nexus-surface-2);
+    border-color: var(--nexus-border);
+}
+
+.nexus-theme .custom-control-input:checked ~ .custom-control-label::before {
+    background: var(--nexus-cyan);
+    border-color: var(--nexus-cyan);
+}
+
+.nexus-theme .form-text {
+    color: var(--nexus-muted);
+}
+
+.nexus-theme .select2-dropdown,
+.nexus-theme .daterangepicker,
+.nexus-theme .dropdown-menu {
+    background: var(--nexus-surface);
+    border: 1px solid var(--nexus-border);
+    border-radius: var(--nexus-radius);
+    box-shadow: var(--nexus-shadow);
+    color: var(--nexus-text);
+}
+
+.nexus-theme .dropdown-item,
+.nexus-theme .select2-results__option {
+    color: var(--nexus-text);
+}
+
+.nexus-theme .dropdown-item:hover,
+.nexus-theme .dropdown-item:focus,
+.nexus-theme .select2-results__option--highlighted[aria-selected] {
+    background: rgba(105, 191, 245, 0.14);
+    color: var(--nexus-text);
+}
+
+/* Cards, tables and status */
+.nexus-theme .card,
+.nexus-theme .modal-content,
+.nexus-theme .info-box,
+.nexus-theme .small-box {
+    background: var(--nexus-surface);
+    border: 1px solid var(--nexus-border);
+    border-radius: var(--nexus-radius-lg);
+    box-shadow: 0 8px 24px rgba(8, 8, 20, 0.07);
+    color: var(--nexus-copy);
+}
+
+.nexus-theme .card-header,
+.nexus-theme .modal-header,
+.nexus-theme .modal-footer {
+    background: var(--nexus-surface-2);
+    border-color: var(--nexus-border);
+}
+
+.nexus-theme .card-dark > .card-header,
+.nexus-theme .bg-dark,
+.nexus-theme .thead-dark th {
+    background: var(--nexus-elevated) !important;
+    border-color: var(--nexus-border) !important;
+    color: var(--nexus-white) !important;
+}
+
+.nexus-theme .card-primary.card-outline,
+.nexus-theme .card-info.card-outline {
+    border-top-color: var(--nexus-cyan);
+}
+
+.nexus-theme .card-warning.card-outline {
+    border-top-color: var(--nexus-warning);
+}
+
+.nexus-theme .table {
+    color: var(--nexus-text);
+}
+
+.nexus-theme .table th {
+    border-color: var(--nexus-border);
+    color: var(--nexus-copy);
+    font-size: 0.75rem;
+    font-weight: 750;
+    letter-spacing: 0.075em;
+    text-transform: uppercase;
+}
+
+.nexus-theme .table td {
+    border-color: var(--nexus-border);
+    vertical-align: middle;
+}
+
+.nexus-theme .table-hover tbody tr:hover,
+.nexus-theme .table-striped tbody tr:nth-of-type(odd) {
+    background: rgba(120, 136, 255, 0.055);
+}
+
+.nexus-theme .badge {
+    border-radius: 999px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.nexus-theme .badge-primary,
+.nexus-theme .badge-info {
+    background: #176f9f;
+    color: var(--nexus-white);
+}
+
+.nexus-theme .badge-success {
+    background: #147a58;
+    color: var(--nexus-white);
+}
+
+.nexus-theme .badge-danger {
+    background: #bd3042;
+    color: var(--nexus-white);
+}
+
+.nexus-theme .badge-warning {
+    background: var(--nexus-warning);
+    color: var(--nexus-ink);
+}
+
+.nexus-theme .badge-light {
+    background: var(--nexus-surface-2);
+    border: 1px solid var(--nexus-border);
+    color: var(--nexus-text);
+}
+
+.nexus-theme .alert {
+    background: var(--nexus-surface-2);
+    border: 1px solid var(--nexus-border);
+    border-left-width: 4px;
+    border-radius: var(--nexus-radius);
+    color: var(--nexus-text);
+}
+
+.nexus-theme .alert-info,
+.nexus-theme .alert-primary {
+    border-left-color: var(--nexus-info);
+}
+
+.nexus-theme .alert-success {
+    border-left-color: var(--nexus-success);
+}
+
+.nexus-theme .alert-warning {
+    border-left-color: var(--nexus-warning);
+}
+
+.nexus-theme .alert-danger {
+    border-left-color: var(--nexus-danger-soft);
+}
+
+.nexus-theme .breadcrumb {
+    background: transparent;
+    padding-left: 0;
+}
+
+.nexus-theme .page-link {
+    background: var(--nexus-surface);
+    border-color: var(--nexus-border);
+    color: #1677ad;
+}
+
+.nexus-theme.dark-mode .page-link,
+.nexus-theme.nexus-client .page-link {
+    color: var(--nexus-cyan);
+}
+
+.nexus-theme .page-item.active .page-link {
+    background: var(--nexus-cyan);
+    border-color: var(--nexus-cyan);
+    color: var(--nexus-ink);
+}
+
+/* Authentication */
+body.nexus-auth {
+    background:
+        radial-gradient(circle at 12% 10%, rgba(120, 136, 255, 0.18), transparent 30rem),
+        radial-gradient(circle at 88% 88%, rgba(105, 191, 245, 0.15), transparent 30rem),
+        var(--nexus-ink);
+    color: var(--nexus-copy);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    position: relative;
+}
+
+body.nexus-auth::before {
+    background-image: linear-gradient(rgba(105, 191, 245, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(105, 191, 245, 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    content: "";
+    inset: 0;
+    mask-image: linear-gradient(to bottom, black, transparent 80%);
+    pointer-events: none;
+    position: fixed;
+}
+
+.nexus-auth .login-box {
+    max-width: 27rem;
+    position: relative;
+    width: 100%;
+    z-index: 1;
+}
+
+.nexus-auth .login-logo {
+    margin-bottom: 1.25rem;
+}
+
+.nexus-auth .login-logo img {
+    max-height: 5.5rem;
+    object-fit: contain;
+    width: auto;
+}
+
+.nexus-auth .login-logo .nexus-fallback-logo {
+    color: var(--nexus-white);
+    font-family: var(--nexus-font-display);
+    font-size: 1.35rem;
+    font-style: italic;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+.nexus-auth .login-logo .nexus-fallback-logo i {
+    color: var(--nexus-cyan);
+}
+
+.nexus-auth .card {
+    backdrop-filter: blur(16px);
+    background: rgba(18, 17, 36, 0.94);
+    border-color: rgba(105, 191, 245, 0.24);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.42);
+    overflow: hidden;
+}
+
+.nexus-auth .login-card-body {
+    background: transparent;
+    color: var(--nexus-copy);
+    padding: 2rem;
+}
+
+.nexus-theme .nexus-eyebrow {
+    color: var(--nexus-cyan);
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    margin-bottom: 0.6rem;
+    text-transform: uppercase;
+}
+
+.nexus-auth .nexus-auth-title {
+    font-size: clamp(1.65rem, 5vw, 2.25rem);
+    line-height: 1.15;
+    margin-bottom: 0.65rem;
+}
+
+.nexus-auth .nexus-auth-copy {
+    color: var(--nexus-copy);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.nexus-auth .nexus-field-label {
+    display: block;
+    font-size: 0.875rem;
+    margin-bottom: 0.45rem;
+}
+
+.nexus-auth .btn-primary,
+.nexus-client .nexus-portal-cta {
+    background: var(--nexus-gradient);
+    border-color: transparent;
+    color: var(--nexus-ink);
+}
+
+.nexus-auth .btn-primary:hover,
+.nexus-client .nexus-portal-cta:hover {
+    background: linear-gradient(110deg, #8291f7 0%, #7bd2f1 100%);
+    border-color: transparent;
+    color: var(--nexus-ink);
+}
+
+.nexus-auth .nexus-security-note {
+    align-items: flex-start;
+    border-top: 1px solid var(--nexus-border);
+    color: var(--nexus-muted);
+    display: flex;
+    font-size: 0.78rem;
+    gap: 0.55rem;
+    line-height: 1.5;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+}
+
+.nexus-auth .nexus-security-note i {
+    color: var(--nexus-cyan);
+    margin-top: 0.18rem;
+}
+
+.nexus-auth .nexus-auth-footer {
+    color: var(--nexus-muted);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 0.82rem;
+    gap: 0.35rem 1rem;
+    justify-content: center;
+    margin-top: 1rem;
+    text-align: center;
+}
+
+/* Customer portal */
+body.nexus-client {
+    background:
+        radial-gradient(circle at 90% 0%, rgba(120, 136, 255, 0.11), transparent 30rem),
+        var(--nexus-page);
+    color: var(--nexus-copy);
+    min-height: 100vh;
+}
+
+.nexus-client .nexus-client-nav {
+    background: rgba(18, 17, 36, 0.96);
+    border-bottom: 1px solid var(--nexus-border);
+    min-height: 4.75rem;
+}
+
+.nexus-client .navbar-brand {
+    color: var(--nexus-white);
+    font-family: var(--nexus-font-display);
+    font-style: italic;
+    font-weight: 800;
+    letter-spacing: 0.015em;
+}
+
+.nexus-client .navbar-brand::before {
+    border: 2px solid var(--nexus-cyan);
+    content: "";
+    display: inline-block;
+    height: 0.78rem;
+    margin-right: 0.5rem;
+    transform: skew(-14deg);
+    width: 0.95rem;
+}
+
+.nexus-client .navbar-dark .navbar-nav .nav-link {
+    color: var(--nexus-cloud);
+    font-size: 0.875rem;
+    font-weight: 650;
+}
+
+.nexus-client .navbar-dark .navbar-nav .active > .nav-link,
+.nexus-client .navbar-dark .navbar-nav .nav-link.active,
+.nexus-client .navbar-dark .navbar-nav .nav-link:hover {
+    color: var(--nexus-white);
+}
+
+.nexus-client .navbar-dark .navbar-nav .nav-link.active {
+    box-shadow: inset 0 -2px var(--nexus-cyan);
+}
+
+.nexus-client .nexus-client-shell {
+    max-width: 76rem;
+    padding-bottom: 2.5rem;
+    padding-top: 1.75rem;
+}
+
+.nexus-client .nexus-client-welcome {
+    align-items: center;
+    background: linear-gradient(110deg, rgba(120, 136, 255, 0.11), rgba(105, 191, 245, 0.07));
+    border: 1px solid var(--nexus-border);
+    border-radius: var(--nexus-radius-lg);
+    margin-bottom: 2rem;
+    padding: 1rem 1.25rem;
+}
+
+.nexus-client .nexus-client-welcome h1 {
+    font-size: 1.35rem;
+    margin: 0;
+}
+
+.nexus-client .nexus-client-welcome .nexus-avatar {
+    flex: 0 0 auto;
+}
+
+.nexus-client .nexus-client-logo {
+    max-height: 3rem;
+    max-width: 9rem;
+    object-fit: contain;
+}
+
+.nexus-client .card {
+    transition: border-color 150ms ease, transform 150ms ease;
+}
+
+.nexus-client a.card:hover,
+.nexus-client a .card:hover {
+    border-color: rgba(105, 191, 245, 0.55);
+    transform: translateY(-2px);
+}
+
+.nexus-client .text-dark {
+    color: var(--nexus-text) !important;
+}
+
+.nexus-client .table-bordered,
+.nexus-client .border-dark {
+    border-color: var(--nexus-border) !important;
+}
+
+.nexus-client .nexus-ticket-title {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.nexus-client .nexus-client-footer {
+    border-top: 1px solid var(--nexus-border);
+    color: var(--nexus-muted);
+    font-size: 0.85rem;
+    margin-top: 3rem;
+    padding: 1.5rem 0 2rem;
+    text-align: center;
+}
+
+/* Agent and administrator shell */
+.nexus-agent .content-wrapper {
+    background: var(--nexus-page);
+    color: var(--nexus-copy);
+}
+
+.nexus-agent .main-header {
+    background: var(--nexus-night) !important;
+    border-bottom: 1px solid var(--nexus-border-dark);
+}
+
+.nexus-agent .main-header .nav-link,
+.nexus-agent .main-header .navbar-nav .nav-link {
+    color: var(--nexus-cloud);
+}
+
+.nexus-agent .main-header .form-control-navbar {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: var(--nexus-white);
+}
+
+.nexus-agent .main-header .btn-navbar {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: var(--nexus-cyan);
+}
+
+.nexus-agent .main-sidebar {
+    background: var(--nexus-night);
+    border-right: 1px solid var(--nexus-border-dark);
+}
+
+.nexus-agent .brand-link {
+    background: var(--nexus-ink);
+    border-bottom: 1px solid var(--nexus-border-dark);
+    color: var(--nexus-white);
+    min-height: 4.15rem;
+}
+
+.nexus-agent .brand-link .brand-image {
+    border: 2px solid var(--nexus-cyan);
+    height: 1rem;
+    margin: 0.65rem 0.75rem 0 0.35rem;
+    opacity: 1;
+    transform: skew(-14deg);
+    width: 1.15rem;
+}
+
+.nexus-agent .brand-link .brand-text {
+    font-family: var(--nexus-font-display);
+    font-style: italic;
+    font-weight: 800 !important;
+    letter-spacing: 0.01em;
+}
+
+.nexus-agent .nav-sidebar .nav-header {
+    color: #8f96b5;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+}
+
+.nexus-agent .nav-sidebar .nav-link {
+    border-radius: var(--nexus-radius);
+    color: #c8cad8;
+    margin-bottom: 0.15rem;
+}
+
+.nexus-agent .nav-sidebar .nav-link:hover {
+    background: rgba(105, 191, 245, 0.09);
+    color: var(--nexus-white);
+}
+
+.nexus-agent .nav-sidebar > .nav-item > .nav-link.active {
+    background: var(--nexus-gradient);
+    box-shadow: none;
+    color: var(--nexus-ink);
+    font-weight: 700;
+}
+
+.nexus-agent .nav-sidebar > .nav-item > .nav-link.active .nav-icon {
+    color: var(--nexus-ink);
+}
+
+.nexus-agent .content-header h1,
+.nexus-agent .content h1 {
+    font-size: clamp(1.65rem, 3vw, 2.25rem);
+}
+
+.nexus-agent .user-menu .user-header {
+    background: var(--nexus-elevated) !important;
+}
+
+.nexus-agent .navbar-badge {
+    background: var(--nexus-cyan);
+    color: var(--nexus-ink);
+}
+
+.nexus-agent .dataTables_wrapper .dataTables_filter input,
+.nexus-agent .dataTables_wrapper .dataTables_length select {
+    background: var(--nexus-surface-2);
+    border: 1px solid var(--nexus-border);
+    color: var(--nexus-text);
+}
+
+.nexus-agent.dark-mode .content-wrapper,
+.nexus-agent.dark-mode .main-footer {
+    background: var(--nexus-page);
+    color: var(--nexus-copy);
+}
+
+.nexus-agent.dark-mode .card,
+.nexus-agent.dark-mode .modal-content {
+    background: var(--nexus-surface);
+    color: var(--nexus-copy);
+}
+
+/* Responsive behavior */
+@media (max-width: 991.98px) {
+    .nexus-client .navbar-collapse {
+        background: var(--nexus-night);
+        border: 1px solid var(--nexus-border);
+        border-radius: var(--nexus-radius-lg);
+        margin-top: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .nexus-client .navbar-dark .navbar-nav .nav-link.active {
+        box-shadow: inset 3px 0 var(--nexus-cyan);
+        padding-left: 0.75rem;
+    }
+
+    .nexus-client .nexus-portal-cta {
+        display: inline-flex;
+        margin: 0.5rem 0;
+    }
+}
+
+@media (max-width: 767.98px) {
+    body.nexus-auth {
+        justify-content: flex-start;
+        padding-top: 1.25rem;
+    }
+
+    .nexus-auth .login-card-body {
+        padding: 1.35rem;
+    }
+
+    .nexus-client .nexus-client-shell {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .nexus-client .nexus-client-welcome {
+        align-items: flex-start;
+    }
+
+    .nexus-client .nexus-client-logo {
+        display: none;
+    }
+
+    .nexus-client .table-responsive {
+        border: 1px solid var(--nexus-border);
+        border-radius: var(--nexus-radius);
+    }
+
+    .nexus-agent .content.mt-3 {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .nexus-theme .btn:not(.btn-sm):not(.dropdown-toggle-split) {
+        min-height: 2.75rem;
+    }
+
+    .nexus-auth .login-logo img {
+        max-height: 4rem;
+    }
+
+    .nexus-client .nexus-client-welcome h1 {
+        font-size: 1.15rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .nexus-theme *,
+    .nexus-theme *::before,
+    .nexus-theme *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+@media print {
+    .nexus-theme {
+        --nexus-page: #ffffff;
+        --nexus-surface: #ffffff;
+        --nexus-surface-2: #ffffff;
+        --nexus-border: #b8b8b8;
+        --nexus-text: #000000;
+        --nexus-copy: #222222;
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    .nexus-theme .card,
+    .nexus-theme .table,
+    .nexus-theme .content-wrapper {
+        box-shadow: none !important;
+    }
+}

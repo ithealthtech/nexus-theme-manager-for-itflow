@@ -2,6 +2,20 @@
 
 All notable changes to this project are documented here.
 
+## [2.0.0] - 2026-08-08
+
+### Changed
+
+- Renamed the project and package to Nexus Theme Manager for IT Flow.
+- Removed organization-specific names, domains, navigation links, and footer links from every managed surface.
+- Replaced the stylesheet, CSS namespace, package ID, temporary-file prefix, and state paths with Nexus identifiers.
+- Added a documented uninstall/reinstall migration from version 1.0.0.
+
+### Compatibility
+
+- Remains pinned to ITFlow 26.08 at commit `ccaa45b0ae9900ad731a6491559f65ff8d87a8f3`.
+- Version 1.0.0 must be uninstalled before installing 2.0.0.
+
 ## [1.0.0] - 2026-08-08
 
 ### Added
@@ -9,7 +23,8 @@ All notable changes to this project are documented here.
 - Standalone lifecycle manager with `doctor`, `install`, `adopt`, `status`, `verify`, `disable`, `enable`, and `uninstall` commands.
 - Exact compatibility checks for ITFlow 26.08 at commit `ccaa45b0ae9900ad731a6491559f65ff8d87a8f3`.
 - Immutable payload verification, protected backups, atomic activation, rollback, drift detection, and operation locking.
-- IT Done Right customer, technician, authentication, and recovery-page theme templates.
+- Customer, technician, authentication, and recovery-page theme templates.
 - Automated lifecycle tests and multi-version PHP continuous integration.
 
-[1.0.0]: https://github.com/ithealthtech/itflow-itdoneright-theme-manager/releases/tag/v1.0.0
+[1.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v1.0.0
+[2.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.0.0
