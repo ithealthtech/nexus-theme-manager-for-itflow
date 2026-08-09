@@ -50,6 +50,19 @@ cd "/opt/${nexus_asset}"
 
 Continue only if `sha256sum` reports `OK`. The final `cd` places the shell in the verified package directory so the installation commands below can be run as written.
 
+### Automated latest-release install
+
+The repository also includes a root-only bootstrap script that resolves the latest GitHub release, downloads and verifies the versioned archive, extracts it to the expected directory under `/opt`, runs `doctor`, installs the theme, and verifies the result:
+
+```bash
+curl --fail --location --remote-name \
+  https://raw.githubusercontent.com/ithealthtech/nexus-theme-manager-for-itflow/main/install-latest.sh
+chmod +x install-latest.sh
+sudo ./install-latest.sh --root /var/www/itflow.example.com
+```
+
+To store manager state somewhere other than `/var/lib/nexus-itflow-theme`, add `--state-root PATH`. The script refuses an existing versioned extraction directory and never skips checksum or compatibility validation.
+
 ## Package layout
 
 - `manager.php`: lifecycle manager
@@ -57,7 +70,8 @@ Continue only if `sha256sum` reports `OK`. The final `cd` places the shell in th
 - `payload/`: 12 themed PHP templates plus the stylesheet
 - `baseline/`: exact supported upstream templates used for compatibility and testing
 - `docs/`: design, changed-file, and test documentation
-- `install.sh` / `uninstall.sh`: optional shell wrappers
+- `install.sh` / `uninstall.sh`: lifecycle command wrappers for an extracted package
+- `install-latest.sh`: GitHub latest-release download, verification, extraction, and install bootstrap
 
 ## Install
 

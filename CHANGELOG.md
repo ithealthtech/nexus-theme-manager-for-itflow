@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here.
 
+## [Unreleased]
+
+### Added
+
+- Added `install-latest.sh` to securely download, verify, extract, preflight, install, and verify the latest GitHub release on Debian/Ubuntu systems.
+
 ## [2.0.0] - 2026-08-08
 
 ### Changed
@@ -28,3 +34,4 @@ All notable changes to this project are documented here.
 
 [1.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v1.0.0
 [2.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.0.0
+[Unreleased]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/compare/v2.0.0...HEAD
