@@ -19,9 +19,9 @@ This screenshot was captured from an isolated local ITFlow 26.08/AdminLTE test e
 | Item | Supported value |
 |---|---|
 | ITFlow release | 26.08 |
-| ITFlow commit | `ccaa45b0ae9900ad731a6491559f65ff8d87a8f3` |
-| Theme manager | 2.1.0 |
-| Theme payload | 26.08.2 |
+| ITFlow commit | `89b080b430aaafba5d520c4e52c57b28a9559085` |
+| Theme manager | 2.2.0 |
+| Theme payload | 26.08.3 |
 | Runtime | PHP 8.1 or newer, CLI SAPI |
 | Target systems | Debian/Ubuntu production installs; lifecycle tests also run on Windows |
 
@@ -37,7 +37,7 @@ Install the command-line prerequisites, set `nexus_version` to the release you w
 sudo apt-get update
 sudo apt-get install -y ca-certificates curl unzip
 
-nexus_version="2.1.0"
+nexus_version="2.2.0"
 nexus_asset="Nexus-Theme-Manager-for-ITFlow-${nexus_version}"
 nexus_download_dir="$HOME/Downloads/nexus-theme-manager"
 
@@ -82,7 +82,7 @@ To store manager state somewhere other than `/var/lib/nexus-itflow-theme`, add `
 ## Install
 
 1. Create and verify an ITFlow application/database backup.
-2. Extract this ZIP outside the ITFlow document root, for example `/opt/Nexus-Theme-Manager-for-ITFlow-2.1.0`.
+2. Extract this ZIP outside the ITFlow document root, for example `/opt/Nexus-Theme-Manager-for-ITFlow-2.2.0`.
 3. Run the non-mutating preflight:
 
 ```bash
@@ -157,8 +157,8 @@ sudo php /opt/theme-manager-1.0.0/manager.php uninstall --root /var/www/itflow.e
 2. Run the current preflight and install.
 
 ```bash
-sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.1.0/manager.php doctor --root /var/www/itflow.example.com
-sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.1.0/manager.php install --root /var/www/itflow.example.com --yes
+sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.2.0/manager.php doctor --root /var/www/itflow.example.com
+sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.2.0/manager.php install --root /var/www/itflow.example.com --yes
 ```
 
 The new protected state root is `/var/lib/nexus-itflow-theme`. Keep the archived 1.0.0 recovery state until the Nexus installation and portal smoke tests pass.

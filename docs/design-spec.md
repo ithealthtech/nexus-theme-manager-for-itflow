@@ -1,7 +1,7 @@
 # Nexus Theme Manager for IT Flow Design Specification
 
 - Date: 2026-08-08
-- Implementation baseline: ITFlow 26.08, commit `ccaa45b0ae9900ad731a6491559f65ff8d87a8f3`
+- Implementation baseline: ITFlow 26.08, commit `89b080b430aaafba5d520c4e52c57b28a9559085`
 
 ## Design intent
 

@@ -1,9 +1,9 @@
 # Lifecycle test report
 
 - Date: 2026-08-09
-- Manager version: 2.1.0
-- Payload version: 26.08.2
-- PHP runtime: 8.4.24 CLI
+- Manager version: 2.2.0
+- Payload version: 26.08.3
+- PHP runtime: 8.4.15 CLI
 
 ## Syntax validation
 

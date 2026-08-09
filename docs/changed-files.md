@@ -1,6 +1,6 @@
 # Nexus Theme Manager for IT Flow File Manifest
 
-Baseline: ITFlow 26.08 at `ccaa45b0ae9900ad731a6491559f65ff8d87a8f3`
+Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 
 ## Added
 
