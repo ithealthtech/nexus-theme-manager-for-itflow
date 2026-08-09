@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here.
 
+## [2.2.0] - 2026-08-09
+
+### Changed
+
+- Rebased the compatibility baseline and themed templates onto ITFlow commit `89b080b430aaafba5d520c4e52c57b28a9559085`.
+- Preserved upstream query optimizations in the five client and navigation templates changed since the previous baseline.
+- Updated package metadata, verification documentation, and the sanitized preview for the new compatibility release.
+
 ## [2.1.0] - 2026-08-09
 
 ### Added
@@ -35,3 +43,4 @@ All notable changes to this project are documented here.
 [1.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v1.0.0
 [2.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.0.0
 [2.1.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.1.0
+[2.2.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.2.0
