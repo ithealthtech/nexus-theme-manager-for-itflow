@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here.
 
-## [Unreleased]
+## [2.1.0] - 2026-08-09
 
 ### Added
 
@@ -34,4 +34,4 @@ All notable changes to this project are documented here.
 
 [1.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v1.0.0
 [2.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.0.0
-[Unreleased]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/compare/v2.0.0...HEAD
+[2.1.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.1.0
