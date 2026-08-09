@@ -55,6 +55,9 @@ function makeFixture(string $packageRoot, string $destination): void
     if (!is_dir($destination . DIRECTORY_SEPARATOR . 'css')) {
         mkdir($destination . DIRECTORY_SEPARATOR . 'css', 0777, true);
     }
+    if (!is_dir($destination . DIRECTORY_SEPARATOR . 'uploads')) {
+        mkdir($destination . DIRECTORY_SEPARATOR . 'uploads', 0777, true);
+    }
     file_put_contents($destination . DIRECTORY_SEPARATOR . 'config.php', "<?php\n// Test fixture only.\n");
 }
 
@@ -105,6 +108,14 @@ function sha(string $path): string
 try {
     mkdir($testRoot, 0777, true);
 
+    $adminPageSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'nexus.php');
+    $adminPostSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'post' . DIRECTORY_SEPARATOR . 'nexus.php');
+    $adminNavSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'side_nav.php');
+    expect(str_contains($adminPageSource, "require_once 'includes/inc_all_admin.php'"), 'administration page uses ITFlow administrator permission enforcement');
+    expect(str_contains($adminPostSource, 'validateCSRFToken()'), 'administration action validates the ITFlow CSRF token');
+    expect(!preg_match('/\\b(?:exec|shell_exec|system|passthru|proc_open)\\s*\\(/', $adminPostSource), 'administration action cannot launch lifecycle shell commands');
+    expect(str_contains($adminNavSource, '/admin/nexus.php'), 'administration navigation exposes the Nexus Theme Manager');
+
     $fixture = $testRoot . DIRECTORY_SEPARATOR . 'fixture';
     $stateRoot = $testRoot . DIRECTORY_SEPARATOR . 'state';
     makeFixture($packageRoot, $fixture);
@@ -119,6 +130,14 @@ try {
         expect(is_file($target) && sha($target) === $entry['payload_sha256'], 'install activates ' . $entry['path']);
     }
 
+    require_once $fixture . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'nexus_theme.php';
+    expect(nexusThemeIsEnabled($fixture), 'web control defaults to an active Nexus theme');
+    expect(nexusThemeControlIsWritable($fixture), 'web control detects a writable ITFlow uploads directory');
+    nexusThemeSetEnabled(false, $fixture);
+    expect(!nexusThemeIsEnabled($fixture), 'web control pauses the Nexus visual layer');
+    nexusThemeSetEnabled(true, $fixture);
+    expect(nexusThemeIsEnabled($fixture), 'web control reactivates the Nexus visual layer');
+
     runManager($manager, array_merge(['verify'], $common), 0);
     [$statusJson] = runManager($manager, array_merge(['status'], $common, ['--json']), 0);
     $status = json_decode($statusJson, true, 512, JSON_THROW_ON_ERROR);
@@ -129,7 +148,9 @@ try {
     runManager($manager, array_merge(['enable'], $common, ['--yes']), 3);
     expect(true, 'enable is refused while already enabled');
 
+    nexusThemeSetEnabled(false, $fixture);
     runManager($manager, array_merge(['disable'], $common, ['--yes']), 0);
+    expect(nexusThemeIsEnabled($fixture), 'CLI disable clears the web theme-control marker');
     foreach ($manifest['files'] as $entry) {
         $target = $fixture . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $entry['path']);
         if ($entry['baseline_sha256'] === null) {
@@ -177,14 +198,17 @@ try {
     $adoptState = $testRoot . DIRECTORY_SEPARATOR . 'adopt-state';
     makeFixture($packageRoot, $adoptFixture);
     copyTree($packageRoot . DIRECTORY_SEPARATOR . 'payload', $adoptFixture);
+    nexusThemeSetEnabled(false, $adoptFixture);
     $adoptCommon = ['--root', $adoptFixture, '--state-root', $adoptState];
     runManager($manager, array_merge(['adopt'], $adoptCommon, ['--yes']), 0);
+    expect(!nexusThemeIsEnabled($adoptFixture), 'adopt preserves the current web presentation state');
     [$adoptStatusJson] = runManager($manager, array_merge(['status'], $adoptCommon, ['--json']), 0);
     $adoptStatus = json_decode($adoptStatusJson, true, 512, JSON_THROW_ON_ERROR);
     expect($adoptStatus['status'] === 'healthy' && $adoptStatus['mode'] === 'enabled', 'adopt manages an existing exact theme installation');
     runManager($manager, array_merge(['verify'], $adoptCommon), 0);
     expect(true, 'adopted installation verifies');
     runManager($manager, array_merge(['uninstall'], $adoptCommon, ['--yes', '--purge']), 0);
+    expect(nexusThemeIsEnabled($adoptFixture), 'adopted uninstall clears the web presentation-state marker');
     $adoptRestored = true;
     foreach ($manifest['files'] as $entry) {
         $target = $adoptFixture . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $entry['path']);

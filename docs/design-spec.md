@@ -67,6 +67,14 @@ Typography uses local/system fallbacks only:
 4. Dense operational cards, filters, forms, tables, tabs, queues, and modals
 5. Existing footer and all JavaScript interactions
 
+### Nexus administration manager
+
+1. Dedicated **NEXUS → Theme Manager** administration navigation entry
+2. High-signal hero with active/paused state and primary presentation control
+3. Manager, payload, compatibility, and core-asset health summaries
+4. Clear separation between web-safe presentation control and root-only lifecycle operations
+5. Responsive metric and control cards built from the existing AdminLTE layout system
+
 ## Component rules
 
 | Component | Rule |
@@ -104,3 +112,4 @@ Typography uses local/system fallbacks only:
 - Ticket number, subject, status text, and update time form the primary scan path.
 - Technician operational content remains dense and light by default while the shell uses Nexus tokens.
 - Priority and status badges retain conventional semantics and text labels.
+- The Nexus administration page clearly exposes theme state, package versions, asset health, and the protected CLI boundary.

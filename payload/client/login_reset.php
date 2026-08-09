@@ -9,6 +9,9 @@ header("Content-Security-Policy: default-src 'self'");
 require_once '../config.php';
 require_once '../functions.php';
 require_once '../includes/load_global_settings.php';
+require_once '../includes/nexus_theme.php';
+
+$nexus_theme_enabled = nexusThemeIsEnabled();
 
 
 if (empty($config_smtp_host)) {
@@ -186,11 +189,13 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     <!-- Theme style -->
     <link rel="stylesheet" href="../libs/adminlte/css/adminlte.min.css">
-    <link rel="stylesheet" href="../css/nexus-theme.css">
+    <?php if ($nexus_theme_enabled) { ?>
+        <link rel="stylesheet" href="../css/nexus-theme.css">
+    <?php } ?>
 
 </head>
 
-<body class="hold-transition login-page nexus-theme nexus-auth">
+<body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth' : '' ?>">
 <div class="login-box">
     <div class="login-logo"><span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml($company_name_display) ?></span></div>
     <div class="card">

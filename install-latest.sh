@@ -61,10 +61,18 @@ done
 [ -d "$itflow_root" ] || fail "ITFlow root is not a directory: $itflow_root"
 
 require_command curl
+require_command cut
 require_command mktemp
 require_command php
 require_command sha256sum
 require_command unzip
+
+resolved_itflow_root=$(CDPATH= cd -- "$itflow_root" && pwd -P)
+instance_id=$(printf '%s' "$resolved_itflow_root" | sha256sum | cut -c1-16)
+effective_state_root=${state_root:-/var/lib/nexus-itflow-theme}
+existing_state="$effective_state_root/$instance_id/state.json"
+
+[ ! -f "$existing_state" ] || fail "An existing managed Nexus installation was detected. Use manager.php from the currently installed Nexus version to verify and uninstall it, then rerun this installer."
 
 temporary_directory=$(mktemp -d)
 trap 'rm -rf -- "$temporary_directory"' EXIT HUP INT TERM

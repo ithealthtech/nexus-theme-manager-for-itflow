@@ -103,6 +103,7 @@ final class ThemeManager
             $this->assertBaselineCompatible();
             $this->lintPhpFiles($this->packageRoot . DIRECTORY_SEPARATOR . 'payload');
             $this->confirm('Install the Nexus theme into ' . $this->root . '?', $yes);
+            $this->clearWebThemeControlState();
 
             $state = $this->createStateAndBackup();
 
@@ -248,6 +249,7 @@ final class ThemeManager
             $this->verifyState($state, false);
             $this->lintPhpFiles($this->packageRoot . DIRECTORY_SEPARATOR . 'payload');
             $this->confirm('Enable the Nexus theme?', $yes);
+            $this->clearWebThemeControlState();
             $this->applyPayload($state);
             $state['mode'] = 'enabled';
             $state['status'] = 'installed';
@@ -308,6 +310,7 @@ final class ThemeManager
             throw new ThemeManagerException('Cannot disable: recorded mode is not enabled.', NEXUS_EXIT_CONFLICT);
         }
         $this->verifyState($state, false);
+        $this->clearWebThemeControlState();
         $this->restoreOriginals($state, true);
         $state['mode'] = 'disabled';
         $state['status'] = 'installed';
@@ -450,7 +453,9 @@ final class ThemeManager
     private function restoreOriginals(array $state, bool $conflictSafe): void
     {
         $backupRoot = $this->stateDir . DIRECTORY_SEPARATOR . 'original';
-        foreach ($this->manifest['files'] as $entry) {
+        // Reverse dependency order so navigation and templates are restored before
+        // the shared Nexus helper and stylesheet are removed.
+        foreach (array_reverse($this->manifest['files']) as $entry) {
             $relative = $entry['path'];
             $target = $this->targetPath($relative);
             $metadata = $state['files'][$relative] ?? null;
@@ -487,7 +492,7 @@ final class ThemeManager
         }
 
         if ($lint) {
-            $this->lintPhpFiles($this->root);
+            $this->lintPhpFiles($this->root, ($state['mode'] ?? null) === 'disabled');
         }
     }
 
@@ -626,7 +631,7 @@ final class ThemeManager
         }
     }
 
-    private function lintPhpFiles(string $base): void
+    private function lintPhpFiles(string $base, bool $allowMissingOwned = false): void
     {
         foreach ($this->manifest['files'] as $entry) {
             if (!$entry['php']) {
@@ -634,6 +639,9 @@ final class ThemeManager
             }
             $path = $base . DIRECTORY_SEPARATOR . $this->nativePath($entry['path']);
             if (!is_file($path)) {
+                if ($allowMissingOwned && $entry['baseline_sha256'] === null) {
+                    continue;
+                }
                 throw new ThemeManagerException("Cannot lint missing PHP file: $path", NEXUS_EXIT_VERIFY);
             }
             [$exitCode, $output] = $this->runProcess([PHP_BINARY, '-l', $path]);
@@ -661,6 +669,23 @@ final class ThemeManager
         return [$exitCode, trim($stdout . "\n" . $stderr)];
     }
 
+    private function clearWebThemeControlState(): void
+    {
+        $marker = $this->root
+            . DIRECTORY_SEPARATOR . 'uploads'
+            . DIRECTORY_SEPARATOR . '.nexus-theme-disabled';
+
+        if (!file_exists($marker) && !is_link($marker)) {
+            return;
+        }
+        if (is_dir($marker) && !is_link($marker)) {
+            throw new ThemeManagerException('The Nexus web theme control marker is unexpectedly a directory.');
+        }
+        if (!@unlink($marker)) {
+            throw new ThemeManagerException('Could not clear the Nexus web theme control state.');
+        }
+    }
+
     private function loadManifest(): array
     {
         $path = $this->packageRoot . DIRECTORY_SEPARATOR . 'manifest.json';
@@ -673,7 +698,7 @@ final class ThemeManager
                 throw new ThemeManagerException("Manifest key is missing: $key", NEXUS_EXIT_VERIFY);
             }
         }
-        if ($manifest['schema'] !== 1 || !is_array($manifest['files']) || count($manifest['files']) !== 13) {
+        if ($manifest['schema'] !== 1 || !is_array($manifest['files']) || count($manifest['files']) !== 17) {
             throw new ThemeManagerException('Manifest schema or file count is invalid.', NEXUS_EXIT_VERIFY);
         }
 
@@ -904,7 +929,7 @@ final class ThemeManager
 function nexusUsage(): void
 {
     $usage = <<<'TEXT'
-Nexus Theme Manager for IT Flow 2.2.0
+Nexus Theme Manager for IT Flow 2.3.0
 
 Usage:
   php manager.php <command> --root /path/to/itflow [options]
