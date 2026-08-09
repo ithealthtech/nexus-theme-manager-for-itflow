@@ -1,8 +1,8 @@
 # Nexus Theme Manager for IT Flow Verification Report
 
 - Date: 2026-08-09
-- Package version: 2.2.0
-- Payload version: 26.08.3
+- Package version: 2.3.0
+- Payload version: 26.08.4
 - Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 - Test runtime: PHP 8.4.15 CLI
 
@@ -12,11 +12,12 @@
 |---|---|
 | `manager.php` syntax | Pass |
 | Lifecycle test syntax | Pass |
-| 12 payload PHP templates | Pass |
-| 12 baseline PHP templates | Pass |
-| Lifecycle simulation | 55 passed, 0 failed |
-| Manifest payload hashes | 13/13 verified |
-| Manifest baseline hashes | 12/12 verified |
+| 16 payload PHP files | Pass |
+| 13 baseline PHP templates | Pass |
+| Three shell entrypoints | Syntax pass |
+| Lifecycle simulation | 78 passed, 0 failed |
+| Manifest payload hashes | 17/17 verified |
+| Manifest baseline hashes | 13/13 verified |
 | Old organization name/domain/internal namespace scan | No matches |
 | Package-level SHA-256 manifest | Verified |
 
@@ -27,9 +28,11 @@ The automated suite creates isolated ITFlow fixtures and protected state roots, 
 | Behavior | Result |
 |---|---|
 | Non-mutating compatibility preflight | Pass |
-| Exact 13-file install and checksum verification | Pass |
+| Administration permission, CSRF, no-shell, and menu invariants | Pass |
+| Exact 17-file install and checksum verification | Pass |
 | Duplicate install refusal | Pass |
-| Disable restores 12 originals and removes the Nexus stylesheet | Pass |
+| Administrator web control pause/reactivate | Pass |
+| Disable restores 13 originals and removes four theme-owned files | Pass |
 | Enable reapplies the exact payload | Pass |
 | Post-install drift detection | Pass |
 | Conflict-safe uninstall refusal | Pass |
@@ -37,6 +40,7 @@ The automated suite creates isolated ITFlow fixtures and protected state roots, 
 | Purge uninstall | Pass |
 | Incompatible baseline refusal without mutation | Pass |
 | Exact existing-payload adoption | Pass |
+| Adopted web-state preservation and uninstall cleanup | Pass |
 | Non-exact adoption refusal | Pass |
 | Package tamper detection | Pass |
 
@@ -69,7 +73,7 @@ The automated package is ready for a staging migration. A production operator mu
 
 1. Back up the ITFlow application and database.
 2. Verify and uninstall version 1.0.0 with its original manager.
-3. Run the Nexus 2.2.0 `doctor` command.
+3. Run the Nexus 2.3.0 `doctor` command.
 4. Install Nexus and reload the PHP/web service gracefully.
-5. Smoke-test login, MFA, password recovery, customer tickets, technician navigation, administration, and configured integrations.
+5. Smoke-test login, MFA, password recovery, customer tickets, technician navigation, **Administration → NEXUS → Theme Manager**, pause/reactivate, and configured integrations.
 6. Retain the archived 1.0.0 recovery state until acceptance is complete.

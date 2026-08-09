@@ -38,6 +38,10 @@ jobs:
       - name: Run lifecycle tests
         run: php tests/lifecycle.php
 
+      - name: Validate shell entrypoints
+        shell: bash
+        run: sh -n install.sh uninstall.sh install-latest.sh
+
       - name: Verify package checksums
         shell: bash
         run: sha256sum --check SHA256SUMS.txt

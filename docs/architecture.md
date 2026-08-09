@@ -4,7 +4,7 @@
 
 The supported ITFlow 26.08 source exposes an administration color selector, but it does not provide a plugin loader, theme manifest, template override registry, or lifecycle hooks. The official project distributes the application as a source checkout, and the official installer deploys that checkout directly.
 
-A web-upload installer would have to introduce a new privileged PHP endpoint into the document root. That would increase attack surface and still require patching core templates. This package instead uses the existing PHP CLI runtime and remains outside the document root.
+A web-upload installer would have to introduce a PHP endpoint capable of replacing application code. Nexus does not do that: installation, updates, rollback, disable, and uninstall remain root-only CLI operations outside the document root. The installed administration page can only toggle a fixed presentation-state marker through ITFlow's existing administrator session, CSRF validation, audit log, and POST-handler conventions.
 
 References:
 
@@ -55,8 +55,14 @@ This policy prevents an uninstall from silently discarding an ITFlow update, eme
 
 ## File activation
 
-For each managed file, the manager creates a temporary file in the destination directory, applies the recorded permissions and ownership, then renames it over the target. On Linux this is a same-filesystem atomic replacement. The theme-owned stylesheet is removed while disabled or uninstalled.
+For each managed file, the manager creates a temporary file in the destination directory, applies the recorded permissions and ownership, then renames it over the target. On Linux this is a same-filesystem atomic replacement. Activation installs the shared helper before dependent pages and adds administration navigation last. Restoration reverses that order so links and dependent templates are removed before shared assets.
+
+## Administration control
+
+The in-app manager is available only after ITFlow's standard administrator permission check. Its POST action validates the session CSRF token and accepts only `enable` or `disable`. It writes or removes the fixed `uploads/.nexus-theme-disabled` marker atomically; the marker contains no secret or executable content. When absent, the Nexus visual layer is active by default.
+
+Pausing the visual layer does not replace PHP templates or alter protected manager state. Full package lifecycle commands remain available only through the root-owned CLI manager.
 
 ## Trust boundary
 
-The manifest protects payload and baseline files from accidental corruption. It is stored in the same archive, so authenticity comes from verifying the published outer ZIP SHA-256 before extraction. The manager never downloads code, runs a package-supplied SQL migration, or exposes a web endpoint.
+The manifest protects payload and baseline files from accidental corruption. It is stored in the same archive, so authenticity comes from verifying the published outer ZIP SHA-256 before extraction. The manager never downloads code or runs a package-supplied SQL migration. The administration endpoint cannot alter package code, backups, or lifecycle state.

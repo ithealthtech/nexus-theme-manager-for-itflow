@@ -5,6 +5,9 @@
  */
 
 header("X-Frame-Options: DENY"); // Legacy
+
+require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
+$nexus_theme_enabled = nexusThemeIsEnabled();
 ?>
 
 <!DOCTYPE html>
@@ -28,10 +31,12 @@ header("X-Frame-Options: DENY"); // Legacy
 
     <!-- Theme style -->
     <link rel="stylesheet" href="/libs/adminlte/css/adminlte.min.css">
-    <link rel="stylesheet" href="/css/nexus-theme.css">
+    <?php if ($nexus_theme_enabled) { ?>
+        <link rel="stylesheet" href="/css/nexus-theme.css">
+    <?php } ?>
 
 </head>
-<body class="hold-transition nexus-theme nexus-client">
+<body class="hold-transition <?= $nexus_theme_enabled ? 'nexus-theme nexus-client' : '' ?>">
 <a class="sr-only sr-only-focusable" href="#main-content">Skip to main content</a>
 
 <!-- Navbar -->

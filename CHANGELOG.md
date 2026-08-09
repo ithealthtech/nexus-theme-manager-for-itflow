@@ -2,6 +2,21 @@
 
 All notable changes to this project are documented here.
 
+## [2.3.0] - 2026-08-09
+
+### Added
+
+- Added a dedicated **Administration → NEXUS → Theme Manager** page with package, payload, compatibility, and core-asset status.
+- Added an administrator-only, CSRF-protected control for activating or pausing the Nexus visual layer without granting web access to package lifecycle operations.
+- Added audit and application logging for in-app theme state changes.
+- Added an isolated administration preview and README screenshot.
+
+### Changed
+
+- Expanded the managed payload from 13 to 17 files and the verified ITFlow baseline from 12 to 13 templates.
+- Made shared theme loading conditional on the administration-controlled presentation state.
+- Updated lifecycle ordering so dependent navigation and templates are restored before shared Nexus assets are removed.
+
 ## [2.2.0] - 2026-08-09
 
 ### Changed
@@ -44,3 +59,4 @@ All notable changes to this project are documented here.
 [2.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.0.0
 [2.1.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.1.0
 [2.2.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.2.0
+[2.3.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.3.0

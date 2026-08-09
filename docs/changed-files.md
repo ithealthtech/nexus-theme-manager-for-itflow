@@ -7,6 +7,9 @@ Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 | File | Purpose | Upgrade conflict risk |
 |---|---|---|
 | `css/nexus-theme.css` | Scoped tokens and styles for authentication, customer, agent, admin, light/dark, responsive, reduced-motion, and print states | Low |
+| `includes/nexus_theme.php` | Fixed-path, atomic presentation-state control shared by managed surfaces | Low |
+| `admin/nexus.php` | Administrator-only status and theme-control workspace | Low |
+| `admin/post/nexus.php` | CSRF-protected theme state action with audit/application logging | Low |
 
 ## Edited
 
@@ -24,6 +27,7 @@ Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 | `client/profile.php` | Adds page heading and password label association | Field names, action, and handler preserved |
 | `client/login_reset.php` | Applies auth design, persistent labels/autocomplete, accessible feedback, security note, and return links; repairs invalid presentation markup | Reset tokens, request keys, decisions, and redirects preserved |
 | `agent/user/mfa_enforcement.php` | Applies auth design and improves MFA labels/autocomplete/QR alternative text | MFA logic, token field, action, and redirects preserved |
+| `admin/includes/side_nav.php` | Adds the **NEXUS → Theme Manager** administration navigation entry | Existing sections, conditions, and custom links preserved |
 
 ## Intentionally untouched
 
@@ -31,15 +35,15 @@ Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 - Bootstrap and all other files under `libs/**`
 - `css/itflow_custom.css`
 - `includes/inc_wrapper.php` and shared footer logic
-- Agent/admin/client sidebar PHP conditions
+- Agent/client sidebar PHP conditions and all pre-existing administration navigation conditions
 - Authentication handlers, session decisions, rate limiting, MFA verification, CSRF validation, redirects, and authorization
 - Database queries except where existing page output is rendered unchanged
-- POST handlers such as `client/post.php`
+- Existing POST handlers such as `client/post.php`; Nexus adds only its isolated admin handler
 - Schema, migrations, uploads, company logo, favicon, and client data
 
 ## Contract regression result
 
-The overlay was compared file-by-file with the pinned archive. Across all 12 edited PHP files, these sets are unchanged:
+The overlay was compared file-by-file with the pinned archive. Across all 13 edited upstream PHP files, these sets are unchanged except for the isolated Nexus administration route and its explicit POST action:
 
 - Request/session key references
 - HTML field names

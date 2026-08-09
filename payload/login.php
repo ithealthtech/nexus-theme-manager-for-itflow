@@ -12,6 +12,9 @@ if (!file_exists('config.php')) {
 require_once "config.php";
 require_once "functions.php";
 require_once "libs/totp/totp.php";
+require_once __DIR__ . "/includes/nexus_theme.php";
+
+$nexus_theme_enabled = nexusThemeIsEnabled();
 
 require_once __DIR__ . "/includes/session_init.php";
 
@@ -701,9 +704,11 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
     <?php } ?>
 
     <link rel="stylesheet" href="libs/adminlte/css/adminlte.min.css">
-    <link rel="stylesheet" href="css/nexus-theme.css">
+    <?php if ($nexus_theme_enabled) { ?>
+        <link rel="stylesheet" href="css/nexus-theme.css">
+    <?php } ?>
 </head>
-<body class="hold-transition login-page nexus-theme nexus-auth">
+<body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth' : '' ?>">
 
 <div class="login-box">
     <div class="login-logo">

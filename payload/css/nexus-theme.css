@@ -866,6 +866,152 @@ body.nexus-client {
     }
 }
 
+/* Nexus administration manager */
+.nexus-manager-page {
+    padding-bottom: 2rem;
+}
+
+.nexus-agent .nexus-manager-hero {
+    background:
+        radial-gradient(circle at 88% 20%, rgba(105, 201, 238, 0.32), transparent 34%),
+        linear-gradient(120deg, #17162f 0%, #292559 52%, #445cae 100%);
+    box-shadow: 0 1.25rem 3rem rgba(18, 17, 36, 0.2);
+    color: var(--nexus-white);
+    isolation: isolate;
+    position: relative;
+}
+
+.nexus-agent .nexus-manager-hero::after {
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 50%;
+    content: '';
+    height: 15rem;
+    position: absolute;
+    right: -4rem;
+    top: -7rem;
+    width: 15rem;
+    z-index: -1;
+}
+
+.nexus-agent .nexus-manager-hero h1 {
+    color: var(--nexus-white);
+}
+
+.nexus-agent .nexus-manager-hero .lead {
+    color: rgba(255, 255, 255, 0.78);
+    max-width: 48rem;
+}
+
+.nexus-manager-mark {
+    align-items: center;
+    background: var(--nexus-gradient);
+    border-radius: 1rem;
+    box-shadow: 0 0.75rem 1.75rem rgba(105, 201, 238, 0.2);
+    color: var(--nexus-ink);
+    display: inline-flex;
+    font-size: 1.4rem;
+    height: 3.5rem;
+    justify-content: center;
+    width: 3.5rem;
+}
+
+.nexus-manager-kicker {
+    color: var(--nexus-cyan);
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+}
+
+.nexus-manager-status {
+    border-radius: 999px;
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+    padding: 0.55rem 0.8rem;
+    text-transform: uppercase;
+}
+
+.nexus-manager-status .fa-circle {
+    font-size: 0.5rem;
+    vertical-align: 0.12rem;
+}
+
+.nexus-manager-meta {
+    color: rgba(255, 255, 255, 0.67);
+}
+
+.nexus-manager-metrics > div {
+    margin-bottom: 1rem;
+}
+
+.nexus-manager-metrics .card {
+    border: 1px solid rgba(114, 133, 244, 0.12);
+    box-shadow: 0 0.65rem 1.7rem rgba(18, 17, 36, 0.08);
+}
+
+.nexus-manager-metric-icon {
+    align-items: center;
+    border-radius: 0.75rem;
+    color: #ffffff;
+    display: flex;
+    float: right;
+    height: 2.75rem;
+    justify-content: center;
+    width: 2.75rem;
+}
+
+.nexus-manager-control-row {
+    align-items: center;
+    display: flex;
+    gap: 1.5rem;
+    justify-content: space-between;
+    min-height: 4.5rem;
+}
+
+.nexus-manager-command {
+    background: #151427;
+    border: 1px solid rgba(114, 133, 244, 0.25);
+    border-radius: 0.75rem;
+    margin-top: 0.85rem;
+    padding: 0.85rem 1rem;
+}
+
+.nexus-manager-command span {
+    color: #b8b6d2;
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.35rem;
+    text-transform: uppercase;
+}
+
+.nexus-manager-command code {
+    color: var(--nexus-cyan);
+    display: block;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
+.nexus-agent.dark-mode .nexus-manager-metrics .card,
+.nexus-agent.dark-mode .nexus-manager-page > .row > div > .card {
+    border-color: var(--nexus-border);
+}
+
+@media (max-width: 767.98px) {
+    .nexus-manager-hero .btn-lg {
+        width: 100%;
+    }
+
+    .nexus-manager-control-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .nexus-theme *,
     .nexus-theme *::before,

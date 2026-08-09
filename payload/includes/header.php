@@ -6,6 +6,9 @@
 
 header("X-Frame-Options: DENY");
 
+require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
+$nexus_theme_enabled = nexusThemeIsEnabled();
+
 ?>
 
 <!DOCTYPE html>
@@ -36,15 +39,17 @@ header("X-Frame-Options: DENY");
     <link rel="stylesheet" href="/libs/intl-tel-input/css/intlTelInput.min.css">
     <link rel="stylesheet" href="/css/itflow_custom.css">
     <link rel="stylesheet" href="/libs/adminlte/css/adminlte.min.css">
-    <!-- Nexus theme: intentionally loaded after AdminLTE -->
-    <link rel="stylesheet" href="/css/nexus-theme.css">
+    <?php if ($nexus_theme_enabled) { ?>
+        <!-- Nexus theme: intentionally loaded after AdminLTE -->
+        <link rel="stylesheet" href="/css/nexus-theme.css">
+    <?php } ?>
 
     <!-- Scripts -->
     <script src="/libs/jquery/jquery.min.js"></script>
     <script src="/libs/toastr/toastr.min.js"></script>
 </head>
 <body class="
-    hold-transition sidebar-mini layout-fixed layout-navbar-fixed nexus-theme nexus-agent
+    hold-transition sidebar-mini layout-fixed layout-navbar-fixed <?= $nexus_theme_enabled ? 'nexus-theme nexus-agent' : '' ?>
     accent-<?= escapeHtml($config_theme) ?>
     <?php if ($user_config_theme_dark) echo 'dark-mode'; ?>
 ">

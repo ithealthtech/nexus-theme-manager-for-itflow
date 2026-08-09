@@ -3,6 +3,9 @@ require_once "../../config.php";
 require_once "../../functions.php";
 require_once "../../includes/check_login.php";
 require_once '../../libs/totp/totp.php'; //TOTP MFA Lib
+require_once '../../includes/nexus_theme.php';
+
+$nexus_theme_enabled = nexusThemeIsEnabled();
 
 // Get Company Logo
 $sql = mysqli_query($mysqli, "SELECT company_logo FROM companies");
@@ -46,14 +49,16 @@ $data = "otpauth://totp/ITFlow:$session_email?secret=$token";
     <!-- Theme style -->
     <link rel="stylesheet" href="../../libs/adminlte/css/adminlte.min.css">
     <link href="../../libs/toastr/toastr.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="../../css/nexus-theme.css">
+    <?php if ($nexus_theme_enabled) { ?>
+        <link rel="stylesheet" href="../../css/nexus-theme.css">
+    <?php } ?>
 
     <!-- jQuery -->
     <script src="../../libs/jquery/jquery.min.js"></script>
     <script src="../../libs/toastr/toastr.min.js"></script>
 
 </head>
-<body class="hold-transition login-page nexus-theme nexus-auth">
+<body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth' : '' ?>">
     <?php require_once "../../includes/inc_alert_feedback.php"; ?>
     <div class="login-box">
         <div class="login-logo">
