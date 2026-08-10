@@ -63,9 +63,12 @@ $data = "otpauth://totp/ITFlow:$session_email?secret=$token";
 <body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth ' . nexusThemeBodyClasses($nexus_theme_settings) : '' ?>">
     <?php require_once "../../includes/inc_alert_feedback.php"; ?>
     <div class="login-box">
-        <div class="login-logo">
-            <?php $nexus_mfa_logo = nexusThemeLogoUrl($nexus_theme_settings, !empty($company_logo) ? "/uploads/settings/$company_logo" : ''); ?>
-            <?php if ($nexus_theme_settings['branding']['show_login_logo'] && $nexus_mfa_logo !== '') { ?>
+        <?php
+        $nexus_mfa_logo = nexusThemeLogoUrl($nexus_theme_settings, !empty($company_logo) ? "/uploads/settings/$company_logo" : '');
+        $nexus_mfa_has_logo = $nexus_theme_settings['branding']['show_login_logo'] && $nexus_mfa_logo !== '';
+        ?>
+        <div class="login-logo <?= $nexus_mfa_has_logo ? 'nexus-auth-brand--logo' : 'nexus-auth-brand--text' ?>">
+            <?php if ($nexus_mfa_has_logo) { ?>
                 <img alt="<?= escapeHtml($nexus_theme_settings['branding']['logo_alt'] ?: nexusThemeBrandName($company_name, $nexus_theme_settings) . ' logo') ?>" height="110" width="380" class="img-fluid" src="<?= escapeHtml($nexus_mfa_logo) ?>">
             <?php } else { ?>
                 <span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml(nexusThemeBrandName($session_company_name, $nexus_theme_settings)) ?></span>

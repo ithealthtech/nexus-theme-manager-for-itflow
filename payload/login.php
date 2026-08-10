@@ -713,9 +713,12 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
 <body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth ' . nexusThemeBodyClasses($nexus_theme_settings) : '' ?>">
 
 <div class="login-box">
-    <div class="login-logo">
-        <?php $nexus_login_logo = $nexus_theme_enabled ? nexusThemeLogoUrl($nexus_theme_settings, !empty($company_logo) ? "/uploads/settings/$company_logo" : '') : (!empty($company_logo) ? "uploads/settings/$company_logo" : ''); ?>
-        <?php if ($nexus_login_logo !== '' && (!$nexus_theme_enabled || $nexus_theme_settings['branding']['show_login_logo'])) { ?>
+    <?php
+    $nexus_login_logo = $nexus_theme_enabled ? nexusThemeLogoUrl($nexus_theme_settings, !empty($company_logo) ? "/uploads/settings/$company_logo" : '') : (!empty($company_logo) ? "uploads/settings/$company_logo" : '');
+    $nexus_login_has_logo = $nexus_login_logo !== '' && (!$nexus_theme_enabled || $nexus_theme_settings['branding']['show_login_logo']);
+    ?>
+    <div class="login-logo <?= $nexus_login_has_logo ? 'nexus-auth-brand--logo' : 'nexus-auth-brand--text' ?>">
+        <?php if ($nexus_login_has_logo) { ?>
             <img alt="<?= escapeHtml($nexus_theme_enabled ? ($nexus_theme_settings['branding']['logo_alt'] ?: nexusThemeBrandName($company_name, $nexus_theme_settings) . ' logo') : $company_name . ' logo') ?>" height="110" width="380" class="img-fluid" src="<?= escapeHtml($nexus_login_logo) ?>">
         <?php } else { ?>
             <span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml($nexus_theme_enabled ? nexusThemeBrandName($company_name, $nexus_theme_settings) : $company_name) ?></span>

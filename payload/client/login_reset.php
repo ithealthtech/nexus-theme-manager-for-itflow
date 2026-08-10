@@ -199,7 +199,17 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 <body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth ' . nexusThemeBodyClasses($nexus_theme_settings) : '' ?>">
 <div class="login-box">
-    <div class="login-logo"><?php $nexus_reset_logo = nexusThemeLogoUrl($nexus_theme_settings); if ($nexus_theme_settings['branding']['show_login_logo'] && $nexus_reset_logo !== '') { ?><img alt="<?= escapeHtml($nexus_theme_settings['branding']['logo_alt'] ?: nexusThemeBrandName($company_name_display, $nexus_theme_settings) . ' logo') ?>" height="110" width="380" class="img-fluid" src="<?= escapeHtml($nexus_reset_logo) ?>"><?php } else { ?><span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml(nexusThemeBrandName($company_name_display, $nexus_theme_settings)) ?></span><?php } ?></div>
+    <?php
+    $nexus_reset_logo = nexusThemeLogoUrl($nexus_theme_settings);
+    $nexus_reset_has_logo = $nexus_theme_settings['branding']['show_login_logo'] && $nexus_reset_logo !== '';
+    ?>
+    <div class="login-logo <?= $nexus_reset_has_logo ? 'nexus-auth-brand--logo' : 'nexus-auth-brand--text' ?>">
+        <?php if ($nexus_reset_has_logo) { ?>
+            <img alt="<?= escapeHtml($nexus_theme_settings['branding']['logo_alt'] ?: nexusThemeBrandName($company_name_display, $nexus_theme_settings) . ' logo') ?>" height="110" width="380" class="img-fluid" src="<?= escapeHtml($nexus_reset_logo) ?>">
+        <?php } else { ?>
+            <span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml(nexusThemeBrandName($company_name_display, $nexus_theme_settings)) ?></span>
+        <?php } ?>
+    </div>
     <div class="card">
         <div class="card-body login-card-body">
 
