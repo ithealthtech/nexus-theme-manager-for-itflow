@@ -381,16 +381,21 @@ final class NexusUpdater
             'updated_at' => gmdate('c'),
         ], 0600);
 
-        $unitName = 'nexus-theme-update-' . $instance;
-        $serviceUnit = "[Unit]\nDescription=Nexus Theme Manager verified update for $instance\nAfter=network-online.target\nWants=network-online.target\n\n[Service]\nType=oneshot\nUser=root\nGroup=root\nExecStart=" . self::systemdQuote(PHP_BINARY) . ' ' . self::systemdQuote($serviceDirectory . '/updater.php') . ' run --config ' . self::systemdQuote($configPath) . "\nPrivateTmp=true\nProtectHome=true\nProtectSystem=strict\nReadWritePaths=" . self::systemdQuote($root) . ' ' . self::systemdQuote($effectiveStateRoot) . ' ' . self::systemdQuote('/opt') . ' ' . self::systemdQuote($configDirectory) . ' ' . self::systemdQuote($serviceDirectory) . "\nNoNewPrivileges=true\nUMask=0027\nTimeoutStartSec=900\n\n";
         $requestPath = rtrim($root, DIRECTORY_SEPARATOR) . '/uploads/' . NEXUS_UPDATER_REQUEST;
-        $pathUnit = "[Unit]\nDescription=Watch for Nexus Theme Manager update requests for $instance\n\n[Path]\nPathExists=" . self::systemdQuote($requestPath) . "\nUnit=$unitName.service\n\n[Install]\nWantedBy=multi-user.target\n";
-        self::atomicWrite('/etc/systemd/system/' . $unitName . '.service', $serviceUnit, 0644);
-        self::atomicWrite('/etc/systemd/system/' . $unitName . '.path', $pathUnit, 0644);
+        $units = self::renderSystemdUnits(
+            $instance,
+            PHP_BINARY,
+            $serviceDirectory,
+            $configPath,
+            $requestPath,
+            [$root, $effectiveStateRoot, '/opt', $configDirectory, $serviceDirectory]
+        );
+        self::atomicWrite('/etc/systemd/system/' . $units['unit_name'] . '.service', $units['service'], 0644);
+        self::atomicWrite('/etc/systemd/system/' . $units['unit_name'] . '.path', $units['path'], 0644);
 
         $runner = new self($configPath);
         $runner->runProcess(['/usr/bin/systemctl', 'daemon-reload']);
-        $runner->runProcess(['/usr/bin/systemctl', 'enable', '--now', $unitName . '.path']);
+        $runner->runProcess(['/usr/bin/systemctl', 'enable', '--now', $units['unit_name'] . '.path']);
         $runner->writeReadyMarker();
         $runner->writeStatus('ready', 'GUI updates are ready. Check GitHub for the latest Nexus release.', [
             'current_version' => $version,
@@ -430,6 +435,28 @@ final class NexusUpdater
             throw new NexusUpdaterException('Update request is invalid.');
         }
         return ['schema' => NEXUS_UPDATER_SCHEMA, 'action' => $action, 'request_id' => $requestId];
+    }
+
+    public static function renderSystemdUnits(
+        string $instance,
+        string $phpBinary,
+        string $serviceDirectory,
+        string $configPath,
+        string $requestPath,
+        array $writablePaths
+    ): array {
+        if (!preg_match('/^[a-f0-9]{16}$/', $instance) || $writablePaths === []) {
+            throw new NexusUpdaterException('Systemd unit identity or writable paths are invalid.');
+        }
+        foreach (array_merge([$phpBinary, $serviceDirectory, $configPath, $requestPath], $writablePaths) as $path) {
+            self::validateSystemdPath((string)$path);
+        }
+
+        $unitName = 'nexus-theme-update-' . $instance;
+        $serviceUnit = "[Unit]\nDescription=Nexus Theme Manager verified update for $instance\nAfter=network-online.target\nWants=network-online.target\n\n[Service]\nType=oneshot\nUser=root\nGroup=root\nExecStart=" . self::systemdQuote($phpBinary) . ' ' . self::systemdQuote(rtrim($serviceDirectory, '/') . '/updater.php') . ' run --config ' . self::systemdQuote($configPath) . "\nPrivateTmp=true\nProtectHome=true\nProtectSystem=strict\nReadWritePaths=" . implode(' ', array_map(self::systemdQuote(...), $writablePaths)) . "\nNoNewPrivileges=true\nUMask=0027\nTimeoutStartSec=900\n\n";
+        $pathUnit = "[Unit]\nDescription=Watch for Nexus Theme Manager update requests for $instance\n\n[Path]\nPathExists=" . self::systemdPathValue($requestPath) . "\nUnit=$unitName.service\n\n[Install]\nWantedBy=multi-user.target\n";
+
+        return ['unit_name' => $unitName, 'service' => $serviceUnit, 'path' => $pathUnit];
     }
 
     public static function validateVersion(string $version): string
@@ -581,7 +608,20 @@ final class NexusUpdater
 
     private static function systemdQuote(string $value): string
     {
-        return '"' . str_replace(['\\', '"'], ['\\\\', '\\"'], $value) . '"';
+        return '"' . str_replace(['%', '\\', '"'], ['%%', '\\\\', '\\"'], $value) . '"';
+    }
+
+    private static function systemdPathValue(string $value): string
+    {
+        self::validateSystemdPath($value);
+        return str_replace('%', '%%', $value);
+    }
+
+    private static function validateSystemdPath(string $value): void
+    {
+        if (!str_starts_with($value, '/') || preg_match('/[\x00-\x1f\x7f]/', $value)) {
+            throw new NexusUpdaterException('Systemd paths must be absolute and contain no control characters.');
+        }
     }
 
     private static function runSimple(array $command, bool $throw = true): void

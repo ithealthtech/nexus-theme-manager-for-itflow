@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented here.
 
+## [2.5.1] - 2026-08-10
+
+### Fixed
+
+- Fixed the generated `PathExists=` value in the systemd path unit. Version 2.5.0 incorrectly surrounded this directive with quotes, which systemd treated as part of the path and rejected as non-absolute.
+- Centralized service/path unit rendering and escaped systemd specifiers without quoting the single path-directive value.
+
+### Validation
+
+- Added regression coverage for the exact unquoted absolute `PathExists=` syntax.
+- Added Linux CI validation of both generated units with `systemd-analyze verify`.
+
 ## [2.5.0] - 2026-08-09
 
 ### Added
@@ -106,3 +118,4 @@ All notable changes to this project are documented here.
 [2.3.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.3.0
 [2.4.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.4.0
 [2.5.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.0
+[2.5.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.1

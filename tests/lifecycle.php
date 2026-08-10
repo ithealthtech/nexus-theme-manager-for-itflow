@@ -205,7 +205,7 @@ try {
         'schema' => 1,
         'state' => 'running',
         'message' => '<b>Installing</b>',
-        'current_version' => '2.5.0',
+        'current_version' => '2.5.1',
         'latest_version' => '2.6.0',
         'release_url' => 'https://evil.invalid/release',
         'updated_at' => gmdate('c'),
