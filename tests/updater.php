@@ -99,6 +99,15 @@ try {
     updaterExpect($command === 'install-service' && $options['root'] === '/var/www/itflow' && $options['state_root'] === '/state', 'service setup arguments are parsed without shell interpretation');
     updaterThrows(fn() => nexusUpdaterArguments(['updater.php', 'run', '--url', 'https://evil.invalid']), 'arbitrary updater CLI arguments are rejected');
 
+    $activationRoot = $temporary . DIRECTORY_SEPARATOR . 'activation-root';
+    mkdir($activationRoot, 0700, true);
+    $updateWorkspace = NexusUpdater::createUpdateWorkspace($activationRoot);
+    updaterExpect(
+        dirname($updateWorkspace) === realpath($activationRoot)
+            && str_starts_with(basename($updateWorkspace), '.nexus-update-'),
+        'update workspace is created on the package activation filesystem'
+    );
+
     $unitInstance = str_repeat('b', 16);
     $unitDirectory = $temporary . DIRECTORY_SEPARATOR . 'units';
     $unitUploads = $unitDirectory . DIRECTORY_SEPARATOR . 'uploads';
@@ -147,9 +156,12 @@ try {
     }
 
     $source = (string)file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'updater.php');
+    $installerSource = (string)file_get_contents(dirname(__DIR__) . DIRECTORY_SEPARATOR . 'install-latest.sh');
     updaterExpect(str_contains($source, 'PathExists=') && str_contains($source, 'NoNewPrivileges=true'), 'systemd service uses a fixed request path and hardened execution');
     updaterExpect(str_contains($source, 'ProtectSystem=strict') && str_contains($source, 'ReadWritePaths='), 'systemd service limits filesystem writes to declared paths');
     updaterExpect(str_contains($source, "'--max-filesize'") && str_contains($source, 'validateExtractedTree'), 'release downloads and extracted trees have protected limits');
+    updaterExpect(str_contains($source, 'createUpdateWorkspace($packageRoot)') && !str_contains($source, "rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'nexus-update-'"), 'package activation never relies on a cross-filesystem temporary rename');
+    updaterExpect(str_contains($source, "if (\$command === 'repair-service')") && str_contains($installerSource, '--repair-gui-updater'), 'verified bootstrap can repair an existing updater without replacing the active theme');
     updaterExpect(str_contains($source, "PHP_SAPI !== 'cli'"), 'privileged updater entrypoint rejects web execution');
     updaterExpect(str_contains($source, 'The previous Nexus version was restored automatically.'), 'failed activation includes an automatic rollback path');
     updaterExpect(!str_contains($source, 'shell_exec(') && !preg_match('/\bexec\s*\(/', $source), 'updater does not invoke a command shell');

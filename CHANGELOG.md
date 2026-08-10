@@ -2,6 +2,23 @@
 
 All notable changes to this project are documented here.
 
+## [2.5.3] - 2026-08-10
+
+### Fixed
+
+- Fixed GUI update activation when systemd's private temporary directory is on a different filesystem from `/opt`. Verified releases are now downloaded and extracted inside a root-only staging directory on the `/opt` filesystem before the final atomic rename.
+- Replaced the generic `/opt` move failure with an activation error tied to the protected package root.
+
+### Added
+
+- Added a `repair-service` updater command that refreshes only the privileged updater helper while preserving the active theme version and package registration.
+- Added `install-latest.sh --repair-gui-updater` as a verified recovery path for affected 2.5.0–2.5.2 installations.
+
+### Validation
+
+- Added regression coverage proving the update workspace shares the package activation filesystem.
+- Added coverage for the verified repair bootstrap and unchanged updater security constraints.
+
 ## [2.5.2] - 2026-08-10
 
 ### Fixed
@@ -131,5 +148,6 @@ All notable changes to this project are documented here.
 [2.3.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.3.0
 [2.4.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.4.0
 [2.5.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.0
+[2.5.3]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.3
 [2.5.2]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.2
 [2.5.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.1

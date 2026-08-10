@@ -6,7 +6,7 @@ RELEASES_URL="https://github.com/$REPOSITORY/releases"
 
 usage() {
     cat <<'EOF'
-Usage: sudo ./install-latest.sh --root PATH [--state-root PATH] [--no-gui-updater]
+Usage: sudo ./install-latest.sh --root PATH [--state-root PATH] [--no-gui-updater] [--repair-gui-updater]
 
 Downloads the latest published Nexus Theme Manager release from GitHub,
 verifies its SHA-256 checksum, extracts it under /opt, and installs it.
@@ -15,6 +15,8 @@ Options:
   --root PATH        ITFlow application root (required)
   --state-root PATH  Override the protected manager state directory
   --no-gui-updater   Skip installing the protected systemd GUI updater
+  --repair-gui-updater
+                     Refresh a broken existing GUI updater without changing the active theme
   -h, --help         Show this help
 EOF
 }
@@ -31,6 +33,7 @@ require_command() {
 itflow_root=""
 state_root=""
 gui_updater="yes"
+repair_gui_updater="no"
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -46,6 +49,10 @@ while [ "$#" -gt 0 ]; do
             ;;
         --no-gui-updater)
             gui_updater="no"
+            shift
+            ;;
+        --repair-gui-updater)
+            repair_gui_updater="yes"
             shift
             ;;
         -h|--help)
@@ -78,7 +85,11 @@ instance_id=$(printf '%s' "$resolved_itflow_root" | sha256sum | cut -c1-16)
 effective_state_root=${state_root:-/var/lib/nexus-itflow-theme}
 existing_state="$effective_state_root/$instance_id/state.json"
 
-[ ! -f "$existing_state" ] || fail "An existing managed Nexus installation was detected. Use manager.php from the currently installed Nexus version to verify and uninstall it, then rerun this installer."
+if [ "$repair_gui_updater" = "no" ]; then
+    [ ! -f "$existing_state" ] || fail "An existing managed Nexus installation was detected. Use manager.php from the currently installed Nexus version to verify and uninstall it, then rerun this installer."
+elif [ "$gui_updater" = "no" ]; then
+    fail "--repair-gui-updater cannot be combined with --no-gui-updater"
+fi
 
 temporary_directory=$(mktemp -d)
 trap 'rm -rf -- "$temporary_directory"' EXIT HUP INT TERM
@@ -100,7 +111,9 @@ checksum_name="$archive_name.sha256.txt"
 download_url="$RELEASES_URL/download/$release_tag"
 install_directory="/opt/$asset_name"
 
-[ ! -e "$install_directory" ] || fail "Destination already exists: $install_directory"
+if [ "$repair_gui_updater" = "no" ]; then
+    [ ! -e "$install_directory" ] || fail "Destination already exists: $install_directory"
+fi
 
 printf 'Downloading Nexus Theme Manager %s...\n' "$release_version"
 curl --fail --silent --show-error --location \
@@ -125,6 +138,14 @@ done
 
 mkdir -p /opt
 unzip -q "$temporary_directory/$archive_name" -d "$temporary_directory/extracted"
+
+if [ "$repair_gui_updater" = "yes" ]; then
+    printf 'Repairing the protected GUI updater service...\n'
+    php "$temporary_directory/extracted/$asset_name/updater.php" repair-service --root "$itflow_root"
+    printf '\nGUI updater repaired. Return to Theme Studio, check for updates, and install %s.\n' "$release_version"
+    exit 0
+fi
+
 mv "$temporary_directory/extracted/$asset_name" "$install_directory"
 
 run_manager() {

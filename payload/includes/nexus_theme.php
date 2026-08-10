@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-const NEXUS_MANAGER_VERSION = '2.5.2';
+const NEXUS_MANAGER_VERSION = '2.5.3';
 const NEXUS_THEME_VERSION = '26.08.7';
 const NEXUS_ITFLOW_COMMIT = '89b080b430aaafba5d520c4e52c57b28a9559085';
 const NEXUS_THEME_DISABLED_MARKER = '.nexus-theme-disabled';
