@@ -2,6 +2,26 @@
 
 All notable changes to this project are documented here.
 
+## [3.3.0] - 2026-08-10
+
+### Added
+
+- Theme Studio now uses persistent sub-navigation with focused sections for Branding, Colors, Layout, Motion, Content, Presets & Scheduling, and Updates & System.
+- Section URLs are refresh-stable, making it possible to return directly to a specific settings area without losing the single-page editing workflow.
+- Added a dedicated motion workspace with its own accessibility guidance instead of crowding animation controls into Layout.
+
+### Changed
+
+- Live preview appears only while editing design settings; presets, schedules, recovery, updates, import/export, and reset now open in their own full-width workspaces.
+- The desktop section rail becomes a compact horizontally scrolling submenu on smaller screens.
+- Save and apply remains available across every design section while management actions keep their existing isolated forms and protected lifecycle behavior.
+
+### Validation
+
+- Browser-validated Branding, Presets & Scheduling, and Updates & System section switching in an isolated local Theme Studio fixture.
+- Added lifecycle assertions for the seven-section navigation, hash persistence, motion separation, hidden management panels, and responsive navigation treatment.
+- Captured and reviewed the updated Theme Studio screenshot used by this README.
+
 ## [3.2.0] - 2026-08-10
 
 ### Added
@@ -298,6 +318,7 @@ All notable changes to this project are documented here.
 [3.1.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.1.0
 [3.1.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.1.1
 [3.2.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.2.0
+[3.3.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.3.0
 [3.0.2]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.2
 [3.0.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.1
 [3.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.0

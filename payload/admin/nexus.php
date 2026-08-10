@@ -106,17 +106,33 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
         <input type="hidden" name="nexus_theme_save" value="1">
         <input type="hidden" name="nexus[preset]" id="nexus-preset" value="<?= escapeHtml($nexusSettings['preset']) ?>">
 
-        <div class="row mt-4">
-            <div class="col-xl-7">
+        <div class="nexus-studio-workspace mt-4" data-active-section="brand">
+            <aside class="card nexus-workspace-navigation">
+                <div class="card-body p-3">
+                    <div class="nexus-workspace-navigation-title"><span class="nexus-manager-kicker">Theme settings</span><strong>Studio navigation</strong></div>
+                    <nav class="nav nexus-studio-tabs" aria-label="Theme Studio sections">
+                        <span class="nexus-workspace-nav-label">Design</span>
+                        <a class="nav-link active" href="#nexus-brand" data-workspace-section="brand" data-workspace-title="Branding" data-workspace-description="Logos, identity, browser details, and login artwork."><i class="fas fa-fingerprint"></i><span><strong>Branding</strong><small>Logos &amp; identity</small></span></a>
+                        <a class="nav-link" href="#nexus-colors" data-workspace-section="colors" data-workspace-title="Colors" data-workspace-description="Palettes, surfaces, accents, and accessibility contrast."><i class="fas fa-palette"></i><span><strong>Colors</strong><small>Palette &amp; contrast</small></span></a>
+                        <a class="nav-link" href="#nexus-layout" data-workspace-section="layout" data-workspace-title="Layout" data-workspace-description="Sidebar, header, navigation, density, and interface scale."><i class="fas fa-sliders-h"></i><span><strong>Layout</strong><small>Navigation &amp; spacing</small></span></a>
+                        <a class="nav-link" href="#nexus-motion" data-workspace-section="motion" data-workspace-title="Motion" data-workspace-description="Animation profiles and reduced-motion behavior."><i class="fas fa-magic"></i><span><strong>Motion</strong><small>Popups &amp; modals</small></span></a>
+                        <a class="nav-link" href="#nexus-content" data-workspace-section="content" data-workspace-title="Content" data-workspace-description="Login and client portal headings, messages, and supporting copy."><i class="fas fa-pen-nib"></i><span><strong>Content</strong><small>Headings &amp; messages</small></span></a>
+                        <span class="nexus-workspace-nav-label">Manage</span>
+                        <a class="nav-link" href="#nexus-operations" data-workspace-section="operations" data-workspace-title="Presets &amp; scheduling" data-workspace-description="Save designs, schedule activation, and recover the previous look."><i class="fas fa-layer-group"></i><span><strong>Presets &amp; schedule</strong><small>Reuse &amp; automate</small></span></a>
+                        <a class="nav-link" href="#nexus-system" data-workspace-section="system" data-workspace-title="Updates &amp; system" data-workspace-description="Protected updates, configuration transfer, and factory reset."><i class="fas fa-shield-alt"></i><span><strong>Updates &amp; system</strong><small>Lifecycle &amp; tools</small></span></a>
+                    </nav>
+                    <div class="nexus-workspace-navigation-note"><i class="fas fa-check-circle"></i><span>Settings remain unsaved until you choose <strong>Save and apply</strong>.</span></div>
+                </div>
+            </aside>
+
+            <div class="nexus-workspace-content">
+                <header class="card nexus-workspace-heading">
+                    <div class="card-body"><div><span class="nexus-manager-kicker">Current section</span><h2 class="h4 mb-1" id="nexus-workspace-title">Branding</h2><p class="text-muted mb-0" id="nexus-workspace-description">Logos, identity, browser details, and login artwork.</p></div><span class="nexus-workspace-step" id="nexus-workspace-step">1 of 7</span></div>
+                </header>
+
+                <div class="row nexus-workspace-row">
+            <div class="col-xl-7 nexus-workspace-editor-column">
                 <section class="card nexus-studio-editor">
-                    <div class="card-header border-0 pb-0">
-                        <ul class="nav nav-pills nexus-studio-tabs" role="tablist">
-                            <li class="nav-item"><a class="nav-link active" data-toggle="pill" href="#nexus-brand" role="tab"><i class="fas fa-fingerprint mr-2"></i>Brand</a></li>
-                            <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#nexus-colors" role="tab"><i class="fas fa-palette mr-2"></i>Colors</a></li>
-                            <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#nexus-layout" role="tab"><i class="fas fa-sliders-h mr-2"></i>Layout</a></li>
-                            <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#nexus-content" role="tab"><i class="fas fa-pen-nib mr-2"></i>Content</a></li>
-                        </ul>
-                    </div>
                     <div class="card-body">
                         <div class="tab-content">
                             <div class="tab-pane fade show active" id="nexus-brand" role="tabpanel">
@@ -173,8 +189,15 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
                                 <div class="form-row"><div class="form-group col-md-6"><label for="nexus-header-style">Header treatment</label><select class="custom-select nexus-navigation-control" id="nexus-header-style" name="nexus[appearance][header_style]"><?php foreach (['solid' => 'Solid', 'gradient' => 'Gradient', 'glass' => 'Glass'] as $value => $label) { ?><option value="<?= $value ?>" <?= $nexusSettings['appearance']['header_style'] === $value ? 'selected' : '' ?>><?= $label ?></option><?php } ?></select></div><div class="form-group col-md-6"><label for="nexus-navigation-style">Active navigation</label><select class="custom-select nexus-navigation-control" id="nexus-navigation-style" name="nexus[appearance][navigation_style]"><?php foreach (['pill' => 'Gradient pill', 'rail' => 'Accent rail', 'outline' => 'Outline'] as $value => $label) { ?><option value="<?= $value ?>" <?= $nexusSettings['appearance']['navigation_style'] === $value ? 'selected' : '' ?>><?= $label ?></option><?php } ?></select></div></div>
                                 <div class="custom-control custom-switch mb-3"><input type="checkbox" class="custom-control-input nexus-navigation-control" id="nexus-sidebar-compact" name="nexus[appearance][sidebar_compact]" value="1" <?= $nexusSettings['appearance']['sidebar_compact'] ? 'checked' : '' ?>><label class="custom-control-label" for="nexus-sidebar-compact">Compact sidebar labels and section spacing</label></div>
                                 <div class="form-group"><div class="d-flex justify-content-between"><label for="nexus-font-scale">Interface scale</label><output id="nexus-font-scale-output"><?= (int)$nexusSettings['appearance']['font_scale'] ?>%</output></div><input type="range" class="custom-range" id="nexus-font-scale" name="nexus[appearance][font_scale]" min="90" max="110" step="1" value="<?= (int)$nexusSettings['appearance']['font_scale'] ?>"></div>
-                                <div class="form-group"><label for="nexus-motion-style">Popup and modal motion</label><div class="input-group"><select class="custom-select" id="nexus-motion-style" name="nexus[appearance][motion_style]"><?php foreach (['subtle' => 'Subtle - short, low movement', 'fluid' => 'Fluid - smooth and polished', 'snappy' => 'Snappy - quick with extra energy'] as $value => $label) { ?><option value="<?= $value ?>" <?= $nexusSettings['appearance']['motion_style'] === $value ? 'selected' : '' ?>><?= $label ?></option><?php } ?></select><div class="input-group-append"><button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#nexus-motion-preview-modal"><i class="fas fa-play mr-1"></i>Preview</button></div></div><small class="form-text">Controls modals, dropdowns, tooltips, alerts, toasts, and floating panels.</small></div>
-                                <div class="custom-control custom-switch"><input type="checkbox" class="custom-control-input" id="nexus-reduce-motion" name="nexus[appearance][reduce_motion]" value="1" <?= $nexusSettings['appearance']['reduce_motion'] ? 'checked' : '' ?>><label class="custom-control-label" for="nexus-reduce-motion">Reduce animations and hover motion</label></div>
+                            </div>
+
+                            <div class="tab-pane fade" id="nexus-motion" role="tabpanel">
+                                <div class="nexus-section-heading"><span class="nexus-section-icon"><i class="fas fa-magic"></i></span><div><h2 class="h5 mb-1">Motion &amp; interaction</h2><p class="text-muted mb-0">Give overlays polish without getting in the user's way.</p></div></div>
+                                <div class="nexus-motion-settings mt-4">
+                                    <div class="form-group"><label for="nexus-motion-style">Popup and modal motion</label><div class="input-group"><select class="custom-select" id="nexus-motion-style" name="nexus[appearance][motion_style]"><?php foreach (['subtle' => 'Subtle - short, low movement', 'fluid' => 'Fluid - smooth and polished', 'snappy' => 'Snappy - quick with extra energy'] as $value => $label) { ?><option value="<?= $value ?>" <?= $nexusSettings['appearance']['motion_style'] === $value ? 'selected' : '' ?>><?= $label ?></option><?php } ?></select><div class="input-group-append"><button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#nexus-motion-preview-modal"><i class="fas fa-play mr-1"></i>Preview</button></div></div><small class="form-text">Controls modals, dropdowns, tooltips, alerts, toasts, and floating panels.</small></div>
+                                    <div class="custom-control custom-switch"><input type="checkbox" class="custom-control-input" id="nexus-reduce-motion" name="nexus[appearance][reduce_motion]" value="1" <?= $nexusSettings['appearance']['reduce_motion'] ? 'checked' : '' ?>><label class="custom-control-label" for="nexus-reduce-motion">Reduce animations and hover motion</label></div>
+                                    <div class="nexus-motion-callout"><i class="fas fa-universal-access"></i><div><strong>Accessibility stays in control</strong><p class="mb-0">The visitor's operating-system preference still takes priority over the selected animation profile.</p></div></div>
+                                </div>
                             </div>
 
                             <div class="tab-pane fade" id="nexus-content" role="tabpanel">
@@ -193,9 +216,9 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
                 </section>
             </div>
 
-            <div class="col-xl-5 mt-4 mt-xl-0">
+            <div class="col-xl-5 mt-4 mt-xl-0 nexus-workspace-side-column">
                 <div class="nexus-preview-sticky">
-                    <section class="card nexus-preview-card">
+                    <section class="card nexus-preview-card nexus-workspace-preview">
                         <div class="card-header border-0 d-flex align-items-center justify-content-between"><div><span class="nexus-manager-kicker">Live preview</span><h2 class="h5 mb-0" id="nexus-preview-title">Authentication</h2></div><div class="btn-group btn-group-sm" role="group" aria-label="Preview surface"><button type="button" class="btn btn-info nexus-preview-mode active" data-mode="auth">Login</button><button type="button" class="btn btn-outline-info nexus-preview-mode" data-mode="navigation">Navigation</button></div></div>
                         <div class="card-body p-0">
                             <div class="nexus-live-preview" id="nexus-live-preview" style="--preview-primary:<?= $nexusSettings['colors']['primary'] ?>;--preview-secondary:<?= $nexusSettings['colors']['secondary'] ?>;--preview-sidebar:<?= $nexusSettings['colors']['sidebar'] ?>;--preview-header:<?= $nexusSettings['colors']['header'] ?>;--preview-header-text:<?= $nexusSettings['colors']['header_text'] ?>;--preview-auth:<?= $nexusSettings['colors']['auth_background'] ?>;--preview-page:<?= $nexusSettings['colors']['page'] ?>;--preview-surface:<?= $nexusSettings['colors']['surface'] ?>;--preview-text:<?= $nexusSettings['colors']['text'] ?>;--preview-overlay:<?= $nexusSettings['branding']['login_background_overlay'] / 100 ?>;--preview-bg-position:<?= $nexusSettings['branding']['login_background_position'] ?> center;<?php if ($nexusLoginBackgroundUrl !== '') { ?>--preview-bg-image:url('<?= escapeHtml($nexusLoginBackgroundUrl) ?>');<?php } ?>">
@@ -216,7 +239,7 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
                         </div>
                     </section>
 
-                    <section class="card nexus-design-operations">
+                    <section class="card nexus-design-operations nexus-workspace-panel" data-workspace-panel="operations" id="nexus-operations">
                         <div class="card-header border-0"><div><span class="nexus-manager-kicker">Design operations</span><h2 class="h5 mb-0">Presets, schedule &amp; recovery</h2></div></div>
                         <div class="card-body pt-0">
                             <label for="nexus-preset-name">Save this design as a preset</label><div class="input-group mb-3"><input class="form-control" id="nexus-preset-name" name="nexus_preset_name" form="nexus-save-preset-form" maxlength="50" placeholder="e.g. Holiday campaign"><div class="input-group-append"><button class="btn btn-outline-info" type="submit" form="nexus-save-preset-form" <?= $nexusControlWritable ? '' : 'disabled' ?>><i class="fas fa-bookmark mr-1"></i>Save</button></div></div>
@@ -227,7 +250,7 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
                         </div>
                     </section>
 
-                    <section class="card nexus-update-card">
+                    <section class="card nexus-update-card nexus-workspace-panel" data-workspace-panel="system" id="nexus-system">
                         <div class="card-header border-0 d-flex align-items-center justify-content-between">
                             <div><span class="nexus-manager-kicker">Protected lifecycle</span><h2 class="h5 mb-0">Nexus updates</h2></div>
                             <span class="badge badge-<?= $nexusUpdatePresentation[0] ?> px-3 py-2"><i class="fas fa-<?= $nexusUpdatePresentation[1] ?> mr-1"></i><?= $nexusUpdatePresentation[2] ?></span>
@@ -258,10 +281,12 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
                         <div class="card-footer bg-transparent border-0 pt-0"><span class="small text-muted"><i class="fas fa-lock mr-1 text-success"></i>Fixed repository · SHA-256 verification · rollback protection</span></div>
                     </section>
 
-                    <section class="card">
+                    <section class="card nexus-workspace-panel" data-workspace-panel="system">
                         <div class="card-header border-0"><h2 class="card-title font-weight-bold"><i class="fas fa-toolbox mr-2 text-info"></i>Configuration tools</h2></div>
                         <div class="card-body pt-0"><p class="text-muted">Move designs between Nexus installations or return to the factory palette.</p><div class="btn-group w-100"><button type="button" class="btn btn-outline-info" id="nexus-export"><i class="fas fa-download mr-1"></i>Export</button><button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#nexus-import-modal"><i class="fas fa-upload mr-1"></i>Import</button><button type="submit" form="nexus-reset-form" class="btn btn-outline-danger" <?= $nexusControlWritable ? '' : 'disabled' ?> onclick="return confirm('Restore every Nexus customization to its default value?')"><i class="fas fa-undo mr-1"></i>Reset</button></div><textarea class="d-none" id="nexus-export-json"><?= escapeHtml((string)$nexusExportJson) ?></textarea></div>
                     </section>
+                </div>
+            </div>
                 </div>
             </div>
         </div>
@@ -294,7 +319,36 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
     if (!studio) return;
     var preview = document.getElementById('nexus-live-preview');
     var presetField = document.getElementById('nexus-preset');
+    var workspace = studio.querySelector('.nexus-studio-workspace');
+    var workspaceLinks = Array.prototype.slice.call(studio.querySelectorAll('[data-workspace-section]'));
+    var designSections = ['brand', 'colors', 'layout', 'motion', 'content'];
     var colorVariables = {primary:'--preview-primary', secondary:'--preview-secondary', sidebar:'--preview-sidebar', header:'--preview-header', header_text:'--preview-header-text', auth_background:'--preview-auth', page:'--preview-page', surface:'--preview-surface', text:'--preview-text'};
+
+    function showWorkspaceSection(section, updateLocation) {
+        var selected = workspaceLinks.find(function (link) { return link.dataset.workspaceSection === section; });
+        if (!workspace || !selected) return;
+        workspace.dataset.activeSection = section;
+        workspaceLinks.forEach(function (link) {
+            var active = link === selected;
+            link.classList.toggle('active', active);
+            link.setAttribute('aria-current', active ? 'page' : 'false');
+        });
+        studio.querySelectorAll('.nexus-studio-editor .tab-pane').forEach(function (panel) {
+            var active = panel.id === 'nexus-' + section && designSections.indexOf(section) !== -1;
+            panel.classList.toggle('active', active);
+            panel.classList.toggle('show', active);
+        });
+        document.getElementById('nexus-workspace-title').textContent = selected.dataset.workspaceTitle;
+        document.getElementById('nexus-workspace-description').textContent = selected.dataset.workspaceDescription;
+        document.getElementById('nexus-workspace-step').textContent = (workspaceLinks.indexOf(selected) + 1) + ' of ' + workspaceLinks.length;
+        if (section === 'layout') showPreviewMode('navigation');
+        if (section === 'brand' || section === 'content') showPreviewMode('auth');
+        if (updateLocation && window.history && window.history.replaceState) window.history.replaceState(null, '', selected.getAttribute('href'));
+    }
+
+    workspaceLinks.forEach(function (link) { link.addEventListener('click', function (event) { event.preventDefault(); showWorkspaceSection(link.dataset.workspaceSection, true); }); });
+    var requestedSection = window.location.hash.indexOf('#nexus-') === 0 ? window.location.hash.slice(7) : 'brand';
+    if (!workspaceLinks.some(function (link) { return link.dataset.workspaceSection === requestedSection; })) requestedSection = 'brand';
 
     function updateStudioPalette() {
         var primary = studio.querySelector('[data-color="primary"]').value;
@@ -343,6 +397,9 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
     var scheduleForm = document.getElementById('nexus-schedule-form'); scheduleForm.addEventListener('submit', function (event) { var local = document.getElementById('nexus-schedule-local').value; if (!local) return; var date = new Date(local); if (isNaN(date.getTime())) { event.preventDefault(); return; } document.getElementById('nexus-schedule-at').value = date.toISOString(); });
     updateNavigationPreview(); updateLogoPreview(); updateBackgroundPreview();
     updateContrast();
+    showWorkspaceSection(requestedSection, false);
+    document.getElementById('nexus-customizer-form').addEventListener('input', function () { workspace.classList.add('is-dirty'); });
+    document.getElementById('nexus-customizer-form').addEventListener('change', function () { workspace.classList.add('is-dirty'); });
     <?php if ($nexusUpdateBusy) { ?>setTimeout(function () { window.location.reload(); }, 3500);<?php } ?>
 })();
 </script>

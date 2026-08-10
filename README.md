@@ -10,11 +10,12 @@ ITFlow 26.08 does not expose a native plugin or theme-hook loader. Nexus therefo
 
 ## Administration manager
 
-![Nexus Theme Studio administration page](docs/images/nexus-theme-studio-layout-v3-0-1.png)
+![Nexus Theme Studio administration page](docs/images/nexus-theme-studio-v3-3.jpg)
 
 After installation, open **Administration → NEXUS → Theme Manager**. Theme Studio provides:
 
 - Separate light and dark PNG, JPEG, WebP, or animated GIF logos with native embedded timing—including 24fps artwork—plus content inspection, an 8 MB limit, dimension limits, safe fixed filenames, automatic cache refresh after replacement, contrast selection, sizing, and alignment controls.
+- A focused seven-section workspace with persistent sub-navigation for Branding, Colors, Layout, Motion, Content, Presets & Scheduling, and Updates & System; only the selected controls are shown, and section links survive refreshes.
 - Independent logo placement for authentication pages, the linked technician navigation header, and the client portal; visible company-name text is suppressed wherever the custom logo is active.
 - Branded public guest and invoice views with the active logo, tagline, browser title, favicon, responsive billing masthead, consistent headings, print-safe document styling, and a matching downloadable PDF.
 - Display name, tagline, browser title, custom favicon, login background with focal-point and overlay controls, login messaging, and client-portal messaging.
@@ -58,8 +59,8 @@ Printing keeps a compact, paper-safe Nexus heading. Download uses a dedicated UR
 |---|---|
 | ITFlow release | 26.08 |
 | ITFlow commit | `89b080b430aaafba5d520c4e52c57b28a9559085` |
-| Theme manager | 3.2.0 |
-| Theme payload | 26.08.15 |
+| Theme manager | 3.3.0 |
+| Theme payload | 26.08.16 |
 | Runtime | PHP 8.1 or newer; CLI SAPI for lifecycle operations and the normal ITFlow web SAPI for administration controls |
 | Target systems | Debian/Ubuntu production installs; lifecycle tests also run on Windows |
 
@@ -75,7 +76,7 @@ Install the command-line prerequisites, set `nexus_version` to the release you w
 sudo apt-get update
 sudo apt-get install -y ca-certificates curl unzip
 
-nexus_version="3.2.0"
+nexus_version="3.3.0"
 nexus_asset="Nexus-Theme-Manager-for-ITFlow-${nexus_version}"
 nexus_download_dir="$HOME/Downloads/nexus-theme-manager"
 
@@ -134,7 +135,7 @@ The bootstrap installer detects existing protected Nexus state before downloadin
 ## Install
 
 1. Create and verify an ITFlow application/database backup.
-2. Extract this ZIP outside the ITFlow document root, for example `/opt/Nexus-Theme-Manager-for-ITFlow-3.2.0`.
+2. Extract this ZIP outside the ITFlow document root, for example `/opt/Nexus-Theme-Manager-for-ITFlow-3.3.0`.
 3. Run the non-mutating preflight:
 
 ```bash
@@ -244,8 +245,8 @@ sudo php /opt/theme-manager-1.0.0/manager.php uninstall --root /var/www/itflow.e
 2. Run the current preflight and install.
 
 ```bash
-sudo php /opt/Nexus-Theme-Manager-for-ITFlow-3.2.0/manager.php doctor --root /var/www/itflow.example.com
-sudo php /opt/Nexus-Theme-Manager-for-ITFlow-3.2.0/manager.php install --root /var/www/itflow.example.com --yes
+sudo php /opt/Nexus-Theme-Manager-for-ITFlow-3.3.0/manager.php doctor --root /var/www/itflow.example.com
+sudo php /opt/Nexus-Theme-Manager-for-ITFlow-3.3.0/manager.php install --root /var/www/itflow.example.com --yes
 ```
 
 The new protected state root is `/var/lib/nexus-itflow-theme`. Keep the archived 1.0.0 recovery state until the Nexus installation and portal smoke tests pass.
