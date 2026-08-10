@@ -33,10 +33,13 @@ jobs:
           set -euo pipefail
           while IFS= read -r -d '' file; do
             php -l "$file"
-          done < <(find manager.php tests payload baseline -type f -name '*.php' -print0)
+          done < <(find manager.php updater.php tests payload baseline -type f -name '*.php' -print0)
 
       - name: Run lifecycle tests
         run: php tests/lifecycle.php
+
+      - name: Run GUI updater security tests
+        run: php tests/updater.php
 
       - name: Validate shell entrypoints
         shell: bash

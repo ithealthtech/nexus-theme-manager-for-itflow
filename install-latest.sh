@@ -6,7 +6,7 @@ RELEASES_URL="https://github.com/$REPOSITORY/releases"
 
 usage() {
     cat <<'EOF'
-Usage: sudo ./install-latest.sh --root PATH [--state-root PATH]
+Usage: sudo ./install-latest.sh --root PATH [--state-root PATH] [--no-gui-updater]
 
 Downloads the latest published Nexus Theme Manager release from GitHub,
 verifies its SHA-256 checksum, extracts it under /opt, and installs it.
@@ -14,6 +14,7 @@ verifies its SHA-256 checksum, extracts it under /opt, and installs it.
 Options:
   --root PATH        ITFlow application root (required)
   --state-root PATH  Override the protected manager state directory
+  --no-gui-updater   Skip installing the protected systemd GUI updater
   -h, --help         Show this help
 EOF
 }
@@ -29,6 +30,7 @@ require_command() {
 
 itflow_root=""
 state_root=""
+gui_updater="yes"
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -41,6 +43,10 @@ while [ "$#" -gt 0 ]; do
             [ "$#" -ge 2 ] || fail "--state-root requires a path"
             state_root=$2
             shift 2
+            ;;
+        --no-gui-updater)
+            gui_updater="no"
+            shift
             ;;
         -h|--help)
             usage
@@ -142,6 +148,17 @@ run_manager install --yes
 printf 'Verifying the installation...\n'
 run_manager verify
 run_manager status
+
+if [ "$gui_updater" = "yes" ]; then
+    printf 'Installing the protected GUI updater service...\n'
+    if [ -n "$state_root" ]; then
+        if ! php "$install_directory/updater.php" install-service --root "$itflow_root" --state-root "$state_root"; then
+            printf 'Warning: Nexus installed, but GUI updater setup failed. Run updater.php install-service after resolving the reported systemd prerequisite.\n' >&2
+        fi
+    elif ! php "$install_directory/updater.php" install-service --root "$itflow_root"; then
+        printf 'Warning: Nexus installed, but GUI updater setup failed. Run updater.php install-service after resolving the reported systemd prerequisite.\n' >&2
+    fi
+fi
 
 printf '\nInstalled Nexus Theme Manager %s from %s.\n' "$release_version" "$install_directory"
 printf 'Reload the web/PHP service gracefully, then smoke-test the ITFlow interfaces.\n'

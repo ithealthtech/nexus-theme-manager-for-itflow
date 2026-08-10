@@ -8,6 +8,8 @@ header("X-Frame-Options: DENY");
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
 $nexus_theme_enabled = nexusThemeIsEnabled();
+$nexus_theme_settings = nexusThemeSettings();
+$nexus_brand_name = nexusThemeBrandName($session_company_name, $nexus_theme_settings);
 
 ?>
 
@@ -19,7 +21,7 @@ $nexus_theme_enabled = nexusThemeIsEnabled();
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="robots" content="noindex">
 
-    <title><?= $session_company_name; ?></title>
+    <title><?= escapeHtml($nexus_theme_enabled ? $nexus_brand_name : $session_company_name) ?></title>
 
     <!-- Favicon -->
     <?php if(file_exists($_SERVER['DOCUMENT_ROOT'] . '/uploads/favicon.ico')) { ?>
@@ -42,6 +44,7 @@ $nexus_theme_enabled = nexusThemeIsEnabled();
     <?php if ($nexus_theme_enabled) { ?>
         <!-- Nexus theme: intentionally loaded after AdminLTE -->
         <link rel="stylesheet" href="/css/nexus-theme.css">
+        <link rel="stylesheet" href="/css/nexus-theme-custom.php?v=<?= nexusThemeSettingsVersion() ?>">
     <?php } ?>
 
     <!-- Scripts -->
@@ -49,7 +52,7 @@ $nexus_theme_enabled = nexusThemeIsEnabled();
     <script src="/libs/toastr/toastr.min.js"></script>
 </head>
 <body class="
-    hold-transition sidebar-mini layout-fixed layout-navbar-fixed <?= $nexus_theme_enabled ? 'nexus-theme nexus-agent' : '' ?>
+    hold-transition sidebar-mini layout-fixed layout-navbar-fixed <?= $nexus_theme_enabled ? 'nexus-theme nexus-agent ' . nexusThemeBodyClasses($nexus_theme_settings) : '' ?>
     accent-<?= escapeHtml($config_theme) ?>
     <?php if ($user_config_theme_dark) echo 'dark-mode'; ?>
 ">

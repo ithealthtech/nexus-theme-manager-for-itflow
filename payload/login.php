@@ -15,6 +15,7 @@ require_once "libs/totp/totp.php";
 require_once __DIR__ . "/includes/nexus_theme.php";
 
 $nexus_theme_enabled = nexusThemeIsEnabled();
+$nexus_theme_settings = nexusThemeSettings();
 
 require_once __DIR__ . "/includes/session_init.php";
 
@@ -693,7 +694,7 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title><?= escapeHtml($company_name) ?> | Login</title>
+    <title><?= escapeHtml($nexus_theme_enabled ? nexusThemeBrandName($company_name, $nexus_theme_settings) : $company_name) ?> | Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
 
@@ -706,28 +707,30 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
     <link rel="stylesheet" href="libs/adminlte/css/adminlte.min.css">
     <?php if ($nexus_theme_enabled) { ?>
         <link rel="stylesheet" href="css/nexus-theme.css">
+        <link rel="stylesheet" href="css/nexus-theme-custom.php?v=<?= nexusThemeSettingsVersion() ?>">
     <?php } ?>
 </head>
-<body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth' : '' ?>">
+<body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth ' . nexusThemeBodyClasses($nexus_theme_settings) : '' ?>">
 
 <div class="login-box">
     <div class="login-logo">
-        <?php if (!empty($company_logo)) { ?>
-            <img alt="<?=escapeHtml($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?= "uploads/settings/$company_logo" ?>">
+        <?php $nexus_login_logo = $nexus_theme_enabled ? nexusThemeLogoUrl($nexus_theme_settings, !empty($company_logo) ? "/uploads/settings/$company_logo" : '') : (!empty($company_logo) ? "uploads/settings/$company_logo" : ''); ?>
+        <?php if ($nexus_login_logo !== '' && (!$nexus_theme_enabled || $nexus_theme_settings['branding']['show_login_logo'])) { ?>
+            <img alt="<?= escapeHtml($nexus_theme_enabled ? ($nexus_theme_settings['branding']['logo_alt'] ?: nexusThemeBrandName($company_name, $nexus_theme_settings) . ' logo') : $company_name . ' logo') ?>" height="110" width="380" class="img-fluid" src="<?= escapeHtml($nexus_login_logo) ?>">
         <?php } else { ?>
-            <span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml($company_name) ?></span>
+            <span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml($nexus_theme_enabled ? nexusThemeBrandName($company_name, $nexus_theme_settings) : $company_name) ?></span>
         <?php } ?>
     </div>
 
     <div class="card">
         <div class="card-body login-card-body">
 
-            <span class="nexus-eyebrow">Secure support portal</span>
+            <span class="nexus-eyebrow"><?= escapeHtml($nexus_theme_settings['content']['login_eyebrow']) ?></span>
             <h1 class="nexus-auth-title">
-                <?php if ($show_role_choice) { ?>Choose your workspace<?php } elseif ($show_mfa_form) { ?>Verify your identity<?php } else { ?>Welcome back<?php } ?>
+                <?php if ($show_role_choice) { ?>Choose your workspace<?php } elseif ($show_mfa_form) { ?>Verify your identity<?php } else { ?><?= escapeHtml($nexus_theme_settings['content']['login_heading']) ?><?php } ?>
             </h1>
             <p class="nexus-auth-copy">
-                <?php if ($show_role_choice) { ?>Select the workspace you need for this session.<?php } elseif ($show_mfa_form) { ?>Enter the code from your authenticator to continue securely.<?php } else { ?>Sign in to request support, follow updates, or manage your ITFlow workspace.<?php } ?>
+                <?php if ($show_role_choice) { ?>Select the workspace you need for this session.<?php } elseif ($show_mfa_form) { ?>Enter the code from your authenticator to continue securely.<?php } else { ?><?= nl2br(escapeHtml($nexus_theme_settings['content']['login_message'])) ?><?php } ?>
             </p>
 
             <?php if (!empty($config_login_message)){ ?>

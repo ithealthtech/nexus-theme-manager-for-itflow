@@ -6,6 +6,7 @@ require_once '../../libs/totp/totp.php'; //TOTP MFA Lib
 require_once '../../includes/nexus_theme.php';
 
 $nexus_theme_enabled = nexusThemeIsEnabled();
+$nexus_theme_settings = nexusThemeSettings();
 
 // Get Company Logo
 $sql = mysqli_query($mysqli, "SELECT company_logo FROM companies");
@@ -33,7 +34,7 @@ $data = "otpauth://totp/ITFlow:$session_email?secret=$token";
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="robots" content="noindex">
 
-    <title>MFA Enforcement | <?= $session_company_name ?></title>
+    <title>MFA Enforcement | <?= escapeHtml($nexus_theme_enabled ? nexusThemeBrandName($session_company_name, $nexus_theme_settings) : $session_company_name) ?></title>
 
     <!--
     Favicon
@@ -51,6 +52,7 @@ $data = "otpauth://totp/ITFlow:$session_email?secret=$token";
     <link href="../../libs/toastr/toastr.min.css" rel="stylesheet">
     <?php if ($nexus_theme_enabled) { ?>
         <link rel="stylesheet" href="../../css/nexus-theme.css">
+        <link rel="stylesheet" href="../../css/nexus-theme-custom.php?v=<?= nexusThemeSettingsVersion() ?>">
     <?php } ?>
 
     <!-- jQuery -->
@@ -58,14 +60,15 @@ $data = "otpauth://totp/ITFlow:$session_email?secret=$token";
     <script src="../../libs/toastr/toastr.min.js"></script>
 
 </head>
-<body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth' : '' ?>">
+<body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth ' . nexusThemeBodyClasses($nexus_theme_settings) : '' ?>">
     <?php require_once "../../includes/inc_alert_feedback.php"; ?>
     <div class="login-box">
         <div class="login-logo">
-            <?php if (!empty($company_logo)) { ?>
-                <img alt="<?= escapeHtml($company_name)?> logo" height="110" width="380" class="img-fluid" src="<?= "../../uploads/settings/$company_logo" ?>">
+            <?php $nexus_mfa_logo = nexusThemeLogoUrl($nexus_theme_settings, !empty($company_logo) ? "/uploads/settings/$company_logo" : ''); ?>
+            <?php if ($nexus_theme_settings['branding']['show_login_logo'] && $nexus_mfa_logo !== '') { ?>
+                <img alt="<?= escapeHtml($nexus_theme_settings['branding']['logo_alt'] ?: nexusThemeBrandName($company_name, $nexus_theme_settings) . ' logo') ?>" height="110" width="380" class="img-fluid" src="<?= escapeHtml($nexus_mfa_logo) ?>">
             <?php } else { ?>
-                <span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml($session_company_name) ?></span>
+                <span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml(nexusThemeBrandName($session_company_name, $nexus_theme_settings)) ?></span>
             <?php } ?>
         </div>
 

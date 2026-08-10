@@ -10,7 +10,7 @@
 
 <footer class="nexus-client-footer">
     <?php
-        echo escapeHtml($session_company_name);
+        echo escapeHtml(($nexus_theme_enabled ?? false) ? ($nexus_brand_name ?? $session_company_name) : $session_company_name);
         if (!$config_whitelabel_enabled) {
             echo '<br><small class="text-muted">Powered by ITFlow</small>';
         }

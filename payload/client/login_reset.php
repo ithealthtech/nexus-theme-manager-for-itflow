@@ -12,6 +12,7 @@ require_once '../includes/load_global_settings.php';
 require_once '../includes/nexus_theme.php';
 
 $nexus_theme_enabled = nexusThemeIsEnabled();
+$nexus_theme_settings = nexusThemeSettings();
 
 
 if (empty($config_smtp_host)) {
@@ -170,7 +171,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title><?= escapeHtml($company_name_display) ?> | Password Reset</title>
+    <title><?= escapeHtml($nexus_theme_enabled ? nexusThemeBrandName($company_name_display, $nexus_theme_settings) : $company_name_display) ?> | Password Reset</title>
 
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -191,13 +192,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     <link rel="stylesheet" href="../libs/adminlte/css/adminlte.min.css">
     <?php if ($nexus_theme_enabled) { ?>
         <link rel="stylesheet" href="../css/nexus-theme.css">
+        <link rel="stylesheet" href="../css/nexus-theme-custom.php?v=<?= nexusThemeSettingsVersion() ?>">
     <?php } ?>
 
 </head>
 
-<body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth' : '' ?>">
+<body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth ' . nexusThemeBodyClasses($nexus_theme_settings) : '' ?>">
 <div class="login-box">
-    <div class="login-logo"><span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml($company_name_display) ?></span></div>
+    <div class="login-logo"><?php $nexus_reset_logo = nexusThemeLogoUrl($nexus_theme_settings); if ($nexus_theme_settings['branding']['show_login_logo'] && $nexus_reset_logo !== '') { ?><img alt="<?= escapeHtml($nexus_theme_settings['branding']['logo_alt'] ?: nexusThemeBrandName($company_name_display, $nexus_theme_settings) . ' logo') ?>" height="110" width="380" class="img-fluid" src="<?= escapeHtml($nexus_reset_logo) ?>"><?php } else { ?><span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml(nexusThemeBrandName($company_name_display, $nexus_theme_settings)) ?></span><?php } ?></div>
     <div class="card">
         <div class="card-body login-card-body">
 
