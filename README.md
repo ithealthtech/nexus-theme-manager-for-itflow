@@ -37,7 +37,7 @@ This screenshot was captured from an isolated local ITFlow 26.08/AdminLTE test e
 |---|---|
 | ITFlow release | 26.08 |
 | ITFlow commit | `89b080b430aaafba5d520c4e52c57b28a9559085` |
-| Theme manager | 2.5.2 |
+| Theme manager | 2.5.3 |
 | Theme payload | 26.08.7 |
 | Runtime | PHP 8.1 or newer; CLI SAPI for lifecycle operations and the normal ITFlow web SAPI for administration controls |
 | Target systems | Debian/Ubuntu production installs; lifecycle tests also run on Windows |
@@ -54,7 +54,7 @@ Install the command-line prerequisites, set `nexus_version` to the release you w
 sudo apt-get update
 sudo apt-get install -y ca-certificates curl unzip
 
-nexus_version="2.5.2"
+nexus_version="2.5.3"
 nexus_asset="Nexus-Theme-Manager-for-ITFlow-${nexus_version}"
 nexus_download_dir="$HOME/Downloads/nexus-theme-manager"
 
@@ -113,7 +113,7 @@ The bootstrap installer detects existing protected Nexus state before downloadin
 ## Install
 
 1. Create and verify an ITFlow application/database backup.
-2. Extract this ZIP outside the ITFlow document root, for example `/opt/Nexus-Theme-Manager-for-ITFlow-2.5.2`.
+2. Extract this ZIP outside the ITFlow document root, for example `/opt/Nexus-Theme-Manager-for-ITFlow-2.5.3`.
 3. Run the non-mutating preflight:
 
 ```bash
@@ -188,6 +188,15 @@ Add `--json` to any command for automation-friendly output.
 
 Open **Administration → NEXUS → Theme Manager**, then use **Check for updates**. When a newer published release is available, select **Install version**. The page shows download, verification, rollback, installation, and completion state and refreshes while work is running.
 
+If a 2.5.0–2.5.2 installation reports that the verified package could not be moved into `/opt`, repair only the protected updater service with the verified latest-release bootstrap. This does not disable or replace the active theme:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ithealthtech/nexus-theme-manager-for-itflow/v2.5.3/install-latest.sh -o /tmp/nexus-repair.sh
+sudo sh /tmp/nexus-repair.sh --root /var/www/itflow.example.com --repair-gui-updater
+```
+
+Return to Theme Studio, select **Check for updates**, then install the available release.
+
 The browser writes only an allow-listed `check` or `update` request to ITFlow's uploads directory. A root-owned systemd path unit notices that fixed request file and launches the updater helper outside the web process. The helper always resolves the latest release from `ithealthtech/nexus-theme-manager-for-itflow`, requires an exact semantic version and asset layout, verifies the published SHA-256 file and package manifest, runs the current manager's `verify`, and runs the new manager's `doctor`, `install`, and `verify`. If activation fails, it attempts to restore and verify the previous release automatically.
 
 Remove the system service without uninstalling the theme with:
@@ -214,8 +223,8 @@ sudo php /opt/theme-manager-1.0.0/manager.php uninstall --root /var/www/itflow.e
 2. Run the current preflight and install.
 
 ```bash
-sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.5.2/manager.php doctor --root /var/www/itflow.example.com
-sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.5.2/manager.php install --root /var/www/itflow.example.com --yes
+sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.5.3/manager.php doctor --root /var/www/itflow.example.com
+sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.5.3/manager.php install --root /var/www/itflow.example.com --yes
 ```
 
 The new protected state root is `/var/lib/nexus-itflow-theme`. Keep the archived 1.0.0 recovery state until the Nexus installation and portal smoke tests pass.

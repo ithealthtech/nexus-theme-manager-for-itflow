@@ -7,6 +7,7 @@ const NEXUS_UPDATER_SCHEMA = 1;
 const NEXUS_UPDATER_REQUEST = '.nexus-theme-update-request.json';
 const NEXUS_UPDATER_STATUS = '.nexus-theme-update-status.json';
 const NEXUS_UPDATER_READY = '.nexus-theme-updater-ready.json';
+const NEXUS_UPDATER_PACKAGE_ROOT = '/opt';
 
 final class NexusUpdaterException extends RuntimeException
 {
@@ -106,10 +107,8 @@ final class NexusUpdater
 
     private function performUpdate(array $release, string $requestId): void
     {
-        $temporaryRoot = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'nexus-update-' . bin2hex(random_bytes(8));
-        if (!mkdir($temporaryRoot, 0700, true)) {
-            throw new NexusUpdaterException('A protected update workspace could not be created.');
-        }
+        $packageRoot = NEXUS_UPDATER_PACKAGE_ROOT;
+        $temporaryRoot = self::createUpdateWorkspace($packageRoot);
 
         $oldPackage = realpath((string)$this->config['package_directory']);
         if ($oldPackage === false || !is_file($oldPackage . DIRECTORY_SEPARATOR . 'manager.php')) {
@@ -142,12 +141,12 @@ final class NexusUpdater
             self::validateExtractedTree($newPackageStaged);
             self::validatePackageManifest($newPackageStaged, $release['version']);
 
-            $newPackage = '/opt/' . $release['asset_name'];
+            $newPackage = $packageRoot . DIRECTORY_SEPARATOR . $release['asset_name'];
             if (file_exists($newPackage)) {
                 throw new NexusUpdaterException('The target package directory already exists: ' . $newPackage);
             }
             if (!@rename($newPackageStaged, $newPackage)) {
-                throw new NexusUpdaterException('The verified package could not be moved into /opt.');
+                throw new NexusUpdaterException('The verified package could not be activated under ' . $packageRoot . '.');
             }
 
             $this->writeStatus('running', 'Verified release downloaded. Creating rollback state.', [
@@ -203,7 +202,7 @@ final class NexusUpdater
                     $this->runManager($oldManager, 'install', ['--yes']);
                     $this->runManager($oldManager, 'verify');
                     if (is_string($newPackage) && is_dir($newPackage)) {
-                        self::removeTree($newPackage, '/opt');
+                        self::removeTree($newPackage, $packageRoot);
                     }
                     throw new NexusUpdaterException($error->getMessage() . ' The previous Nexus version was restored automatically.');
                 } catch (NexusUpdaterException $rollbackError) {
@@ -215,8 +214,21 @@ final class NexusUpdater
             }
             throw $error;
         } finally {
-            self::removeTree($temporaryRoot, dirname($temporaryRoot));
+            self::removeTree($temporaryRoot, $packageRoot);
         }
+    }
+
+    public static function createUpdateWorkspace(string $packageRoot): string
+    {
+        $resolvedRoot = realpath($packageRoot);
+        if ($resolvedRoot === false || !is_dir($resolvedRoot) || is_link($packageRoot)) {
+            throw new NexusUpdaterException('The protected package directory is unavailable.');
+        }
+        $workspace = rtrim($resolvedRoot, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '.nexus-update-' . bin2hex(random_bytes(8));
+        if (!mkdir($workspace, 0700)) {
+            throw new NexusUpdaterException('A protected update workspace could not be created.');
+        }
+        return $workspace;
     }
 
     private function resolveLatestRelease(): array
@@ -399,6 +411,39 @@ final class NexusUpdater
         $runner->writeReadyMarker();
         $runner->writeStatus('ready', 'GUI updates are ready. Check GitHub for the latest Nexus release.', [
             'current_version' => $version,
+        ]);
+    }
+
+    public static function repairService(string $packageRoot, string $itflowRoot): void
+    {
+        self::assertRootLinux();
+        $root = realpath($itflowRoot);
+        $package = realpath($packageRoot);
+        if ($root === false || !is_dir($root . DIRECTORY_SEPARATOR . 'uploads') || $package === false) {
+            throw new NexusUpdaterException('ITFlow root or Nexus repair package is invalid.');
+        }
+        $manifest = self::readJsonFile($package . DIRECTORY_SEPARATOR . 'manifest.json', 262144);
+        self::validateVersion((string)($manifest['package_version'] ?? ''));
+        self::validatePackageManifest($package, (string)$manifest['package_version']);
+
+        $instance = substr(hash('sha256', rtrim($root, DIRECTORY_SEPARATOR)), 0, 16);
+        $configPath = '/etc/nexus-theme-manager/' . $instance . '.json';
+        $config = self::readJsonFile($configPath, 16384);
+        if (($config['instance_id'] ?? null) !== $instance || realpath((string)($config['itflow_root'] ?? '')) !== $root) {
+            throw new NexusUpdaterException('The existing GUI updater registration does not match this ITFlow root.');
+        }
+
+        $serviceDirectory = '/usr/local/lib/nexus-theme-manager/' . $instance;
+        self::ensureDirectory($serviceDirectory, 0755);
+        self::atomicCopy($package . DIRECTORY_SEPARATOR . 'updater.php', $serviceDirectory . '/updater.php', 0755);
+
+        $runner = new self($configPath);
+        $unitName = 'nexus-theme-update-' . $instance;
+        $runner->runProcess(['/usr/bin/systemctl', 'daemon-reload']);
+        $runner->runProcess(['/usr/bin/systemctl', 'enable', '--now', $unitName . '.path']);
+        $runner->writeReadyMarker();
+        $runner->writeStatus('ready', 'GUI updater repaired. Check GitHub, then install the available Nexus release.', [
+            'current_version' => $config['package_version'],
         ]);
     }
 
@@ -675,6 +720,7 @@ Nexus Theme Manager privileged GUI updater
 
 Usage:
   sudo php updater.php install-service --root /path/to/itflow [--state-root PATH]
+  sudo php updater.php repair-service --root /path/to/itflow
   sudo php updater.php remove-service --root /path/to/itflow
   php updater.php run --config /etc/nexus-theme-manager/<instance>.json
 TEXT
@@ -724,6 +770,14 @@ if (realpath((string)($_SERVER['SCRIPT_FILENAME'] ?? '')) === __FILE__) {
             }
             NexusUpdater::removeService($options['root']);
             fwrite(STDOUT, "GUI updater removed.\n");
+            exit(0);
+        }
+        if ($command === 'repair-service') {
+            if ($options['root'] === null) {
+                throw new NexusUpdaterException('--root is required.');
+            }
+            NexusUpdater::repairService(__DIR__, $options['root']);
+            fwrite(STDOUT, "GUI updater repaired and restarted.\n");
             exit(0);
         }
         if ($command === 'run') {
