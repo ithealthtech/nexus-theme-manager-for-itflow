@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-const NEXUS_MANAGER_VERSION = '3.0.1';
-const NEXUS_THEME_VERSION = '26.08.11';
+const NEXUS_MANAGER_VERSION = '3.0.2';
+const NEXUS_THEME_VERSION = '26.08.12';
 const NEXUS_ITFLOW_COMMIT = '89b080b430aaafba5d520c4e52c57b28a9559085';
 const NEXUS_THEME_DISABLED_MARKER = '.nexus-theme-disabled';
 const NEXUS_THEME_SETTINGS_FILE = '.nexus-theme-settings.json';
@@ -189,6 +189,7 @@ function nexusThemeDefaults(): array
             'logo_path' => '',
             'logo_light_path' => '',
             'logo_dark_path' => '',
+            'asset_revision' => '0000000000000000',
             'logo_alt' => '',
             'logo_size' => 100,
             'logo_alignment' => 'left',
@@ -389,6 +390,10 @@ function nexusThemeValidateSettings(array $input): array
         }
     }
     $result['branding']['logo_path'] = $result['branding']['logo_light_path'];
+    $assetRevision = strtolower(nexusThemeCleanText($input['branding']['asset_revision'] ?? '', 16));
+    $result['branding']['asset_revision'] = preg_match('/^[a-f0-9]{16}$/', $assetRevision) === 1
+        ? $assetRevision
+        : $defaults['branding']['asset_revision'];
     $result['branding']['logo_alt'] = nexusThemeCleanText($input['branding']['logo_alt'] ?? '', 120);
     $result['branding']['logo_size'] = max(50, min(180, (int)($input['branding']['logo_size'] ?? 100)));
     $result['branding']['logo_alignment'] = in_array($input['branding']['logo_alignment'] ?? '', ['left', 'center', 'right'], true) ? $input['branding']['logo_alignment'] : 'left';
@@ -451,6 +456,9 @@ function nexusThemeRollback(?string $root = null): array
         throw new RuntimeException('The previous Nexus design is invalid.');
     }
     $current = nexusThemeSettings($root);
+    $previous['branding'] = is_array($previous['branding'] ?? null) ? $previous['branding'] : [];
+    $previous['branding']['asset_revision'] = bin2hex(random_bytes(8));
+    $current['branding']['asset_revision'] = bin2hex(random_bytes(8));
     $restored = nexusThemeSaveSettings($previous, $root, false);
     nexusThemeAtomicWrite(nexusThemePreviousSettingsPath($root), json_encode($current, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n");
     return $restored;
@@ -608,6 +616,19 @@ function nexusThemeLogoUrl(?array $settings = null, string $fallback = '', strin
     return $preferred !== '' ? $preferred : ($alternate !== '' ? $alternate : ($legacy !== '' ? $legacy : $fallback));
 }
 
+function nexusThemeVersionedAssetUrl(string $url, ?array $settings = null): string
+{
+    if ($url === '' || preg_match('#^/uploads/nexus-theme/(?:logo-light|logo-dark|favicon|login-background)\.(?:png|jpe?g|webp|gif)$#', $url) !== 1) {
+        return $url;
+    }
+    $settings ??= nexusThemeSettings();
+    $revision = (string)($settings['branding']['asset_revision'] ?? '');
+    if (preg_match('/^[a-f0-9]{16}$/', $revision) !== 1) {
+        $revision = nexusThemeDefaults()['branding']['asset_revision'];
+    }
+    return $url . '?v=' . $revision;
+}
+
 function nexusThemeLogoVariantForColor(string $background): string
 {
     return nexusThemeContrastColor($background) === '#0b0a17' ? 'dark' : 'light';
@@ -689,7 +710,7 @@ function nexusThemeApplyPreset(string $id, ?string $root = null): array
             continue;
         }
         $current = nexusThemeSettings($root);
-        foreach (['logo_path', 'logo_light_path', 'logo_dark_path', 'favicon_path', 'login_background_path'] as $asset) {
+        foreach (['logo_path', 'logo_light_path', 'logo_dark_path', 'favicon_path', 'login_background_path', 'asset_revision'] as $asset) {
             $preset['settings']['branding'][$asset] = $current['branding'][$asset];
         }
         return nexusThemeSaveSettings($preset['settings'], $root);
@@ -871,7 +892,7 @@ function nexusThemeCustomCss(?array $settings = null): string
     }
     $selector = '.nexus-theme,.nexus-theme.dark-mode,.nexus-theme.nexus-auth,.nexus-theme.nexus-client';
     $css = 'html{font-size:' . $settings['appearance']['font_scale'] . '%}' . $selector . '{' . implode(';', $declarations) . "}\n";
-    $logo = nexusThemeLogoUrl($settings, '', nexusThemeLogoVariantForColor($colors['header']));
+    $logo = nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($settings, '', nexusThemeLogoVariantForColor($colors['header'])), $settings);
     if ($settings['branding']['show_agent_logo'] && $logo !== '') {
         $alignment = $settings['branding']['logo_alignment'];
         $justify = $alignment === 'center' ? 'center' : ($alignment === 'right' ? 'flex-end' : 'flex-start');
@@ -888,7 +909,7 @@ function nexusThemeCustomCss(?array $settings = null): string
     $css .= '.nexus-auth .login-logo{align-items:center;display:flex;justify-content:' . $logoJustify . '}.nexus-auth .login-logo img{max-height:' . $authLogoHeight . '}.nexus-client .nexus-client-logo{display:block;float:none!important;margin:' . $clientLogoMargin . ';max-height:' . $clientLogoHeight . ';object-fit:contain}' . "\n";
     if ($settings['branding']['login_background_path'] !== '') {
         $overlay = number_format($settings['branding']['login_background_overlay'] / 100, 2, '.', '');
-        $background = $settings['branding']['login_background_path'];
+        $background = nexusThemeVersionedAssetUrl($settings['branding']['login_background_path'], $settings);
         $position = $settings['branding']['login_background_position'];
         $css .= '.nexus-auth{background-image:linear-gradient(rgba(0,0,0,' . $overlay . '),rgba(0,0,0,' . $overlay . ')),url("' . $background . '")!important;background-position:center,' . $position . ' center!important;background-repeat:no-repeat!important;background-size:cover!important}' . "\n";
     }

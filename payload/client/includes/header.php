@@ -11,9 +11,9 @@ nexusThemeApplyDueSchedule();
 $nexus_theme_enabled = nexusThemeIsEnabled();
 $nexus_theme_settings = nexusThemeSettings();
 $nexus_brand_name = nexusThemeBrandName($session_company_name, $nexus_theme_settings);
-$nexus_logo_url = nexusThemeLogoUrl($nexus_theme_settings, $session_company_logo ? '/uploads/settings/' . $session_company_logo : '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['sidebar']));
+$nexus_logo_url = nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($nexus_theme_settings, $session_company_logo ? '/uploads/settings/' . $session_company_logo : '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['sidebar'])), $nexus_theme_settings);
 $nexus_native_favicon = is_file($_SERVER['DOCUMENT_ROOT'] . '/uploads/favicon.ico') ? '/uploads/favicon.ico' : '';
-$nexus_favicon_url = $nexus_theme_enabled ? nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon) : $nexus_native_favicon;
+$nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon), $nexus_theme_settings) : $nexus_native_favicon;
 ?>
 
 <!DOCTYPE html>

@@ -112,6 +112,8 @@ try {
     $adminPostSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'post' . DIRECTORY_SEPARATOR . 'nexus.php');
     $adminNavSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'side_nav.php');
     $themeCssSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'nexus-theme.css');
+    $agentHeaderSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'header.php');
+    $clientHeaderSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'client' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'header.php');
     $loginSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'login.php');
     $resetSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'client' . DIRECTORY_SEPARATOR . 'login_reset.php');
     $mfaSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'agent' . DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'mfa_enforcement.php');
@@ -136,6 +138,10 @@ try {
     expect(str_contains($themeCssSource, '.nexus-agent.nexus-navigation-pill .nav-sidebar .nav-link.active') && str_contains($themeCssSource, '.nexus-agent.nexus-navigation-rail .nav-sidebar .nav-link.active') && str_contains($themeCssSource, '.nexus-agent.nexus-navigation-outline .nav-sidebar .nav-link.active'), 'active navigation treatments cover top-level and nested links');
     expect(str_contains($themeCssSource, '.nexus-agent.nexus-sidebar-compact .nav-sidebar .nav-icon') && str_contains($themeCssSource, '.nexus-preview-shell.is-compact .nexus-preview-sidebar'), 'compact sidebar changes labels, icons, spacing, and preview width');
     expect(str_contains($adminPageSource, 'nexus_logo_light') && str_contains($adminPageSource, 'nexus_logo_dark') && str_contains($adminPageSource, 'nexus_login_background'), 'Theme Studio exposes responsive logos and custom login imagery');
+    expect(str_contains($adminPostSource, "['branding']['asset_revision'] = bin2hex(random_bytes(8))"), 'asset uploads and removals rotate the browser cache revision');
+    foreach ([$adminPageSource, $loginSource, $resetSource, $mfaSource, $agentHeaderSource, $clientHeaderSource] as $assetSurfaceSource) {
+        expect(str_contains($assetSurfaceSource, 'nexusThemeVersionedAssetUrl'), 'rendered Nexus surfaces use versioned custom asset URLs');
+    }
     expect(str_contains($adminPostSource, "nexus_preset_action") && str_contains($adminPostSource, "nexus_schedule_command") && str_contains($adminPostSource, "nexus_theme_rollback"), 'administration actions support presets, scheduling, and rollback');
 
     $fixture = $testRoot . DIRECTORY_SEPARATOR . 'fixture';
@@ -164,6 +170,7 @@ try {
     expect($themeDefaults['preset'] === 'aurora', 'theme customization starts with the Aurora preset');
     expect($themeDefaults['branding']['logo_path'] === '', 'theme customization starts without a logo override');
     expect($themeDefaults['branding']['logo_light_path'] === '' && $themeDefaults['branding']['logo_dark_path'] === '', 'theme customization supports separate light and dark logos');
+    expect($themeDefaults['branding']['asset_revision'] === '0000000000000000', 'theme customization starts with a valid asset cache revision');
     expect(isset(nexusThemeAllowedImageTypes('logo-light')[IMAGETYPE_GIF]) && !isset(nexusThemeAllowedImageTypes('favicon')[IMAGETYPE_GIF]), 'animated GIFs are allow-listed only for logo assets');
     expect($themeDefaults['branding']['show_agent_logo'] === true, 'theme customization shows a custom logo in technician navigation by default');
     expect($themeDefaults['appearance']['motion_style'] === 'fluid', 'theme customization starts with the fluid popup motion profile');
@@ -176,6 +183,7 @@ try {
     $customTheme['branding']['brand_name'] = '<b>Nexus Support</b>';
     $customTheme['branding']['tagline'] = "Always ready\nfor you";
     $customTheme['branding']['logo_path'] = '/outside/unsafe.svg';
+    $customTheme['branding']['asset_revision'] = 'bad?cache=off';
     $customTheme['content']['login_heading'] = 'Your support hub';
     $customTheme['colors']['primary'] = '#12ABEF';
     $customTheme['colors']['secondary'] = 'not-a-color';
@@ -192,6 +200,7 @@ try {
     expect($savedTheme['branding']['brand_name'] === 'Nexus Support', 'theme customization strips markup from brand text');
     expect($savedTheme['branding']['tagline'] === 'Always ready for you', 'theme customization normalizes single-line brand text');
     expect($savedTheme['branding']['logo_path'] === '', 'theme customization rejects untrusted logo paths');
+    expect($savedTheme['branding']['asset_revision'] === '0000000000000000', 'theme customization rejects malformed asset cache revisions');
     expect($savedTheme['colors']['primary'] === '#12abef', 'theme customization normalizes valid colors');
     expect($savedTheme['colors']['secondary'] === $themeDefaults['colors']['secondary'], 'theme customization rejects invalid colors');
     expect($savedTheme['appearance']['font_scale'] === 110, 'theme customization clamps interface scale');
@@ -214,10 +223,13 @@ try {
     $agentLogoTheme = $savedTheme;
     $agentLogoTheme['branding']['logo_light_path'] = '/uploads/nexus-theme/logo-light.png';
     $agentLogoTheme['branding']['logo_path'] = '/uploads/nexus-theme/logo-light.png';
+    $agentLogoTheme['branding']['asset_revision'] = '0123456789abcdef';
     $agentLogoCss = nexusThemeCustomCss(nexusThemeValidateSettings($agentLogoTheme));
-    expect(str_contains($agentLogoCss, 'background-image:url("/uploads/nexus-theme/logo-light.png")') && str_contains($agentLogoCss, 'clip-path:inset(50%)'), 'custom logo replaces visible technician navigation title while preserving its accessible name');
+    expect(str_contains($agentLogoCss, 'background-image:url("/uploads/nexus-theme/logo-light.png?v=0123456789abcdef")') && str_contains($agentLogoCss, 'clip-path:inset(50%)'), 'custom logo uses a cache-busting URL in technician navigation while preserving its accessible name');
+    expect(nexusThemeVersionedAssetUrl('/uploads/nexus-theme/logo-light.png', $agentLogoTheme) === '/uploads/nexus-theme/logo-light.png?v=0123456789abcdef', 'managed asset URLs include the current upload revision');
+    expect(nexusThemeVersionedAssetUrl('/uploads/settings/company.png', $agentLogoTheme) === '/uploads/settings/company.png', 'native ITFlow assets are not rewritten by Nexus cache busting');
     $agentLogoTheme['branding']['show_agent_logo'] = false;
-    expect(!str_contains(nexusThemeCustomCss(nexusThemeValidateSettings($agentLogoTheme)), 'background-image:url("/uploads/nexus-theme/logo-light.png")'), 'technician navigation logo placement can be disabled independently');
+    expect(!str_contains(nexusThemeCustomCss(nexusThemeValidateSettings($agentLogoTheme)), 'background-image:url("/uploads/nexus-theme/logo-light.png?v=0123456789abcdef")'), 'technician navigation logo placement can be disabled independently');
     expect(nexusThemeContrastColor('#ffffff') === '#0b0a17' && nexusThemeContrastColor('#000000') === '#ffffff', 'theme customization derives readable accent contrast');
     expect(nexusThemeMixColors('#ffffff', '#000000', 50) === '#808080', 'theme customization derives supporting palette colors');
     expect(nexusThemeValidateSettings(['preset' => 'ocean'])['colors']['primary'] === nexusThemePresets()['ocean']['primary'], 'curated presets resolve to their protected palette');
@@ -229,8 +241,10 @@ try {
     $rollbackTheme['content']['login_heading'] = 'Rollback target';
     nexusThemeSaveSettings($rollbackTheme, $fixture);
     expect(nexusThemeCanRollback($fixture), 'theme customization snapshots the previous design');
+    $preRollbackAssetRevision = nexusThemeSettings($fixture)['branding']['asset_revision'];
     nexusThemeRollback($fixture);
     expect(nexusThemeSettings($fixture)['content']['login_heading'] === 'Support, your way', 'one-click rollback restores the prior design');
+    expect(nexusThemeSettings($fixture)['branding']['asset_revision'] !== $preRollbackAssetRevision, 'one-click rollback rotates the asset cache revision');
     $presetId = nexusThemeSavePreset('Operations', nexusThemeSettings($fixture), $fixture);
     expect(count(nexusThemeSavedPresets($fixture)) === 1, 'saved presets persist a validated design');
     nexusThemeApplyPreset($presetId, $fixture);

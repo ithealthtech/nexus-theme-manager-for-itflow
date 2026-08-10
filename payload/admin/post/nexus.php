@@ -38,14 +38,19 @@ if (isset($_POST['nexus_theme_save'])) {
         $current = nexusThemeSettings();
         $submitted = is_array($_POST['nexus'] ?? null) ? $_POST['nexus'] : [];
         $submitted['branding'] = is_array($submitted['branding'] ?? null) ? $submitted['branding'] : [];
-        foreach (['logo_path', 'logo_light_path', 'logo_dark_path', 'favicon_path', 'login_background_path'] as $asset) {
+        foreach (['logo_path', 'logo_light_path', 'logo_dark_path', 'favicon_path', 'login_background_path', 'asset_revision'] as $asset) {
             $submitted['branding'][$asset] = $current['branding'][$asset];
         }
 
+        $assetChanged = false;
         foreach (['nexus_logo_light' => ['logo_light_path', 'logo-light'], 'nexus_logo_dark' => ['logo_dark_path', 'logo-dark'], 'nexus_favicon' => ['favicon_path', 'favicon'], 'nexus_login_background' => ['login_background_path', 'login-background']] as $uploadName => [$setting, $slot]) {
             if (isset($_FILES[$uploadName]) && ($_FILES[$uploadName]['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
                 $submitted['branding'][$setting] = nexusThemeStoreImage($_FILES[$uploadName], $slot);
+                $assetChanged = true;
             }
+        }
+        if ($assetChanged) {
+            $submitted['branding']['asset_revision'] = bin2hex(random_bytes(8));
         }
         $submitted['branding']['logo_path'] = $submitted['branding']['logo_light_path'];
 
@@ -74,6 +79,7 @@ if (isset($_POST['nexus_theme_remove_asset'])) {
         if ($slot === 'logo-light') {
             $settings['branding']['logo_path'] = '';
         }
+        $settings['branding']['asset_revision'] = bin2hex(random_bytes(8));
         nexusThemeSaveSettings($settings);
         logAudit('Nexus Theme Manager', 'Edit', "$session_name removed a Nexus custom image");
         flashAlert('Custom image detached from the active design.');
@@ -194,7 +200,7 @@ if (isset($_POST['nexus_theme_import'])) {
         }
         $current = nexusThemeSettings();
         $decoded['branding'] = is_array($decoded['branding'] ?? null) ? $decoded['branding'] : [];
-        foreach (['logo_path', 'logo_light_path', 'logo_dark_path', 'favicon_path', 'login_background_path'] as $asset) {
+        foreach (['logo_path', 'logo_light_path', 'logo_dark_path', 'favicon_path', 'login_background_path', 'asset_revision'] as $asset) {
             $decoded['branding'][$asset] = $current['branding'][$asset];
         }
         nexusThemeSaveSettings($decoded);

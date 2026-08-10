@@ -9,7 +9,7 @@ nexusThemeApplyDueSchedule();
 $nexus_theme_enabled = nexusThemeIsEnabled();
 $nexus_theme_settings = nexusThemeSettings();
 $nexus_native_favicon = is_file('../../uploads/favicon.ico') ? '/uploads/favicon.ico' : '';
-$nexus_favicon_url = $nexus_theme_enabled ? nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon) : $nexus_native_favicon;
+$nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon), $nexus_theme_settings) : $nexus_native_favicon;
 
 // Get Company Logo
 $sql = mysqli_query($mysqli, "SELECT company_logo FROM companies");
@@ -67,7 +67,7 @@ $data = "otpauth://totp/ITFlow:$session_email?secret=$token";
     <?php require_once "../../includes/inc_alert_feedback.php"; ?>
     <div class="login-box">
         <?php
-        $nexus_mfa_logo = nexusThemeLogoUrl($nexus_theme_settings, !empty($company_logo) ? "/uploads/settings/$company_logo" : '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['auth_background']));
+        $nexus_mfa_logo = nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($nexus_theme_settings, !empty($company_logo) ? "/uploads/settings/$company_logo" : '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['auth_background'])), $nexus_theme_settings);
         $nexus_mfa_has_logo = $nexus_theme_settings['branding']['show_login_logo'] && $nexus_mfa_logo !== '';
         ?>
         <div class="login-logo <?= $nexus_mfa_has_logo ? 'nexus-auth-brand--logo' : 'nexus-auth-brand--text' ?>">

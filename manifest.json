@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "package_id": "org.nexus-theme-manager.itflow",
-  "package_version": "3.0.1",
-  "theme_version": "26.08.11",
+  "package_version": "3.0.2",
+  "theme_version": "26.08.12",
   "name": "Nexus Theme Manager for IT Flow",
   "vendor": "Nexus Theme Manager contributors",
   "compatible_itflow": {
@@ -12,7 +12,7 @@
   "files": [
     {
       "path": "includes/nexus_theme.php",
-      "payload_sha256": "c72c812b64b0fe06180b9e10b161f33be463aa1d784ebe139e02a01e5b2d1d0f",
+      "payload_sha256": "5dcc36f35fa6a6c1807935ae72a0f8d133edf75d4aa86355161acafcae563197",
       "baseline_sha256": null,
       "php": true
     },
@@ -30,19 +30,19 @@
     },
     {
       "path": "admin/nexus.php",
-      "payload_sha256": "dfac810ea3c0c939507c9502460aa6b85c5d058970fd9a6e3b27b2074cc78ca1",
+      "payload_sha256": "a259ae03bbcb0058cde207b8a4c8b13abc0df5496e12f7dc47aa42cd4c31f80b",
       "baseline_sha256": null,
       "php": true
     },
     {
       "path": "admin/post/nexus.php",
-      "payload_sha256": "1387412b578ee74f2a9a02f22bd8db582b11d5413cb563a56cc5b556f488358d",
+      "payload_sha256": "e30554665c89f136c1426041f8836ca16ca94655d3401ff2f00775ac6540a3ec",
       "baseline_sha256": null,
       "php": true
     },
     {
       "path": "agent/user/mfa_enforcement.php",
-      "payload_sha256": "71726888e4a72316326e019dade8b941e827a18d1740f3914e713c6673f209ff",
+      "payload_sha256": "3c209f630cd8afff3747d44ee3b4afaadac1300efe0d30d753f6cec117ae61c3",
       "baseline_sha256": "3e05780ead5a74897ab1dcc7df3160faf82efeb35284100c10c521ee3b5ce948",
       "php": true
     },
@@ -54,7 +54,7 @@
     },
     {
       "path": "client/includes/header.php",
-      "payload_sha256": "22eead09745f12e3f98fbd485a06f889b0bbe88ba9427ba5b0f5daac10f55f72",
+      "payload_sha256": "244c3289974eb97fe6f73cb34225ca82769642747c7e1957a70aa01ff578193b",
       "baseline_sha256": "3c9c34d1e0f2fd6683cc2ffc992f988b4c7641ae91f066c9aa7cb0d6aa6b3317",
       "php": true
     },
@@ -66,7 +66,7 @@
     },
     {
       "path": "client/login_reset.php",
-      "payload_sha256": "437ba7730ecc6097e65f6ef24ebd98310096093375cf2180bce13d6547e10c34",
+      "payload_sha256": "e55f1758ea9dd78ce138e1be6dd03bffe1e90292018657a137ff9eb8e54df5f1",
       "baseline_sha256": "a2c2447f1d5300df35be840dda5a72b57628bc02d918a1d4f34765d6a026ae94",
       "php": true
     },
@@ -96,7 +96,7 @@
     },
     {
       "path": "includes/header.php",
-      "payload_sha256": "a5726ff5dd8d79799eae329089b3b65de824cdd92f64806ca1f60295d098d68a",
+      "payload_sha256": "49a4c7dc22e6048052b06064df39b8e8e91b2c23aea9ccd6b6daaacbe28274ae",
       "baseline_sha256": "5e756504c451b78f4d537cf1496ddf88f3156c1af5d44272d1125f9ee9af8f4b",
       "php": true
     },
@@ -108,7 +108,7 @@
     },
     {
       "path": "login.php",
-      "payload_sha256": "b47dad4ace42ca4df4b1c8c8720e9a7062971619cd5ee8b5b01a32770635d649",
+      "payload_sha256": "1554c2e09fd39f6c1055a517222c60aed15910bc9896c2e3d2d7f07f6da662b1",
       "baseline_sha256": "ca09fdb5b8da8355799a9821b59ce9d32adb8c214199720353a8fe68792d3a2e",
       "php": true
     },

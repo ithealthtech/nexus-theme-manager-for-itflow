@@ -15,7 +15,7 @@ nexusThemeApplyDueSchedule();
 $nexus_theme_enabled = nexusThemeIsEnabled();
 $nexus_theme_settings = nexusThemeSettings();
 $nexus_native_favicon = is_file('../uploads/favicon.ico') ? '/uploads/favicon.ico' : '';
-$nexus_favicon_url = $nexus_theme_enabled ? nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon) : $nexus_native_favicon;
+$nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon), $nexus_theme_settings) : $nexus_native_favicon;
 
 
 if (empty($config_smtp_host)) {
@@ -203,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 <body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth ' . nexusThemeBodyClasses($nexus_theme_settings) : '' ?>">
 <div class="login-box">
     <?php
-    $nexus_reset_logo = nexusThemeLogoUrl($nexus_theme_settings, '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['auth_background']));
+    $nexus_reset_logo = nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($nexus_theme_settings, '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['auth_background'])), $nexus_theme_settings);
     $nexus_reset_has_logo = $nexus_theme_settings['branding']['show_login_logo'] && $nexus_reset_logo !== '';
     ?>
     <div class="login-logo <?= $nexus_reset_has_logo ? 'nexus-auth-brand--logo' : 'nexus-auth-brand--text' ?>">

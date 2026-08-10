@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented here.
 
+## [3.0.2] - 2026-08-10
+
+### Fixed
+
+- Replacing a light or dark logo now rotates a validated asset revision and immediately changes every rendered logo URL, even when the filename and all other theme settings stay the same.
+- Applied the same cache-busting behavior to technician navigation CSS, login and recovery pages, MFA enrollment, client navigation, Theme Studio previews, favicons, and login backgrounds.
+- Asset removal and design rollback now rotate the revision as well, preventing an older browser-cached image from reappearing.
+- Native ITFlow assets outside the protected Nexus upload directory remain untouched.
+
+### Validation
+
+- Added lifecycle coverage for revision generation, URL versioning, native-asset isolation, rendered surface integration, generated CSS, and rollback behavior.
+
 ## [3.0.1] - 2026-08-10
 
 ### Fixed
@@ -228,5 +241,6 @@ All notable changes to this project are documented here.
 [2.5.3]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.3
 [2.5.2]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.2
 [2.5.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.1
+[3.0.2]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.2
 [3.0.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.1
 [3.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.0

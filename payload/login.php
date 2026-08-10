@@ -18,7 +18,7 @@ nexusThemeApplyDueSchedule();
 $nexus_theme_enabled = nexusThemeIsEnabled();
 $nexus_theme_settings = nexusThemeSettings();
 $nexus_native_favicon = is_file(__DIR__ . '/uploads/favicon.ico') ? '/uploads/favicon.ico' : '';
-$nexus_favicon_url = $nexus_theme_enabled ? nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon) : $nexus_native_favicon;
+$nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon), $nexus_theme_settings) : $nexus_native_favicon;
 
 require_once __DIR__ . "/includes/session_init.php";
 
@@ -717,7 +717,7 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
 
 <div class="login-box">
     <?php
-    $nexus_login_logo = $nexus_theme_enabled ? nexusThemeLogoUrl($nexus_theme_settings, !empty($company_logo) ? "/uploads/settings/$company_logo" : '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['auth_background'])) : (!empty($company_logo) ? "uploads/settings/$company_logo" : '');
+    $nexus_login_logo = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($nexus_theme_settings, !empty($company_logo) ? "/uploads/settings/$company_logo" : '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['auth_background'])), $nexus_theme_settings) : (!empty($company_logo) ? "uploads/settings/$company_logo" : '');
     $nexus_login_has_logo = $nexus_login_logo !== '' && (!$nexus_theme_enabled || $nexus_theme_settings['branding']['show_login_logo']);
     ?>
     <div class="login-logo <?= $nexus_login_has_logo ? 'nexus-auth-brand--logo' : 'nexus-auth-brand--text' ?>">
