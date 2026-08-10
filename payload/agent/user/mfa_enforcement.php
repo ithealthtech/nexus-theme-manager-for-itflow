@@ -112,6 +112,10 @@ $data = "otpauth://totp/ITFlow:$session_email?secret=$token";
             </div>
             <!-- /.login-card-body -->
         </div>
+
+    <?php if ($nexus_theme_enabled && $nexus_theme_settings['branding']['tagline'] !== '') { ?>
+        <div class="nexus-auth-tagline"><?= escapeHtml($nexus_theme_settings['branding']['tagline']) ?></div>
+    <?php } ?>
     </div>
     <!-- /.login-box -->
 

@@ -602,18 +602,20 @@ body.nexus-auth::before {
 }
 
 .nexus-auth .nexus-auth-title {
+    color: var(--nexus-white);
     font-size: clamp(1.65rem, 5vw, 2.25rem);
     line-height: 1.15;
     margin-bottom: 0.65rem;
 }
 
 .nexus-auth .nexus-auth-copy {
-    color: var(--nexus-copy);
+    color: var(--nexus-muted-dark);
     line-height: 1.6;
     margin-bottom: 1.5rem;
 }
 
 .nexus-auth .nexus-field-label {
+    color: var(--nexus-cloud);
     display: block;
     font-size: 0.875rem;
     margin-bottom: 0.45rem;
@@ -623,7 +625,7 @@ body.nexus-auth::before {
 .nexus-client .nexus-portal-cta {
     background: var(--nexus-gradient);
     border-color: transparent;
-    color: var(--nexus-ink);
+    color: var(--nexus-primary-contrast);
 }
 
 .nexus-auth .btn-primary:hover,
@@ -659,6 +661,120 @@ body.nexus-auth::before {
     justify-content: center;
     margin-top: 1rem;
     text-align: center;
+}
+
+.nexus-auth .nexus-auth-tagline {
+    color: var(--nexus-cloud);
+    font-size: 0.84rem;
+    line-height: 1.5;
+    margin-top: 1.15rem;
+    text-align: center;
+}
+
+/* Guest and public billing shell */
+body.nexus-guest {
+    background: var(--nexus-page);
+    color: var(--nexus-copy);
+    min-height: 100vh;
+}
+
+.nexus-guest .wrapper,
+.nexus-guest .content-wrapper {
+    background: var(--nexus-page);
+}
+
+.nexus-guest .content-wrapper { min-height: calc(100vh - 7.5rem); }
+.nexus-guest .content { padding: 1.75rem 0 2.5rem; }
+.nexus-guest .content > .container { max-width: 74rem; }
+
+.nexus-guest-masthead {
+    background:
+        radial-gradient(circle at 82% 10%, rgba(105, 191, 245, 0.16), transparent 24rem),
+        linear-gradient(120deg, var(--nexus-night), var(--nexus-elevated));
+    border-bottom: 2px solid var(--nexus-cyan);
+    box-shadow: 0 0.7rem 2rem rgba(8, 8, 20, 0.18);
+    color: var(--nexus-cloud);
+}
+
+.nexus-guest-masthead-inner {
+    align-items: center;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: minmax(12rem, 1fr) auto minmax(12rem, 1fr);
+    min-height: 7.5rem;
+    padding-bottom: 1.25rem;
+    padding-top: 1.25rem;
+}
+
+.nexus-guest-brand {
+    align-items: center;
+    color: var(--nexus-white) !important;
+    display: flex;
+    gap: 0.75rem;
+    min-width: 0;
+    text-decoration: none !important;
+}
+
+.nexus-guest-brand img { max-height: 4rem; max-width: 15rem; object-fit: contain; }
+.nexus-guest-brand strong { font-family: var(--nexus-font-display); font-size: 1.1rem; }
+
+.nexus-guest-heading { text-align: center; }
+.nexus-guest-heading span { color: var(--nexus-cyan); display: block; font-size: 0.66rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
+.nexus-guest-heading strong { color: var(--nexus-white); display: block; font-family: var(--nexus-font-display); font-size: 1.35rem; margin-top: 0.2rem; }
+.nexus-guest-tagline { color: var(--nexus-muted-dark); font-size: 0.8rem; line-height: 1.5; margin: 0; text-align: right; }
+
+.nexus-guest-invoice .content > .container > .card:first-of-type {
+    border-top: 3px solid var(--nexus-cyan);
+    box-shadow: var(--nexus-shadow);
+    overflow: hidden;
+}
+
+.nexus-guest-invoice .content > .container > .card:first-of-type > .card-header {
+    align-items: center;
+    background: var(--nexus-surface) !important;
+    border-bottom: 1px solid var(--nexus-border);
+    display: flex;
+    min-height: 4.25rem;
+    padding: 0.85rem 1.25rem;
+}
+
+.nexus-guest-invoice .content > .container > .card:first-of-type > .card-header > .row {
+    align-items: center;
+    flex: 1 1 auto;
+    width: 100%;
+}
+
+.nexus-guest-invoice .card-header h4 { color: var(--nexus-text); font-size: 1rem; margin: 0; }
+.nexus-guest-invoice .card-body > .row:first-child h3 { color: var(--nexus-text); font-size: clamp(1.75rem, 4vw, 2.5rem); letter-spacing: 0.04em; }
+.nexus-guest-invoice .card-body > .row.bg-light { background: var(--nexus-surface-2) !important; border: 1px solid var(--nexus-border); border-radius: var(--nexus-radius); margin-left: 0; margin-right: 0; }
+.nexus-guest-invoice .table thead.bg-light { background: var(--nexus-surface-2) !important; }
+.nexus-guest-invoice .table thead th { border-bottom-color: var(--nexus-border); color: var(--nexus-text); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.055em; text-transform: uppercase; }
+.nexus-guest-invoice .table td { color: var(--nexus-copy); vertical-align: middle; }
+.nexus-guest-invoice .btn-default { background: var(--nexus-surface); border-color: var(--nexus-border); color: var(--nexus-text); }
+.nexus-guest-invoice .btn-success { background: var(--nexus-gradient); border-color: transparent; color: var(--nexus-primary-contrast); font-weight: 750; }
+.nexus-guest-invoice .content > .container > p.text-center { color: var(--nexus-muted); margin: 1.5rem 0 0; }
+
+@media (max-width: 767.98px) {
+    .nexus-guest-masthead-inner { grid-template-columns: 1fr; text-align: center; }
+    .nexus-guest-brand { justify-content: center; }
+    .nexus-guest-tagline { text-align: center; }
+    .nexus-guest .content { padding-top: 1rem; }
+    .nexus-guest-invoice .card-header .row > div { flex: 0 0 100%; max-width: 100%; }
+    .nexus-guest-invoice .card-header .float-right { float: none !important; margin-top: 0.75rem; }
+    .nexus-guest-invoice .card-body > .row:first-child > [class*="col-sm-"] { flex: 0 0 100%; max-width: 100%; text-align: center; }
+    .nexus-guest-invoice .card-body > .row:first-child > .col-sm-2 { margin-bottom: 0.85rem; }
+    .nexus-guest-invoice .card-body > .row:first-child > .col-sm-6 { margin-bottom: 1.35rem; }
+    .nexus-guest-invoice .card-body > .row:first-child h3 { text-align: center !important; }
+    .nexus-guest-invoice .card-body > .row:first-child .badge { float: none !important; }
+    .nexus-guest-invoice .card-body > .row:first-child .table { margin: 0.75rem auto 0; max-width: 18rem; }
+    .nexus-guest-invoice .card-body > .row:first-child img { margin: 0 auto; }
+}
+
+@media print {
+    .nexus-guest { background: #fff !important; }
+    .nexus-guest .content { padding: 0; }
+    .nexus-guest .content-wrapper { background: #fff !important; }
+    .nexus-guest-invoice .content > .container > .card:first-of-type { border: 0; box-shadow: none; }
 }
 
 /* Customer portal */

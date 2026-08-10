@@ -114,6 +114,7 @@ try {
     $themeCssSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'nexus-theme.css');
     $agentHeaderSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'header.php');
     $clientHeaderSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'client' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'header.php');
+    $guestHeaderSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'guest' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'guest_header.php');
     $loginSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'login.php');
     $resetSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'client' . DIRECTORY_SEPARATOR . 'login_reset.php');
     $mfaSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'agent' . DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'mfa_enforcement.php');
@@ -125,8 +126,10 @@ try {
     expect(str_contains($adminNavSource, 'NEXUS_MANAGER_VERSION'), 'administration navigation reports the installed manager version');
     foreach ([$loginSource, $resetSource, $mfaSource] as $authSource) {
         expect(str_contains($authSource, "'nexus-auth-brand--logo' : 'nexus-auth-brand--text'"), 'authentication template marks logo and text branding as mutually exclusive');
+        expect(str_contains($authSource, "['branding']['tagline']"), 'authentication template renders the configured brand tagline');
     }
     expect(str_contains($themeCssSource, '.nexus-auth .login-logo.nexus-auth-brand--logo > :not(img)') && str_contains($themeCssSource, 'font-size: 0;'), 'logo branding suppresses duplicate title content while preserving the image');
+    expect(str_contains($themeCssSource, '.nexus-auth .nexus-auth-title') && str_contains($themeCssSource, 'color: var(--nexus-white);'), 'authentication heading remains readable on the dark login card');
     expect(str_contains($themeCssSource, '.nexus-theme .modal.fade .modal-dialog') && str_contains($themeCssSource, '@keyframes nexus-notice-in'), 'theme includes modal and notification motion treatments');
     expect(str_contains($themeCssSource, '@media (prefers-reduced-motion: reduce)') && str_contains($themeCssSource, '.nexus-theme.nexus-motion-reduced'), 'motion treatments preserve user and operating-system reduced-motion preferences');
     expect(str_contains($themeCssSource, 'linear-gradient(120deg, var(--nexus-night)') && str_contains($adminPageSource, 'function updateStudioPalette()'), 'Theme Studio hero follows saved and previewed palette colors');
@@ -142,6 +145,8 @@ try {
     foreach ([$adminPageSource, $loginSource, $resetSource, $mfaSource, $agentHeaderSource, $clientHeaderSource] as $assetSurfaceSource) {
         expect(str_contains($assetSurfaceSource, 'nexusThemeVersionedAssetUrl'), 'rendered Nexus surfaces use versioned custom asset URLs');
     }
+    expect(str_contains($guestHeaderSource, 'nexus-guest-invoice') && str_contains($guestHeaderSource, 'Secure billing portal') && str_contains($guestHeaderSource, "['branding']['tagline']"), 'guest invoices use the branded Nexus masthead and tagline');
+    expect(str_contains($themeCssSource, '.nexus-guest-invoice') && str_contains($themeCssSource, '.nexus-guest-masthead'), 'guest invoice layout uses the responsive Nexus billing shell');
     expect(str_contains($adminPostSource, "nexus_preset_action") && str_contains($adminPostSource, "nexus_schedule_command") && str_contains($adminPostSource, "nexus_theme_rollback"), 'administration actions support presets, scheduling, and rollback');
 
     $fixture = $testRoot . DIRECTORY_SEPARATOR . 'fixture';

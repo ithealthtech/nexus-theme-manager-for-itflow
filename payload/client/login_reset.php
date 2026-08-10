@@ -308,6 +308,10 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     </div>
     <!-- /.div.card -->
 
+    <?php if ($nexus_theme_enabled && $nexus_theme_settings['branding']['tagline'] !== '') { ?>
+        <div class="nexus-auth-tagline"><?= escapeHtml($nexus_theme_settings['branding']['tagline']) ?></div>
+    <?php } ?>
+
 </div>
 <!-- /.login-box -->
 

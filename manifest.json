@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "package_id": "org.nexus-theme-manager.itflow",
-  "package_version": "3.0.2",
-  "theme_version": "26.08.12",
+  "package_version": "3.1.0",
+  "theme_version": "26.08.13",
   "name": "Nexus Theme Manager for IT Flow",
   "vendor": "Nexus Theme Manager contributors",
   "compatible_itflow": {
@@ -12,13 +12,13 @@
   "files": [
     {
       "path": "includes/nexus_theme.php",
-      "payload_sha256": "5dcc36f35fa6a6c1807935ae72a0f8d133edf75d4aa86355161acafcae563197",
+      "payload_sha256": "c02897745e66dde8cd6db51016595c3dac3ad21607419517b2ee40bacfb6e5f5",
       "baseline_sha256": null,
       "php": true
     },
     {
       "path": "css/nexus-theme.css",
-      "payload_sha256": "3b34561b6a9489b49274832927b6ea22d8f08a3c99746ee356ef64a0d7565d3d",
+      "payload_sha256": "9d63a693e539a7cdd81ea188f3bd88a28e58c27138d63e786ade6ae9dc5a9680",
       "baseline_sha256": null,
       "php": false
     },
@@ -42,7 +42,7 @@
     },
     {
       "path": "agent/user/mfa_enforcement.php",
-      "payload_sha256": "3c209f630cd8afff3747d44ee3b4afaadac1300efe0d30d753f6cec117ae61c3",
+      "payload_sha256": "e0fafe89769475cf1b6810031097f7dc7332552cda1acf1186b580b778593e94",
       "baseline_sha256": "3e05780ead5a74897ab1dcc7df3160faf82efeb35284100c10c521ee3b5ce948",
       "php": true
     },
@@ -66,7 +66,7 @@
     },
     {
       "path": "client/login_reset.php",
-      "payload_sha256": "e55f1758ea9dd78ce138e1be6dd03bffe1e90292018657a137ff9eb8e54df5f1",
+      "payload_sha256": "2908fde62c8b8980466c5ac4e0f8f9b97b91ca29d1325765dd59da99f15667f3",
       "baseline_sha256": "a2c2447f1d5300df35be840dda5a72b57628bc02d918a1d4f34765d6a026ae94",
       "php": true
     },
@@ -108,8 +108,14 @@
     },
     {
       "path": "login.php",
-      "payload_sha256": "1554c2e09fd39f6c1055a517222c60aed15910bc9896c2e3d2d7f07f6da662b1",
+      "payload_sha256": "5d83b40cd63ed513ac6d03c076d7bd68ce2880e8e533928c199c8393d707a526",
       "baseline_sha256": "ca09fdb5b8da8355799a9821b59ce9d32adb8c214199720353a8fe68792d3a2e",
+      "php": true
+    },
+    {
+      "path": "guest/includes/guest_header.php",
+      "payload_sha256": "06bdb7c27b68d2f81362721e6f011d2841e29af64d291ae7507ef8f30e62b492",
+      "baseline_sha256": "9008dd8ad322a20b9d71a1b7a86b9c8f2b938b630424ccbc441839b27ae7ceb6",
       "php": true
     },
     {

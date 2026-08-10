@@ -2,6 +2,25 @@
 
 All notable changes to this project are documented here.
 
+## [3.1.0] - 2026-08-10
+
+### Added
+
+- Added the shared guest header to the managed overlay so public invoice URLs use the active Nexus logo, brand name, tagline, browser title, favicon, palette, and layout settings.
+- Added a responsive guest billing masthead and invoice document treatment that visually bridges authentication, client portal, and public billing surfaces while preserving print output.
+
+### Fixed
+
+- Forced authentication titles such as **Welcome back** to use readable light text on the dark login card, independent of the light document text palette.
+- Restored the configured brand tagline beneath login, password recovery, and MFA enrollment cards.
+- Improved authentication supporting-copy, field-label, and primary-button contrast.
+- Guest invoice company details and invoice metadata now stack cleanly on small screens without horizontal page overflow.
+
+### Validation
+
+- Browser-validated the guest invoice at 1440px and 390px, including computed colors, responsive stacking, and zero horizontal page overflow.
+- Added lifecycle assertions for authentication title contrast, tagline rendering, branded guest integration, and the new pinned guest-header baseline.
+
 ## [3.0.2] - 2026-08-10
 
 ### Fixed
@@ -241,6 +260,7 @@ All notable changes to this project are documented here.
 [2.5.3]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.3
 [2.5.2]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.2
 [2.5.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.1
+[3.1.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.1.0
 [3.0.2]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.2
 [3.0.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.1
 [3.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.0

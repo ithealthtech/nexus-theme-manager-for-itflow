@@ -839,6 +839,10 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
         </div>
     </div>
 
+    <?php if ($nexus_theme_enabled && $nexus_theme_settings['branding']['tagline'] !== '') { ?>
+        <div class="nexus-auth-tagline"><?= escapeHtml($nexus_theme_settings['branding']['tagline']) ?></div>
+    <?php } ?>
+
     <?php if (!$config_whitelabel_enabled) { ?>
         <div class="nexus-auth-footer">Powered by ITFlow</div>
     <?php } ?>

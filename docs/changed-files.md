@@ -37,6 +37,7 @@ Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 | `client/profile.php` | Adds page heading and password label association | Field names, action, and handler preserved |
 | `client/login_reset.php` | Applies generated palette, custom logo/identity, persistent labels/autocomplete, and accessible recovery treatment | Reset tokens, request keys, decisions, and redirects preserved |
 | `agent/user/mfa_enforcement.php` | Applies generated palette and custom logo/identity while improving MFA labels and QR alternative text | MFA logic, token field, action, and redirects preserved |
+| `guest/includes/guest_header.php` | Extends shared guest pages with the Nexus identity, tagline, favicon, responsive public-billing masthead, and generated theme styles | Guest URL-key validation, invoice queries, payment actions, and exports remain untouched |
 | `admin/includes/side_nav.php` | Adds the **NEXUS → Theme Manager** administration navigation entry | Existing sections, conditions, and custom links preserved |
 
 ## Intentionally untouched
@@ -53,7 +54,7 @@ Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 
 ## Contract regression result
 
-The overlay was compared file-by-file with the pinned archive. Across all 13 edited upstream PHP files, these sets are unchanged except for the isolated Nexus administration route and its explicit POST action:
+The overlay was compared file-by-file with the pinned archive. Across all 14 edited upstream PHP files, these sets are unchanged except for the isolated Nexus administration route and its explicit POST action:
 
 - Request/session key references
 - HTML field names

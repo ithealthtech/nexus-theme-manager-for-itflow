@@ -16,6 +16,7 @@ After installation, open **Administration → NEXUS → Theme Manager**. Theme S
 
 - Separate light and dark PNG, JPEG, WebP, or animated GIF logos with native embedded timing—including 24fps artwork—plus content inspection, an 8 MB limit, dimension limits, safe fixed filenames, automatic cache refresh after replacement, contrast selection, sizing, and alignment controls.
 - Independent logo placement for authentication pages, the linked technician navigation header, and the client portal; visible company-name text is suppressed wherever the custom logo is active.
+- Branded public guest and invoice views with the active logo, tagline, browser title, favicon, responsive billing masthead, consistent headings, and print-safe document styling.
 - Display name, tagline, browser title, custom favicon, login background with focal-point and overlay controls, login messaging, and client-portal messaging.
 - Nine-part color system with independent sidebar, header, and header-text colors; five curated presets; free-form controls; instant authentication and navigation previews; and live WCAG contrast feedback.
 - Sidebar width and compact mode, independent content and menu density, solid/gradient/glass headers, pill/rail/outline active navigation, corner styles, and 90–110% interface scaling.
@@ -33,14 +34,20 @@ Theme settings, rollback state, schedules, presets, and uploaded branding are st
 
 This screenshot was captured from an isolated local ITFlow 26.08/AdminLTE test environment using the release stylesheet and sanitized demonstration data.
 
+## Guest invoice preview
+
+![Nexus branded guest invoice](docs/images/nexus-guest-invoice-v3-1.png)
+
+Guest invoice URLs keep ITFlow's URL-key validation, invoice queries, payment controls, PDF export, and print behavior while presenting the document inside the same responsive Nexus identity used by login and portal pages.
+
 ## Compatibility
 
 | Item | Supported value |
 |---|---|
 | ITFlow release | 26.08 |
 | ITFlow commit | `89b080b430aaafba5d520c4e52c57b28a9559085` |
-| Theme manager | 3.0.2 |
-| Theme payload | 26.08.12 |
+| Theme manager | 3.1.0 |
+| Theme payload | 26.08.13 |
 | Runtime | PHP 8.1 or newer; CLI SAPI for lifecycle operations and the normal ITFlow web SAPI for administration controls |
 | Target systems | Debian/Ubuntu production installs; lifecycle tests also run on Windows |
 
@@ -56,7 +63,7 @@ Install the command-line prerequisites, set `nexus_version` to the release you w
 sudo apt-get update
 sudo apt-get install -y ca-certificates curl unzip
 
-nexus_version="3.0.2"
+nexus_version="3.1.0"
 nexus_asset="Nexus-Theme-Manager-for-ITFlow-${nexus_version}"
 nexus_download_dir="$HOME/Downloads/nexus-theme-manager"
 
@@ -106,7 +113,7 @@ The bootstrap installer detects existing protected Nexus state before downloadin
 - `manager.php`: lifecycle manager
 - `updater.php`: fixed-policy root helper and systemd service installer for GUI updates
 - `manifest.json`: compatibility and immutable file checksums
-- `payload/`: 18 managed theme, customization, administration, and integration files
+- `payload/`: 19 managed theme, customization, administration, guest, and integration files
 - `baseline/`: exact supported upstream templates used for compatibility and testing
 - `docs/`: design, changed-file, and test documentation
 - `install.sh` / `uninstall.sh`: lifecycle command wrappers for an extracted package
@@ -115,7 +122,7 @@ The bootstrap installer detects existing protected Nexus state before downloadin
 ## Install
 
 1. Create and verify an ITFlow application/database backup.
-2. Extract this ZIP outside the ITFlow document root, for example `/opt/Nexus-Theme-Manager-for-ITFlow-3.0.2`.
+2. Extract this ZIP outside the ITFlow document root, for example `/opt/Nexus-Theme-Manager-for-ITFlow-3.1.0`.
 3. Run the non-mutating preflight:
 
 ```bash
@@ -225,8 +232,8 @@ sudo php /opt/theme-manager-1.0.0/manager.php uninstall --root /var/www/itflow.e
 2. Run the current preflight and install.
 
 ```bash
-sudo php /opt/Nexus-Theme-Manager-for-ITFlow-3.0.2/manager.php doctor --root /var/www/itflow.example.com
-sudo php /opt/Nexus-Theme-Manager-for-ITFlow-3.0.2/manager.php install --root /var/www/itflow.example.com --yes
+sudo php /opt/Nexus-Theme-Manager-for-ITFlow-3.1.0/manager.php doctor --root /var/www/itflow.example.com
+sudo php /opt/Nexus-Theme-Manager-for-ITFlow-3.1.0/manager.php install --root /var/www/itflow.example.com --yes
 ```
 
 The new protected state root is `/var/lib/nexus-itflow-theme`. Keep the archived 1.0.0 recovery state until the Nexus installation and portal smoke tests pass.
