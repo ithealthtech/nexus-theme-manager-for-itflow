@@ -37,7 +37,7 @@ This screenshot was captured from an isolated local ITFlow 26.08/AdminLTE test e
 |---|---|
 | ITFlow release | 26.08 |
 | ITFlow commit | `89b080b430aaafba5d520c4e52c57b28a9559085` |
-| Theme manager | 2.5.0 |
+| Theme manager | 2.5.1 |
 | Theme payload | 26.08.6 |
 | Runtime | PHP 8.1 or newer; CLI SAPI for lifecycle operations and the normal ITFlow web SAPI for administration controls |
 | Target systems | Debian/Ubuntu production installs; lifecycle tests also run on Windows |
@@ -54,7 +54,7 @@ Install the command-line prerequisites, set `nexus_version` to the release you w
 sudo apt-get update
 sudo apt-get install -y ca-certificates curl unzip
 
-nexus_version="2.5.0"
+nexus_version="2.5.1"
 nexus_asset="Nexus-Theme-Manager-for-ITFlow-${nexus_version}"
 nexus_download_dir="$HOME/Downloads/nexus-theme-manager"
 
@@ -86,7 +86,7 @@ sudo ./install-latest.sh --root /var/www/itflow.example.com
 
 To store manager state somewhere other than `/var/lib/nexus-itflow-theme`, add `--state-root PATH`. Add `--no-gui-updater` only when you intentionally do not want the systemd updater. The script refuses an existing versioned extraction directory and never skips checksum or compatibility validation.
 
-### Upgrade from 2.2.0, 2.3.0, or 2.4.0
+### Upgrade from 2.2.0, 2.3.0, 2.4.0, or 2.5.0
 
 The protected manager does not overwrite an active package in place. Set `installed_version` to the active Nexus release, verify and uninstall it with its original manager, then run the latest-release installer:
 
@@ -113,7 +113,7 @@ The bootstrap installer detects existing protected Nexus state before downloadin
 ## Install
 
 1. Create and verify an ITFlow application/database backup.
-2. Extract this ZIP outside the ITFlow document root, for example `/opt/Nexus-Theme-Manager-for-ITFlow-2.5.0`.
+2. Extract this ZIP outside the ITFlow document root, for example `/opt/Nexus-Theme-Manager-for-ITFlow-2.5.1`.
 3. Run the non-mutating preflight:
 
 ```bash
@@ -214,8 +214,8 @@ sudo php /opt/theme-manager-1.0.0/manager.php uninstall --root /var/www/itflow.e
 2. Run the current preflight and install.
 
 ```bash
-sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.5.0/manager.php doctor --root /var/www/itflow.example.com
-sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.5.0/manager.php install --root /var/www/itflow.example.com --yes
+sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.5.1/manager.php doctor --root /var/www/itflow.example.com
+sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.5.1/manager.php install --root /var/www/itflow.example.com --yes
 ```
 
 The new protected state root is `/var/lib/nexus-itflow-theme`. Keep the archived 1.0.0 recovery state until the Nexus installation and portal smoke tests pass.

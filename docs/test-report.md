@@ -1,10 +1,10 @@
 # Nexus Theme Manager for IT Flow Verification Report
 
 - Date: 2026-08-09
-- Package version: 2.5.0
+- Package version: 2.5.1
 - Payload version: 26.08.6
 - Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
-- Test runtime: PHP 8.4.16 CLI
+- Test runtime: PHP 8.4.24 CLI
 
 ## Release checks
 
@@ -18,7 +18,7 @@
 | 13 baseline PHP templates | Pass |
 | Three shell entrypoints | Syntax pass |
 | Lifecycle simulation | 109 passed, 0 failed |
-| GUI updater security suite | 26 passed, 0 failed |
+| GUI updater security suite | 29 passed, 0 failed |
 | Manifest payload hashes | 18/18 verified |
 | Manifest baseline hashes | 13/13 verified |
 | Old organization name/domain/internal namespace scan | No matches |
@@ -81,7 +81,7 @@ The automated package is ready for a staging migration. A production operator mu
 
 1. Back up the ITFlow application and database.
 2. Verify and uninstall version 1.0.0 with its original manager.
-3. Run the Nexus 2.5.0 `doctor` command.
+3. Run the Nexus 2.5.1 `doctor` command.
 4. Install Nexus and reload the PHP/web service gracefully.
 5. Smoke-test login, MFA, password recovery, customer tickets, technician navigation, **Administration → NEXUS → Theme Manager**, customization save/reset, logo upload/removal, pause/reactivate, update check/status, and configured integrations.
 6. Retain the archived 1.0.0 recovery state until acceptance is complete.

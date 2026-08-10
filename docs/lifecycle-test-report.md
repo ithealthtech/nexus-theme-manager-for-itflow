@@ -1,9 +1,9 @@
 # Lifecycle test report
 
 - Date: 2026-08-09
-- Manager version: 2.5.0
+- Manager version: 2.5.1
 - Payload version: 26.08.6
-- PHP runtime: 8.4.16 CLI
+- PHP runtime: 8.4.24 CLI
 
 ## Syntax validation
 
@@ -61,6 +61,6 @@ The lifecycle suite ran on Windows to exercise cross-platform path and replaceme
 
 ## GUI updater security suite
 
-Result: **26 assertions passed, 0 failed**
+Result: **29 assertions passed, 0 failed**
 
-The focused suite validates strict semantic versions, fixed request fields, unsafe request rejection, archive-root and traversal checks, checksum and checksum-filename enforcement, package manifest/version requirements, CLI argument allow-listing, web-entrypoint refusal, shell-free process execution, systemd filesystem hardening, and the automatic rollback path. Actual systemd activation remains a Linux staging acceptance check because the local verification host is Windows.
+The focused suite validates strict semantic versions, fixed request fields, unsafe request rejection, archive-root and traversal checks, checksum and checksum-filename enforcement, package manifest/version requirements, CLI argument allow-listing, web-entrypoint refusal, shell-free process execution, systemd filesystem hardening, generated unit syntax through `systemd-analyze verify` in Linux CI, and the automatic rollback path.
