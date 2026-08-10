@@ -2,6 +2,25 @@
 
 All notable changes to this project are documented here.
 
+## [3.2.0] - 2026-08-10
+
+### Added
+
+- Added a dedicated URL-key-validated Nexus invoice PDF endpoint using ITFlow's bundled TCPDF runtime.
+- Downloaded invoices now use the active Nexus brand name, tagline, light logo, palette, status, billing hierarchy, item table, notes, totals, and footer.
+- Browser printing now preserves a compact paper-safe Nexus masthead with a dark-logo or brand-text fallback for reliable contrast.
+
+### Lifecycle
+
+- The original guest invoice template is now an exact managed baseline so disable and uninstall restore ITFlow's original download route byte-for-byte.
+- The PDF builder and endpoint are theme-owned files removed by CLI disable or uninstall.
+- Pausing Nexus from Theme Studio redirects the managed download link to ITFlow's original PDF renderer, so presentation deactivation removes the PDF customization without requiring a CLI operation.
+
+### Validation
+
+- Rendered the TCPDF output to PNG with Poppler and visually checked its one-page layout, headings, tables, totals, spacing, and footer.
+- Added lifecycle coverage for the managed download route, safe content escaping, print masthead, pause fallback, install, disable, enable, and uninstall behavior.
+
 ## [3.1.1] - 2026-08-10
 
 ### Fixed
@@ -278,6 +297,7 @@ All notable changes to this project are documented here.
 [2.5.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.1
 [3.1.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.1.0
 [3.1.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.1.1
+[3.2.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.2.0
 [3.0.2]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.2
 [3.0.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.1
 [3.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.0

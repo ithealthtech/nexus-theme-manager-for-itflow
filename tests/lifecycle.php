@@ -115,6 +115,9 @@ try {
     $agentHeaderSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'header.php');
     $clientHeaderSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'client' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'header.php');
     $guestHeaderSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'guest' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'guest_header.php');
+    $guestInvoiceSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'guest' . DIRECTORY_SEPARATOR . 'guest_view_invoice.php');
+    $invoicePdfEndpointSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'guest' . DIRECTORY_SEPARATOR . 'nexus_invoice_pdf.php');
+    $invoicePdfHelperSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'nexus_invoice_pdf.php');
     $loginSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'login.php');
     $resetSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'client' . DIRECTORY_SEPARATOR . 'login_reset.php');
     $mfaSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'agent' . DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'mfa_enforcement.php');
@@ -152,6 +155,10 @@ try {
     }
     expect(str_contains($guestHeaderSource, 'nexus-guest-invoice') && str_contains($guestHeaderSource, 'Secure billing portal') && str_contains($guestHeaderSource, "['branding']['tagline']"), 'guest invoices use the branded Nexus masthead and tagline');
     expect(str_contains($themeCssSource, '.nexus-guest-invoice') && str_contains($themeCssSource, '.nexus-guest-masthead'), 'guest invoice layout uses the responsive Nexus billing shell');
+    expect(str_contains($themeCssSource, '.nexus-guest-masthead.d-print-none') && str_contains($themeCssSource, 'display: block !important') && str_contains($guestHeaderSource, 'nexus-guest-logo-print'), 'browser printing preserves a compact print-safe Nexus invoice masthead');
+    expect(str_contains($guestInvoiceSource, 'nexus_invoice_pdf.php?invoice_id=') && !str_contains($guestInvoiceSource, 'guest_post.php?export_invoice_pdf='), 'guest invoice download uses the lifecycle-managed Nexus PDF endpoint');
+    expect(str_contains($invoicePdfEndpointSource, '!nexusThemeIsEnabled()') && str_contains($invoicePdfEndpointSource, "'export_invoice_pdf' => \$invoice_id") && str_contains($invoicePdfEndpointSource, 'nexusThemeInvoicePdfHtml'), 'paused themes redirect PDF downloads to the original ITFlow renderer');
+    expect(str_contains($invoicePdfHelperSource, 'SECURE BILLING PORTAL') && str_contains($invoicePdfHelperSource, 'BILLING DOCUMENT') && str_contains($invoicePdfHelperSource, 'BALANCE DUE'), 'downloadable invoices use the Nexus document hierarchy');
     expect(str_contains($adminPostSource, "nexus_preset_action") && str_contains($adminPostSource, "nexus_schedule_command") && str_contains($adminPostSource, "nexus_theme_rollback"), 'administration actions support presets, scheduling, and rollback');
 
     $fixture = $testRoot . DIRECTORY_SEPARATOR . 'fixture';
@@ -169,12 +176,36 @@ try {
     }
 
     require_once $fixture . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'nexus_theme.php';
+    require_once $fixture . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'nexus_invoice_pdf.php';
     expect(nexusThemeIsEnabled($fixture), 'web control defaults to an active Nexus theme');
     expect(nexusThemeControlIsWritable($fixture), 'web control detects a writable ITFlow uploads directory');
     nexusThemeSetEnabled(false, $fixture);
     expect(!nexusThemeIsEnabled($fixture), 'web control pauses the Nexus visual layer');
     nexusThemeSetEnabled(true, $fixture);
     expect(nexusThemeIsEnabled($fixture), 'web control reactivates the Nexus visual layer');
+
+    $invoicePdfHtml = nexusThemeInvoicePdfHtml([
+        'brand_name' => 'Nexus Support',
+        'tagline' => 'Secure support',
+        'company_name' => 'Nexus Support LLC',
+        'client_name' => '<script>Client</script>',
+        'invoice_label' => 'INV-26',
+        'status' => 'Paid',
+        'date' => '2026-08-03',
+        'due' => '2026-08-10',
+        'balance' => '$0.00',
+        'items' => [[
+            'name' => 'Managed Services',
+            'description' => 'Monthly coverage',
+            'quantity' => '1',
+            'unit_price' => '$100.00',
+            'tax' => '$0.00',
+            'amount' => '$100.00',
+        ]],
+        'totals' => [['label' => 'Balance', 'value' => '$0.00', 'important' => true]],
+    ], nexusThemeDefaults());
+    expect(str_contains($invoicePdfHtml, 'Invoice details') && str_contains($invoicePdfHtml, 'Managed Services'), 'Nexus PDF builder renders branded headings and invoice content');
+    expect(str_contains($invoicePdfHtml, '&lt;script&gt;Client&lt;/script&gt;') && !str_contains($invoicePdfHtml, '<script>'), 'Nexus PDF builder escapes database-backed document content');
 
     $themeDefaults = nexusThemeSettings($fixture);
     expect($themeDefaults['preset'] === 'aurora', 'theme customization starts with the Aurora preset');

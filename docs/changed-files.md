@@ -18,8 +18,10 @@ Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 | `css/nexus-theme.css` | Scoped design system plus Theme Studio, authentication/navigation previews, palette, density, sidebar/header, motion, radius, and responsive states | Low |
 | `css/nexus-theme-custom.php` | CSP-compatible same-origin stylesheet generated exclusively from validated settings | Low |
 | `includes/nexus_theme.php` | Presentation state, allow-listed customization, atomic settings/rollback/presets/schedule, palette derivation, inspected raster-asset storage, and fixed update request/status helpers | Low |
+| `includes/nexus_invoice_pdf.php` | Pure escaped Nexus invoice-document HTML builder for ITFlow's bundled TCPDF runtime | Low |
 | `admin/nexus.php` | Administrator-only Theme Studio with live authentication/navigation previews, responsive branding, presets, scheduling, rollback, accessibility feedback, import/export, reset, and update actions | Low |
 | `admin/post/nexus.php` | CSRF-protected state, settings, assets, presets, schedule, rollback, import/reset, and allow-listed update queue actions with audit/application logging | Low |
+| `guest/nexus_invoice_pdf.php` | URL-key-validated themed invoice download endpoint; redirects to ITFlow's original renderer whenever Nexus presentation is paused | Medium |
 
 ## Edited
 
@@ -38,6 +40,7 @@ Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 | `client/login_reset.php` | Applies generated palette, custom logo/identity, persistent labels/autocomplete, and accessible recovery treatment | Reset tokens, request keys, decisions, and redirects preserved |
 | `agent/user/mfa_enforcement.php` | Applies generated palette and custom logo/identity while improving MFA labels and QR alternative text | MFA logic, token field, action, and redirects preserved |
 | `guest/includes/guest_header.php` | Extends shared guest pages with the Nexus identity, tagline, favicon, responsive public-billing masthead, and generated theme styles | Guest URL-key validation, invoice queries, payment actions, and exports remain untouched |
+| `guest/guest_view_invoice.php` | Routes the Download action through the managed Nexus PDF endpoint while the overlay is active | Invoice queries, payments, print action, history, and URL-key validation preserved |
 | `admin/includes/side_nav.php` | Adds the **NEXUS → Theme Manager** administration navigation entry | Existing sections, conditions, and custom links preserved |
 
 ## Intentionally untouched

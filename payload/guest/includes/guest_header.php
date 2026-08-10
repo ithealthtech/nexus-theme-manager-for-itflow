@@ -5,10 +5,10 @@ nexusThemeApplyDueSchedule();
 $nexus_guest_enabled = nexusThemeIsEnabled();
 $nexus_guest_settings = nexusThemeSettings();
 $nexus_guest_brand = nexusThemeBrandName($session_company_name, $nexus_guest_settings);
-$nexus_guest_logo = nexusThemeVersionedAssetUrl(
-    nexusThemeLogoUrl($nexus_guest_settings, '', nexusThemeLogoVariantForColor($nexus_guest_settings['colors']['sidebar'])),
-    $nexus_guest_settings
-);
+$nexus_guest_logo_raw = nexusThemeLogoUrl($nexus_guest_settings, '', nexusThemeLogoVariantForColor($nexus_guest_settings['colors']['sidebar']));
+$nexus_guest_print_logo_raw = nexusThemeLogoUrl($nexus_guest_settings, '', 'dark');
+$nexus_guest_logo = nexusThemeVersionedAssetUrl($nexus_guest_logo_raw, $nexus_guest_settings);
+$nexus_guest_print_logo = nexusThemeVersionedAssetUrl($nexus_guest_print_logo_raw, $nexus_guest_settings);
 $nexus_guest_native_favicon = is_file($_SERVER['DOCUMENT_ROOT'] . '/uploads/favicon.ico') ? '/uploads/favicon.ico' : '';
 $nexus_guest_favicon = $nexus_guest_enabled
     ? nexusThemeVersionedAssetUrl(nexusThemeFaviconUrl($nexus_guest_settings, $nexus_guest_native_favicon), $nexus_guest_settings)
@@ -54,7 +54,12 @@ if ($nexus_guest_enabled) {
                 <div class="container nexus-guest-masthead-inner">
                     <a class="nexus-guest-brand" href="/login.php" aria-label="<?= escapeHtml($nexus_guest_brand) ?> support portal">
                         <?php if ($nexus_guest_logo !== '') { ?>
-                            <img src="<?= escapeHtml($nexus_guest_logo) ?>" alt="<?= escapeHtml($nexus_guest_settings['branding']['logo_alt'] ?: $nexus_guest_brand . ' logo') ?>">
+                            <img class="nexus-guest-logo-screen" src="<?= escapeHtml($nexus_guest_logo) ?>" alt="<?= escapeHtml($nexus_guest_settings['branding']['logo_alt'] ?: $nexus_guest_brand . ' logo') ?>">
+                            <?php if ($nexus_guest_print_logo_raw !== '' && $nexus_guest_print_logo_raw !== $nexus_guest_logo_raw) { ?>
+                                <img class="nexus-guest-logo-print" src="<?= escapeHtml($nexus_guest_print_logo) ?>" alt="">
+                            <?php } else { ?>
+                                <strong class="nexus-guest-brand-print-text"><?= escapeHtml($nexus_guest_brand) ?></strong>
+                            <?php } ?>
                         <?php } else { ?>
                             <span class="nexus-preview-symbol"><i class="fas fa-layer-group" aria-hidden="true"></i></span>
                             <strong><?= escapeHtml($nexus_guest_brand) ?></strong>

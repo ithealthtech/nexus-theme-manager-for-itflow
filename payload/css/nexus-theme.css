@@ -717,6 +717,8 @@ body.nexus-guest {
 
 .nexus-guest-brand img { max-height: 4rem; max-width: 15rem; object-fit: contain; }
 .nexus-guest-brand strong { font-family: var(--nexus-font-display); font-size: 1.1rem; }
+.nexus-guest-logo-print,
+.nexus-guest-brand-print-text { display: none; }
 
 .nexus-guest-heading { text-align: center; }
 .nexus-guest-heading span { color: var(--nexus-cyan); display: block; font-size: 0.66rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; }
@@ -771,10 +773,38 @@ body.nexus-guest {
 }
 
 @media print {
+    @page { margin: 11mm; }
     .nexus-guest { background: #fff !important; }
     .nexus-guest .content { padding: 0; }
-    .nexus-guest .content-wrapper { background: #fff !important; }
+    .nexus-guest .content-wrapper { background: #fff !important; min-height: 0; }
+    .nexus-guest .content > .container { max-width: none; padding: 0; }
+    .nexus-guest .nexus-guest-masthead.d-print-none {
+        background: #fff !important;
+        border-bottom: 2px solid var(--nexus-info);
+        box-shadow: none;
+        display: block !important;
+        margin-bottom: 8mm;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    .nexus-guest .nexus-guest-masthead-inner {
+        gap: 8mm;
+        grid-template-columns: minmax(45mm, 1fr) auto minmax(45mm, 1fr);
+        min-height: 22mm;
+        padding: 4mm 0;
+    }
+    .nexus-guest .nexus-guest-logo-screen { display: none !important; }
+    .nexus-guest .nexus-guest-logo-print,
+    .nexus-guest .nexus-guest-brand-print-text { display: block !important; }
+    .nexus-guest .nexus-guest-brand img { max-height: 14mm; max-width: 50mm; }
+    .nexus-guest .nexus-guest-brand strong,
+    .nexus-guest .nexus-guest-heading strong { color: #111827 !important; }
+    .nexus-guest .nexus-guest-heading span { color: var(--nexus-info) !important; }
+    .nexus-guest .nexus-guest-tagline { color: #4b5563 !important; }
     .nexus-guest-invoice .content > .container > .card:first-of-type { border: 0; box-shadow: none; }
+    .nexus-guest-invoice .content > .container > .card:first-of-type > .card-body { padding: 0; }
+    .nexus-guest-invoice .card,
+    .nexus-guest-invoice .table-responsive { break-inside: auto; }
 }
 
 /* Customer portal */

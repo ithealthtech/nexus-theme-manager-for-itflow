@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "package_id": "org.nexus-theme-manager.itflow",
-  "package_version": "3.1.1",
-  "theme_version": "26.08.14",
+  "package_version": "3.2.0",
+  "theme_version": "26.08.15",
   "name": "Nexus Theme Manager for IT Flow",
   "vendor": "Nexus Theme Manager contributors",
   "compatible_itflow": {
@@ -12,13 +12,19 @@
   "files": [
     {
       "path": "includes/nexus_theme.php",
-      "payload_sha256": "1900974e0cf08165825370de5e30420632c2663a54a23ccc118db667b00452bd",
+      "payload_sha256": "1c153d7eecd15dbd7b923240ac04f7d47879251c0c652833ed237df6a5797219",
+      "baseline_sha256": null,
+      "php": true
+    },
+    {
+      "path": "includes/nexus_invoice_pdf.php",
+      "payload_sha256": "d942c176b423822f307c0fff8a74b8cb19658381818a692535a09db9123fdeb6",
       "baseline_sha256": null,
       "php": true
     },
     {
       "path": "css/nexus-theme.css",
-      "payload_sha256": "6283bcccac7964133c3c9ac0087b7f7b0c8f96551c35a513b0aef48226c91796",
+      "payload_sha256": "c2a63b97988a9847f1555a249ba252d9391f1156003e70608433b3405351399c",
       "baseline_sha256": null,
       "php": false
     },
@@ -114,8 +120,20 @@
     },
     {
       "path": "guest/includes/guest_header.php",
-      "payload_sha256": "b79e7c864be2035307c4b8bae0501c0b3db7b8a5d80d0f277f5d1a4034a7b83a",
+      "payload_sha256": "2fcd58df7f4bdaef3bcc99287d3057b295c1bba0bb909f2aec6c4a80c06ed33f",
       "baseline_sha256": "9008dd8ad322a20b9d71a1b7a86b9c8f2b938b630424ccbc441839b27ae7ceb6",
+      "php": true
+    },
+    {
+      "path": "guest/guest_view_invoice.php",
+      "payload_sha256": "f5bc972feb03fd7b56204cbfd8af38a4d4b87075a0751e9047eef9b575d3ab33",
+      "baseline_sha256": "32407574819e08f5f90bfd9a426d9fe9ba4b9634ee0b555ea721366c526e2427",
+      "php": true
+    },
+    {
+      "path": "guest/nexus_invoice_pdf.php",
+      "payload_sha256": "d19bf7fc213533c8ef2b188d4b1ec13b6c7c5ae8c04aa9fc193a5a583ab8d2eb",
+      "baseline_sha256": null,
       "php": true
     },
     {
