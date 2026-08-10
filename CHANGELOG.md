@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented here.
 
+## [2.5.2] - 2026-08-10
+
+### Fixed
+
+- Replaced the administration sidebar's oversized rectangular return header with a compact, rounded back control that blends with the Nexus navigation.
+- Made image and text branding explicitly mutually exclusive on the main login, password-reset, and MFA-enforcement pages.
+- Suppressed stray title nodes inside logo-mode authentication headers so a custom logo cannot be followed by duplicate company-name text.
+
+### Changed
+
+- The administration navigation badge now reports the installed manager version instead of a stale hard-coded value.
+- Bumped the theme payload to 26.08.7 without changing the pinned ITFlow 26.08 baseline.
+
 ## [2.5.1] - 2026-08-10
 
 ### Fixed
@@ -118,4 +131,5 @@ All notable changes to this project are documented here.
 [2.3.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.3.0
 [2.4.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.4.0
 [2.5.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.0
+[2.5.2]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.2
 [2.5.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.1

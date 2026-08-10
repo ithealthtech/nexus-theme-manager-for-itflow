@@ -1,12 +1,8 @@
 <!-- Main Sidebar Container -->
 <aside class="main-sidebar sidebar-dark-<?= escapeHtml($config_theme) ?> d-print-none">
-    <a class="brand-link pb-1 mt-1" href="/agent/<?= $config_start_page ?>">
-        <p class="h6">
-            <i class="nav-icon fas fa-arrow-left ml-3 mr-2"></i>
-            <span class="brand-text">
-                Back | <strong>Administration</strong>
-            </span>
-        </p>
+    <a class="brand-link nexus-admin-back" href="/agent/<?= $config_start_page ?>">
+        <i class="nav-icon fas fa-arrow-left" aria-hidden="true"></i>
+        <span class="brand-text"><span>Back</span><span class="nexus-admin-back-separator" aria-hidden="true"></span><strong>Administration</strong></span>
     </a>
 
     <!-- Sidebar -->
@@ -165,7 +161,7 @@
                         <i class="nav-icon fas fa-layer-group"></i>
                         <p>
                             Theme Manager
-                            <span class="right badge badge-info">2.3</span>
+                            <span class="right badge badge-info"><?= escapeHtml(NEXUS_MANAGER_VERSION) ?></span>
                         </p>
                     </a>
                 </li>
