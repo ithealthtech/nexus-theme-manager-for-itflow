@@ -2,6 +2,21 @@
 
 All notable changes to this project are documented here.
 
+## [3.0.1] - 2026-08-10
+
+### Fixed
+
+- Connected content density to the live navigation preview and made layout changes automatically reveal the affected preview surface.
+- Made compact, comfortable, and spacious content and menu density states visibly distinct in both Theme Studio and the installed ITFlow interface.
+- Strengthened solid, gradient, and glass header treatments so each selection has an immediately recognizable result.
+- Applied rail and outline active-navigation treatments to nested links as well as top-level items, with sufficient specificity to override the base active state.
+- Made compact-sidebar mode visibly condense sidebar labels, icons, section headings, spacing, and preview width.
+
+### Validation
+
+- Added lifecycle assertions for every repaired layout control and browser-tested computed style changes for content density, menu density, header treatment, active navigation, and compact sidebar mode.
+- Refreshed the Theme Studio screenshot from an isolated local preview using the release stylesheet.
+
 ## [3.0.0] - 2026-08-10
 
 ### Added
@@ -213,4 +228,5 @@ All notable changes to this project are documented here.
 [2.5.3]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.3
 [2.5.2]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.2
 [2.5.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.1
+[3.0.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.1
 [3.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.0
