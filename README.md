@@ -4,27 +4,28 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![ITFlow compatibility](https://img.shields.io/badge/ITFlow-26.08-2f7d32.svg)](https://github.com/itflow-org/itflow)
 
-Nexus Theme Manager is a lifecycle-managed ITFlow interface package with a full administrator-only Theme Studio, protected root-only installer, and verified GUI update workflow. Administrators can control branding, upload a custom logo, build a color system, tune layout density and scale, personalize portal copy, preview changes live, activate or pause the theme, and install verified Nexus releases without granting the web service permission to execute commands or directly replace application code.
+Nexus Theme Manager is a lifecycle-managed ITFlow interface package with a full administrator-only Theme Studio, protected root-only installer, and verified GUI update workflow. Administrators can control responsive branding, navigation, login imagery, presets, scheduling, rollback, layout, content, motion, and colors from a live visual workspace without granting the web service permission to execute commands or directly replace application code.
 
 ITFlow 26.08 does not expose a native plugin or theme-hook loader. Nexus therefore provides plugin-style lifecycle behavior around the exact supported templates: compatibility checks, immutable package checksums, out-of-web-root backups, atomic file replacement, enable/disable, conflict-safe uninstall, PHP linting, and operation locking.
 
 ## Administration manager
 
-![Nexus Theme Studio administration page](docs/images/nexus-gui-updater.png)
+![Nexus Theme Studio administration page](docs/images/nexus-theme-studio-v3.png)
 
 After installation, open **Administration → NEXUS → Theme Manager**. Theme Studio provides:
 
-- Custom PNG, JPEG, or WebP logo upload with content inspection, size and dimension limits, safe fixed filenames, and ITFlow-branding fallback.
+- Separate light and dark PNG, JPEG, WebP, or animated GIF logos with native embedded timing—including 24fps artwork—plus content inspection, an 8 MB limit, dimension limits, safe fixed filenames, automatic contrast selection, sizing, and alignment controls.
 - Independent logo placement for authentication pages, the linked technician navigation header, and the client portal; visible company-name text is suppressed wherever the custom logo is active.
-- Display name, tagline, login messaging, and client-portal messaging controls.
-- Seven-part color system with five curated presets, free-form color controls, instant preview, and live WCAG contrast feedback.
-- Sharp, balanced, or rounded corners; compact, comfortable, or spacious density; 90–110% interface scaling; and reduced motion.
-- Configuration export, validated JSON import, one-click reset, asset health, and theme pause/activation.
+- Display name, tagline, browser title, custom favicon, login background with focal-point and overlay controls, login messaging, and client-portal messaging.
+- Nine-part color system with independent sidebar, header, and header-text colors; five curated presets; free-form controls; instant authentication and navigation previews; and live WCAG contrast feedback.
+- Sidebar width and compact mode, independent content and menu density, solid/gradient/glass headers, pill/rail/outline active navigation, corner styles, and 90–110% interface scaling.
+- Subtle, fluid, or snappy motion profiles for modals, dropdowns, tooltips, popovers, alerts, toasts, and floating panels, with an instant Theme Studio preview and full reduced-motion support.
+- Named saved presets with import/export, scheduled activation or pause, reversible one-click rollback, configuration import/export, reset, asset health, and theme pause/activation.
 - Atomic settings writes, administrator permissions, CSRF protection, audit logging, and a CSP-compatible same-origin generated stylesheet.
 
 Theme Studio also checks for Nexus releases and can queue an update. A root-owned systemd path service handles the privileged work with a fixed GitHub repository, exact release filenames, archive and manifest validation, SHA-256 verification, compatibility checks, and automatic rollback. The web request cannot supply a URL, command, file path, release version, or lifecycle flag.
 
-Theme settings and uploaded branding are stored in ITFlow's writable `uploads` area and survive CLI disable, uninstall, and version upgrades. Use **Reset** or **Remove logo** in Theme Studio when you intentionally want to remove them.
+Theme settings, rollback state, schedules, presets, and uploaded branding are stored in ITFlow's writable `uploads` area and survive CLI disable, uninstall, and version upgrades. Reset and asset-detach controls preserve the immediately previous design so rollback remains complete.
 
 ## Technician theme preview
 
@@ -38,8 +39,8 @@ This screenshot was captured from an isolated local ITFlow 26.08/AdminLTE test e
 |---|---|
 | ITFlow release | 26.08 |
 | ITFlow commit | `89b080b430aaafba5d520c4e52c57b28a9559085` |
-| Theme manager | 2.5.4 |
-| Theme payload | 26.08.8 |
+| Theme manager | 3.0.0 |
+| Theme payload | 26.08.10 |
 | Runtime | PHP 8.1 or newer; CLI SAPI for lifecycle operations and the normal ITFlow web SAPI for administration controls |
 | Target systems | Debian/Ubuntu production installs; lifecycle tests also run on Windows |
 
@@ -55,7 +56,7 @@ Install the command-line prerequisites, set `nexus_version` to the release you w
 sudo apt-get update
 sudo apt-get install -y ca-certificates curl unzip
 
-nexus_version="2.5.4"
+nexus_version="3.0.0"
 nexus_asset="Nexus-Theme-Manager-for-ITFlow-${nexus_version}"
 nexus_download_dir="$HOME/Downloads/nexus-theme-manager"
 
@@ -87,7 +88,7 @@ sudo ./install-latest.sh --root /var/www/itflow.example.com
 
 To store manager state somewhere other than `/var/lib/nexus-itflow-theme`, add `--state-root PATH`. Add `--no-gui-updater` only when you intentionally do not want the systemd updater. The script refuses an existing versioned extraction directory and never skips checksum or compatibility validation.
 
-### Upgrade from 2.2.0, 2.3.0, 2.4.0, or 2.5.0
+### Upgrade from any 2.x release
 
 The protected manager does not overwrite an active package in place. Set `installed_version` to the active Nexus release, verify and uninstall it with its original manager, then run the latest-release installer:
 
@@ -114,7 +115,7 @@ The bootstrap installer detects existing protected Nexus state before downloadin
 ## Install
 
 1. Create and verify an ITFlow application/database backup.
-2. Extract this ZIP outside the ITFlow document root, for example `/opt/Nexus-Theme-Manager-for-ITFlow-2.5.4`.
+2. Extract this ZIP outside the ITFlow document root, for example `/opt/Nexus-Theme-Manager-for-ITFlow-3.0.0`.
 3. Run the non-mutating preflight:
 
 ```bash
@@ -148,7 +149,7 @@ sudo php manager.php verify --root /var/www/itflow.example.com
 sudo php manager.php status --root /var/www/itflow.example.com
 ```
 
-8. Open **Administration → NEXUS → Theme Manager** and confirm that the theme is Active, all five core administration assets are present, and the update card reports **Ready**.
+8. Open **Administration → NEXUS → Theme Manager** and confirm that the theme is Active, all six core administration assets are present, and the update card reports **Ready**.
 
 State and original-file backups default to `/var/lib/nexus-itflow-theme/<instance-id>`, outside the web root. Use `--state-root PATH` consistently on every command only when the default is unsuitable.
 
@@ -224,8 +225,8 @@ sudo php /opt/theme-manager-1.0.0/manager.php uninstall --root /var/www/itflow.e
 2. Run the current preflight and install.
 
 ```bash
-sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.5.4/manager.php doctor --root /var/www/itflow.example.com
-sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.5.4/manager.php install --root /var/www/itflow.example.com --yes
+sudo php /opt/Nexus-Theme-Manager-for-ITFlow-3.0.0/manager.php doctor --root /var/www/itflow.example.com
+sudo php /opt/Nexus-Theme-Manager-for-ITFlow-3.0.0/manager.php install --root /var/www/itflow.example.com --yes
 ```
 
 The new protected state root is `/var/lib/nexus-itflow-theme`. Keep the archived 1.0.0 recovery state until the Nexus installation and portal smoke tests pass.

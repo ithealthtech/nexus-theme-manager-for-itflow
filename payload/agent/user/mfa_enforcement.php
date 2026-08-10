@@ -5,8 +5,11 @@ require_once "../../includes/check_login.php";
 require_once '../../libs/totp/totp.php'; //TOTP MFA Lib
 require_once '../../includes/nexus_theme.php';
 
+nexusThemeApplyDueSchedule();
 $nexus_theme_enabled = nexusThemeIsEnabled();
 $nexus_theme_settings = nexusThemeSettings();
+$nexus_native_favicon = is_file('../../uploads/favicon.ico') ? '/uploads/favicon.ico' : '';
+$nexus_favicon_url = $nexus_theme_enabled ? nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon) : $nexus_native_favicon;
 
 // Get Company Logo
 $sql = mysqli_query($mysqli, "SELECT company_logo FROM companies");
@@ -34,14 +37,14 @@ $data = "otpauth://totp/ITFlow:$session_email?secret=$token";
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="robots" content="noindex">
 
-    <title>MFA Enforcement | <?= escapeHtml($nexus_theme_enabled ? nexusThemeBrandName($session_company_name, $nexus_theme_settings) : $session_company_name) ?></title>
+    <title><?= escapeHtml($nexus_theme_enabled ? nexusThemePageTitle($session_company_name, 'MFA Enforcement', $nexus_theme_settings) : 'MFA Enforcement | ' . $session_company_name) ?></title>
 
     <!--
     Favicon
     If Fav Icon exists else use the default one
     -->
-    <?php if(file_exists('../../uploads/favicon.ico')) { ?>
-        <link rel="icon" type="image/x-icon" href="../../uploads/favicon.ico">
+    <?php if($nexus_favicon_url !== '') { ?>
+        <link rel="icon" href="<?= escapeHtml($nexus_favicon_url) ?>">
     <?php } ?>
 
     <!-- Font Awesome Icons -->
@@ -64,7 +67,7 @@ $data = "otpauth://totp/ITFlow:$session_email?secret=$token";
     <?php require_once "../../includes/inc_alert_feedback.php"; ?>
     <div class="login-box">
         <?php
-        $nexus_mfa_logo = nexusThemeLogoUrl($nexus_theme_settings, !empty($company_logo) ? "/uploads/settings/$company_logo" : '');
+        $nexus_mfa_logo = nexusThemeLogoUrl($nexus_theme_settings, !empty($company_logo) ? "/uploads/settings/$company_logo" : '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['auth_background']));
         $nexus_mfa_has_logo = $nexus_theme_settings['branding']['show_login_logo'] && $nexus_mfa_logo !== '';
         ?>
         <div class="login-logo <?= $nexus_mfa_has_logo ? 'nexus-auth-brand--logo' : 'nexus-auth-brand--text' ?>">

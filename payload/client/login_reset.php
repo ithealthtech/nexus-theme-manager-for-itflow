@@ -11,8 +11,11 @@ require_once '../functions.php';
 require_once '../includes/load_global_settings.php';
 require_once '../includes/nexus_theme.php';
 
+nexusThemeApplyDueSchedule();
 $nexus_theme_enabled = nexusThemeIsEnabled();
 $nexus_theme_settings = nexusThemeSettings();
+$nexus_native_favicon = is_file('../uploads/favicon.ico') ? '/uploads/favicon.ico' : '';
+$nexus_favicon_url = $nexus_theme_enabled ? nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon) : $nexus_native_favicon;
 
 
 if (empty($config_smtp_host)) {
@@ -171,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title><?= escapeHtml($nexus_theme_enabled ? nexusThemeBrandName($company_name_display, $nexus_theme_settings) : $company_name_display) ?> | Password Reset</title>
+    <title><?= escapeHtml($nexus_theme_enabled ? nexusThemePageTitle($company_name_display, 'Password Reset', $nexus_theme_settings) : $company_name_display . ' | Password Reset') ?></title>
 
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -184,8 +187,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     Favicon
     If Fav Icon exists else use the default one
     -->
-    <?php if(file_exists('../uploads/favicon.ico')) { ?>
-        <link rel="icon" type="image/x-icon" href="../uploads/favicon.ico">
+    <?php if($nexus_favicon_url !== '') { ?>
+        <link rel="icon" href="<?= escapeHtml($nexus_favicon_url) ?>">
     <?php } ?>
 
     <!-- Theme style -->
@@ -200,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 <body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth ' . nexusThemeBodyClasses($nexus_theme_settings) : '' ?>">
 <div class="login-box">
     <?php
-    $nexus_reset_logo = nexusThemeLogoUrl($nexus_theme_settings);
+    $nexus_reset_logo = nexusThemeLogoUrl($nexus_theme_settings, '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['auth_background']));
     $nexus_reset_has_logo = $nexus_theme_settings['branding']['show_login_logo'] && $nexus_reset_logo !== '';
     ?>
     <div class="login-logo <?= $nexus_reset_has_logo ? 'nexus-auth-brand--logo' : 'nexus-auth-brand--text' ?>">

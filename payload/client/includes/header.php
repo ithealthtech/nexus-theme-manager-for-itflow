@@ -7,10 +7,13 @@
 header("X-Frame-Options: DENY"); // Legacy
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
+nexusThemeApplyDueSchedule();
 $nexus_theme_enabled = nexusThemeIsEnabled();
 $nexus_theme_settings = nexusThemeSettings();
 $nexus_brand_name = nexusThemeBrandName($session_company_name, $nexus_theme_settings);
-$nexus_logo_url = nexusThemeLogoUrl($nexus_theme_settings, $session_company_logo ? '/uploads/settings/' . $session_company_logo : '');
+$nexus_logo_url = nexusThemeLogoUrl($nexus_theme_settings, $session_company_logo ? '/uploads/settings/' . $session_company_logo : '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['sidebar']));
+$nexus_native_favicon = is_file($_SERVER['DOCUMENT_ROOT'] . '/uploads/favicon.ico') ? '/uploads/favicon.ico' : '';
+$nexus_favicon_url = $nexus_theme_enabled ? nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon) : $nexus_native_favicon;
 ?>
 
 <!DOCTYPE html>
@@ -18,15 +21,15 @@ $nexus_logo_url = nexusThemeLogoUrl($nexus_theme_settings, $session_company_logo
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title><?= escapeHtml($nexus_theme_enabled ? $nexus_brand_name : $session_company_name) ?> | Client Portal</title>
+    <title><?= escapeHtml($nexus_theme_enabled ? nexusThemePageTitle($session_company_name, 'Client Portal', $nexus_theme_settings) : $session_company_name . ' | Client Portal') ?></title>
 
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
 
     <!-- Favicon: If Fav Icon exists, else use the default one -->
-    <?php if(file_exists($_SERVER['DOCUMENT_ROOT'] . '/uploads/favicon.ico')) { ?>
-        <link rel="icon" href="/uploads/favicon.ico">
+    <?php if($nexus_favicon_url !== '') { ?>
+        <link rel="icon" href="<?= escapeHtml($nexus_favicon_url) ?>">
     <?php } ?>
 
     <!-- Font Awesome -->

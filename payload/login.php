@@ -14,8 +14,11 @@ require_once "functions.php";
 require_once "libs/totp/totp.php";
 require_once __DIR__ . "/includes/nexus_theme.php";
 
+nexusThemeApplyDueSchedule();
 $nexus_theme_enabled = nexusThemeIsEnabled();
 $nexus_theme_settings = nexusThemeSettings();
+$nexus_native_favicon = is_file(__DIR__ . '/uploads/favicon.ico') ? '/uploads/favicon.ico' : '';
+$nexus_favicon_url = $nexus_theme_enabled ? nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon) : $nexus_native_favicon;
 
 require_once __DIR__ . "/includes/session_init.php";
 
@@ -694,14 +697,14 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title><?= escapeHtml($nexus_theme_enabled ? nexusThemeBrandName($company_name, $nexus_theme_settings) : $company_name) ?> | Login</title>
+    <title><?= escapeHtml($nexus_theme_enabled ? nexusThemePageTitle($company_name, 'Login', $nexus_theme_settings) : $company_name . ' | Login') ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
 
     <link rel="stylesheet" href="libs/fontawesome-free/css/all.min.css">
 
-    <?php if(file_exists('uploads/favicon.ico')) { ?>
-        <link rel="icon" type="image/x-icon" href="/uploads/favicon.ico">
+    <?php if($nexus_favicon_url !== '') { ?>
+        <link rel="icon" href="<?= escapeHtml($nexus_favicon_url) ?>">
     <?php } ?>
 
     <link rel="stylesheet" href="libs/adminlte/css/adminlte.min.css">
@@ -714,7 +717,7 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
 
 <div class="login-box">
     <?php
-    $nexus_login_logo = $nexus_theme_enabled ? nexusThemeLogoUrl($nexus_theme_settings, !empty($company_logo) ? "/uploads/settings/$company_logo" : '') : (!empty($company_logo) ? "uploads/settings/$company_logo" : '');
+    $nexus_login_logo = $nexus_theme_enabled ? nexusThemeLogoUrl($nexus_theme_settings, !empty($company_logo) ? "/uploads/settings/$company_logo" : '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['auth_background'])) : (!empty($company_logo) ? "uploads/settings/$company_logo" : '');
     $nexus_login_has_logo = $nexus_login_logo !== '' && (!$nexus_theme_enabled || $nexus_theme_settings['branding']['show_login_logo']);
     ?>
     <div class="login-logo <?= $nexus_login_has_logo ? 'nexus-auth-brand--logo' : 'nexus-auth-brand--text' ?>">

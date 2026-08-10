@@ -15,11 +15,11 @@ Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 
 | File | Purpose | Upgrade conflict risk |
 |---|---|---|
-| `css/nexus-theme.css` | Scoped design system plus Theme Studio, preview, palette, density, radius, and responsive states | Low |
+| `css/nexus-theme.css` | Scoped design system plus Theme Studio, authentication/navigation previews, palette, density, sidebar/header, motion, radius, and responsive states | Low |
 | `css/nexus-theme-custom.php` | CSP-compatible same-origin stylesheet generated exclusively from validated settings | Low |
-| `includes/nexus_theme.php` | Presentation state, allow-listed customization, atomic settings, palette derivation, inspected raster-logo storage, and fixed update request/status helpers | Low |
-| `admin/nexus.php` | Administrator-only Theme Studio with live preview, presets, accessibility feedback, import/export, reset, and update status/actions | Low |
-| `admin/post/nexus.php` | CSRF-protected state, settings, logo, import, reset, and allow-listed update queue actions with audit/application logging | Low |
+| `includes/nexus_theme.php` | Presentation state, allow-listed customization, atomic settings/rollback/presets/schedule, palette derivation, inspected raster-asset storage, and fixed update request/status helpers | Low |
+| `admin/nexus.php` | Administrator-only Theme Studio with live authentication/navigation previews, responsive branding, presets, scheduling, rollback, accessibility feedback, import/export, reset, and update actions | Low |
+| `admin/post/nexus.php` | CSRF-protected state, settings, assets, presets, schedule, rollback, import/reset, and allow-listed update queue actions with audit/application logging | Low |
 
 ## Edited
 

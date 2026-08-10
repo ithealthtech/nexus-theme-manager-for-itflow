@@ -2,6 +2,49 @@
 
 All notable changes to this project are documented here.
 
+## [3.0.0] - 2026-08-10
+
+### Added
+
+- Added an interactive sidebar and header preview alongside the existing authentication preview in Theme Studio.
+- Added separate light and dark logos, automatic contrast selection, logo sizing and alignment, a custom favicon, browser title, and configurable login background imagery.
+- Added animated GIF support for both logo variants, preserving embedded playback timing including 24fps animations in Theme Studio and rendered ITFlow surfaces.
+- Added sidebar width and compact-mode controls, independent menu density, header colors and solid/gradient/glass treatments, and pill/rail/outline active navigation styles.
+- Added named saved presets with validated JSON import/export and a 20-preset safety limit.
+- Added future theme activation or pause scheduling that runs safely on the first ITFlow request at or after the selected time.
+- Added a reversible one-click rollback that atomically swaps the active and immediately previous design.
+
+### Security and compatibility
+
+- New images retain the existing content inspection, MIME verification, dimension limits, fixed filenames, and same-origin storage model.
+- Schedules, presets, active settings, and rollback snapshots are size-limited, validated on every read, and written atomically inside ITFlow's uploads directory.
+- Existing single-logo settings migrate automatically to the light-logo slot without requiring a reset.
+
+### Validation
+
+- Added lifecycle coverage for new defaults, allow-listing, layout classes, sidebar clamping, presets, scheduling, and reversible rollback.
+- Parser-validated every PHP file and browser-validated the Theme Studio at 1440px and 390px with no horizontal overflow.
+
+## [2.6.0] - 2026-08-10
+
+### Added
+
+- Added Subtle, Fluid, and Snappy motion profiles for modal windows, dropdown menus, tooltips, popovers, Select2 menus, date pickers, alerts, toasts, and floating notifications.
+- Added an interactive Theme Studio motion selector and preview modal so administrators can compare profiles before saving.
+- Added softened modal backdrops, spatial window transitions, and reveal treatments that preserve Popper-positioned element transforms.
+- Connected the Theme Studio hero background and design-system mark to the selected palette, including immediate color-picker and preset previews.
+
+### Accessibility
+
+- Existing Theme Studio reduced-motion controls now suppress the new animation system as well as hover motion.
+- Operating-system `prefers-reduced-motion` remains authoritative across every animated surface.
+- Animations are short, finite, and decorative; modal focus management and Bootstrap interaction behavior remain unchanged.
+
+### Validation
+
+- Added lifecycle coverage for motion-profile defaults, allow-list validation, generated body classes, animation assets, and reduced-motion safeguards.
+- Browser-validated modal timing, backdrop treatment, floating-menu positioning, reduced-motion duration, and responsive dialog bounds.
+
 ## [2.5.4] - 2026-08-10
 
 ### Added
@@ -165,7 +208,9 @@ All notable changes to this project are documented here.
 [2.3.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.3.0
 [2.4.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.4.0
 [2.5.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.0
+[2.6.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.6.0
 [2.5.4]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.4
 [2.5.3]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.3
 [2.5.2]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.2
 [2.5.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.1
+[3.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.0

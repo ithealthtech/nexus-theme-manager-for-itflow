@@ -7,9 +7,12 @@
 header("X-Frame-Options: DENY");
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
+nexusThemeApplyDueSchedule();
 $nexus_theme_enabled = nexusThemeIsEnabled();
 $nexus_theme_settings = nexusThemeSettings();
 $nexus_brand_name = nexusThemeBrandName($session_company_name, $nexus_theme_settings);
+$nexus_native_favicon = is_file($_SERVER['DOCUMENT_ROOT'] . '/uploads/favicon.ico') ? '/uploads/favicon.ico' : '';
+$nexus_favicon_url = $nexus_theme_enabled ? nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon) : $nexus_native_favicon;
 
 ?>
 
@@ -21,11 +24,11 @@ $nexus_brand_name = nexusThemeBrandName($session_company_name, $nexus_theme_sett
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="robots" content="noindex">
 
-    <title><?= escapeHtml($nexus_theme_enabled ? $nexus_brand_name : $session_company_name) ?></title>
+    <title><?= escapeHtml($nexus_theme_enabled ? nexusThemePageTitle($session_company_name, '', $nexus_theme_settings) : $session_company_name) ?></title>
 
     <!-- Favicon -->
-    <?php if(file_exists($_SERVER['DOCUMENT_ROOT'] . '/uploads/favicon.ico')) { ?>
-        <link rel="icon" type="image/x-icon" href="/uploads/favicon.ico">
+    <?php if($nexus_favicon_url !== '') { ?>
+        <link rel="icon" href="<?= escapeHtml($nexus_favicon_url) ?>">
     <?php } ?>
 
     <!-- Font Awesome -->
