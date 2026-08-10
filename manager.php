@@ -929,7 +929,7 @@ final class ThemeManager
 function nexusUsage(): void
 {
     $usage = <<<'TEXT'
-Nexus Theme Manager for IT Flow 3.1.0
+Nexus Theme Manager for IT Flow 3.1.1
 
 Usage:
   php manager.php <command> --root /path/to/itflow [options]

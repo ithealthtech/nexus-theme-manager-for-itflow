@@ -2,6 +2,22 @@
 
 All notable changes to this project are documented here.
 
+## [3.1.1] - 2026-08-10
+
+### Fixed
+
+- The client portal navigation now renders the configured light/dark logo instead of always showing the decorative cyan brand marker.
+- Portal logo visibility, size controls, accessible alternative text, and upload cache revisions now apply directly to the navigation brand on desktop and mobile.
+- The welcome panel no longer duplicates the custom logo after it moves into the persistent portal navigation.
+- Every Nexus surface now versions the static theme stylesheet, preventing new markup from rendering against stale cached CSS after an update.
+- Guest invoice mastheads now receive their compact branded layout immediately after an update instead of exposing the logo at its intrinsic dimensions.
+
+### Validation
+
+- Added lifecycle assertions for the portal navigation logo markup, text fallback, and decorative-marker suppression.
+- Added coverage that requires static stylesheet cache invalidation on login, recovery, MFA, technician, authenticated-client, and guest surfaces.
+- Browser-validated the branded navigation image, responsive bounds, marker suppression, and absence of horizontal overflow.
+
 ## [3.1.0] - 2026-08-10
 
 ### Added
@@ -261,6 +277,7 @@ All notable changes to this project are documented here.
 [2.5.2]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.2
 [2.5.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.1
 [3.1.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.1.0
+[3.1.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.1.1
 [3.0.2]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.2
 [3.0.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.1
 [3.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.0

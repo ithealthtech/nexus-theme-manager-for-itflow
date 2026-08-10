@@ -194,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     <!-- Theme style -->
     <link rel="stylesheet" href="../libs/adminlte/css/adminlte.min.css">
     <?php if ($nexus_theme_enabled) { ?>
-        <link rel="stylesheet" href="../css/nexus-theme.css">
+        <link rel="stylesheet" href="../css/nexus-theme.css?v=<?= escapeHtml(NEXUS_THEME_VERSION) ?>">
         <link rel="stylesheet" href="../css/nexus-theme-custom.php?v=<?= nexusThemeSettingsVersion() ?>">
     <?php } ?>
 

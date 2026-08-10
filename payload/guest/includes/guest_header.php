@@ -39,7 +39,7 @@ if ($nexus_guest_enabled) {
     <link rel="stylesheet" href="/libs/select2-bootstrap4-theme/select2-bootstrap4.min.css">
     <link rel="stylesheet" href="/libs/daterangepicker/daterangepicker.css">
     <?php if ($nexus_guest_enabled) { ?>
-        <link rel="stylesheet" href="/css/nexus-theme.css">
+        <link rel="stylesheet" href="/css/nexus-theme.css?v=<?= escapeHtml(NEXUS_THEME_VERSION) ?>">
         <link rel="stylesheet" href="/css/nexus-theme-custom.php?v=<?= nexusThemeSettingsVersion() ?>">
     <?php } ?>
 

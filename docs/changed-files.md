@@ -28,7 +28,7 @@ Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 | `login.php` | Loads static and generated theme CSS; applies custom logo, identity, and login copy while preserving auth behavior | Preserved |
 | `includes/header.php` | Loads static and generated theme CSS; applies agent density, scale, motion, and palette while preserving accent and user dark mode | Preserved |
 | `includes/top_nav.php` | Adds accessible names/label associations, meaningful image alt text, and discreet company website link | Preserved |
-| `client/includes/header.php` | Applies custom identity, logo, portal copy, generated palette, explicit landmarks, and responsive navigation | Module/permission conditions preserved |
+| `client/includes/header.php` | Applies the custom identity and cache-busted logo directly to the persistent portal navigation, plus portal copy, generated palette, explicit landmarks, and responsive behavior | Module/permission conditions preserved |
 | `client/includes/footer.php` | Uses the configured Nexus identity with ITFlow fallback; existing scripts and TinyMCE initialization preserved | Preserved |
 | `client/index.php` | Clarifies support overview hierarchy and primary create-request action | Queries and permission branches preserved |
 | `client/tickets.php` | Adds scan-friendly heading/CTA, responsive table container, hover state, and explicit textual status badge | Queries and routes preserved |

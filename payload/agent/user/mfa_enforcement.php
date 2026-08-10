@@ -54,7 +54,7 @@ $data = "otpauth://totp/ITFlow:$session_email?secret=$token";
     <link rel="stylesheet" href="../../libs/adminlte/css/adminlte.min.css">
     <link href="../../libs/toastr/toastr.min.css" rel="stylesheet">
     <?php if ($nexus_theme_enabled) { ?>
-        <link rel="stylesheet" href="../../css/nexus-theme.css">
+        <link rel="stylesheet" href="../../css/nexus-theme.css?v=<?= escapeHtml(NEXUS_THEME_VERSION) ?>">
         <link rel="stylesheet" href="../../css/nexus-theme-custom.php?v=<?= nexusThemeSettingsVersion() ?>">
     <?php } ?>
 

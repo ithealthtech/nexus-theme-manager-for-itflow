@@ -46,7 +46,7 @@ $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThe
     <link rel="stylesheet" href="/libs/adminlte/css/adminlte.min.css">
     <?php if ($nexus_theme_enabled) { ?>
         <!-- Nexus theme: intentionally loaded after AdminLTE -->
-        <link rel="stylesheet" href="/css/nexus-theme.css">
+        <link rel="stylesheet" href="/css/nexus-theme.css?v=<?= escapeHtml(NEXUS_THEME_VERSION) ?>">
         <link rel="stylesheet" href="/css/nexus-theme-custom.php?v=<?= nexusThemeSettingsVersion() ?>">
     <?php } ?>
 

@@ -129,6 +129,8 @@ try {
         expect(str_contains($authSource, "['branding']['tagline']"), 'authentication template renders the configured brand tagline');
     }
     expect(str_contains($themeCssSource, '.nexus-auth .login-logo.nexus-auth-brand--logo > :not(img)') && str_contains($themeCssSource, 'font-size: 0;'), 'logo branding suppresses duplicate title content while preserving the image');
+    expect(str_contains($clientHeaderSource, 'nexus-client-brand--logo') && str_contains($clientHeaderSource, 'nexus-client-nav-logo') && str_contains($clientHeaderSource, '$nexus_portal_has_logo'), 'client portal renders the configured logo inside the navigation brand');
+    expect(str_contains($themeCssSource, '.navbar-brand.nexus-client-brand--logo::before') && str_contains($themeCssSource, '.nexus-client .nexus-client-nav-logo'), 'client portal replaces the decorative brand marker with the configured responsive logo');
     expect(str_contains($themeCssSource, '.nexus-auth .nexus-auth-title') && str_contains($themeCssSource, 'color: var(--nexus-white);'), 'authentication heading remains readable on the dark login card');
     expect(str_contains($themeCssSource, '.nexus-theme .modal.fade .modal-dialog') && str_contains($themeCssSource, '@keyframes nexus-notice-in'), 'theme includes modal and notification motion treatments');
     expect(str_contains($themeCssSource, '@media (prefers-reduced-motion: reduce)') && str_contains($themeCssSource, '.nexus-theme.nexus-motion-reduced'), 'motion treatments preserve user and operating-system reduced-motion preferences');
@@ -144,6 +146,9 @@ try {
     expect(str_contains($adminPostSource, "['branding']['asset_revision'] = bin2hex(random_bytes(8))"), 'asset uploads and removals rotate the browser cache revision');
     foreach ([$adminPageSource, $loginSource, $resetSource, $mfaSource, $agentHeaderSource, $clientHeaderSource] as $assetSurfaceSource) {
         expect(str_contains($assetSurfaceSource, 'nexusThemeVersionedAssetUrl'), 'rendered Nexus surfaces use versioned custom asset URLs');
+    }
+    foreach ([$loginSource, $resetSource, $mfaSource, $agentHeaderSource, $clientHeaderSource, $guestHeaderSource] as $styledSurfaceSource) {
+        expect(str_contains($styledSurfaceSource, 'nexus-theme.css?v=') && str_contains($styledSurfaceSource, 'NEXUS_THEME_VERSION'), 'rendered Nexus surfaces invalidate the static stylesheet cache after an update');
     }
     expect(str_contains($guestHeaderSource, 'nexus-guest-invoice') && str_contains($guestHeaderSource, 'Secure billing portal') && str_contains($guestHeaderSource, "['branding']['tagline']"), 'guest invoices use the branded Nexus masthead and tagline');
     expect(str_contains($themeCssSource, '.nexus-guest-invoice') && str_contains($themeCssSource, '.nexus-guest-masthead'), 'guest invoice layout uses the responsive Nexus billing shell');

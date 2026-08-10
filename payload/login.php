@@ -709,7 +709,7 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
 
     <link rel="stylesheet" href="libs/adminlte/css/adminlte.min.css">
     <?php if ($nexus_theme_enabled) { ?>
-        <link rel="stylesheet" href="css/nexus-theme.css">
+        <link rel="stylesheet" href="css/nexus-theme.css?v=<?= escapeHtml(NEXUS_THEME_VERSION) ?>">
         <link rel="stylesheet" href="css/nexus-theme-custom.php?v=<?= nexusThemeSettingsVersion() ?>">
     <?php } ?>
 </head>

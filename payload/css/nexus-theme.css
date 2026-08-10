@@ -793,7 +793,9 @@ body.nexus-client {
 }
 
 .nexus-client .navbar-brand {
+    align-items: center;
     color: var(--nexus-white);
+    display: inline-flex;
     font-family: var(--nexus-font-display);
     font-style: italic;
     font-weight: 800;
@@ -808,6 +810,20 @@ body.nexus-client {
     margin-right: 0.5rem;
     transform: skew(-14deg);
     width: 0.95rem;
+}
+
+.nexus-client .navbar-brand.nexus-client-brand--logo::before {
+    content: none;
+    display: none;
+}
+
+.nexus-client .nexus-client-nav-logo {
+    display: block;
+    height: auto;
+    max-height: 3rem;
+    max-width: 11rem;
+    object-fit: contain;
+    width: auto;
 }
 
 .nexus-client .navbar-dark .navbar-nav .nav-link {

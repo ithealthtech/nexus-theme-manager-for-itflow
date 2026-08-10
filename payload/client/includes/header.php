@@ -12,6 +12,7 @@ $nexus_theme_enabled = nexusThemeIsEnabled();
 $nexus_theme_settings = nexusThemeSettings();
 $nexus_brand_name = nexusThemeBrandName($session_company_name, $nexus_theme_settings);
 $nexus_logo_url = nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($nexus_theme_settings, $session_company_logo ? '/uploads/settings/' . $session_company_logo : '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['sidebar'])), $nexus_theme_settings);
+$nexus_portal_has_logo = $nexus_theme_enabled && $nexus_theme_settings['branding']['show_portal_logo'] && $nexus_logo_url !== '';
 $nexus_native_favicon = is_file($_SERVER['DOCUMENT_ROOT'] . '/uploads/favicon.ico') ? '/uploads/favicon.ico' : '';
 $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon), $nexus_theme_settings) : $nexus_native_favicon;
 ?>
@@ -38,7 +39,7 @@ $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThe
     <!-- Theme style -->
     <link rel="stylesheet" href="/libs/adminlte/css/adminlte.min.css">
     <?php if ($nexus_theme_enabled) { ?>
-        <link rel="stylesheet" href="/css/nexus-theme.css">
+        <link rel="stylesheet" href="/css/nexus-theme.css?v=<?= escapeHtml(NEXUS_THEME_VERSION) ?>">
         <link rel="stylesheet" href="/css/nexus-theme-custom.php?v=<?= nexusThemeSettingsVersion() ?>">
     <?php } ?>
 
@@ -50,7 +51,13 @@ $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThe
 
 <nav class="navbar navbar-expand-lg navbar-dark nexus-client-nav">
     <div class="container">
-        <a class="navbar-brand" href="index.php"><?= escapeHtml($nexus_theme_enabled ? $nexus_brand_name : $session_company_name) ?></a>
+        <a class="navbar-brand <?= $nexus_portal_has_logo ? 'nexus-client-brand--logo' : 'nexus-client-brand--text' ?>" href="index.php" aria-label="<?= escapeHtml(($nexus_theme_enabled ? $nexus_brand_name : $session_company_name) . ' home') ?>">
+            <?php if ($nexus_portal_has_logo) { ?>
+                <img height="48" width="176" class="nexus-client-nav-logo" src="<?= escapeHtml($nexus_logo_url) ?>" alt="<?= escapeHtml($nexus_theme_settings['branding']['logo_alt'] ?: $nexus_brand_name . ' logo') ?>">
+            <?php } else { ?>
+                <span><?= escapeHtml($nexus_theme_enabled ? $nexus_brand_name : $session_company_name) ?></span>
+            <?php } ?>
+        </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle portal navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -157,9 +164,7 @@ $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThe
         </div>
 
         <div class="col-md-11 p-0">
-                <?php if ($nexus_theme_enabled && $nexus_theme_settings['branding']['show_portal_logo'] && $nexus_logo_url !== '') { ?>
-                    <img height="48" width="142" class="img-fluid float-right nexus-client-logo" src="<?= escapeHtml($nexus_logo_url) ?>" alt="<?= escapeHtml($nexus_theme_settings['branding']['logo_alt'] ?: $nexus_brand_name . ' logo') ?>">
-                <?php } elseif (!$nexus_theme_enabled && $session_company_logo) { ?>
+                <?php if (!$nexus_theme_enabled && $session_company_logo) { ?>
                     <img height="48" width="142" class="img-fluid float-right nexus-client-logo" src="<?= "/uploads/settings/$session_company_logo" ?>" alt="<?= escapeHtml($session_company_name) ?> logo">
                 <?php } ?>
             <p class="h4 mb-1"><?= $nexus_theme_enabled ? escapeHtml($nexus_theme_settings['content']['portal_heading']) : 'Welcome' ?>, <strong><?= stripslashes(escapeHtml($session_contact_name)) ?></strong></p>

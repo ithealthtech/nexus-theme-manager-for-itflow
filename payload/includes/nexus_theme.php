@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-const NEXUS_MANAGER_VERSION = '3.1.0';
-const NEXUS_THEME_VERSION = '26.08.13';
+const NEXUS_MANAGER_VERSION = '3.1.1';
+const NEXUS_THEME_VERSION = '26.08.14';
 const NEXUS_ITFLOW_COMMIT = '89b080b430aaafba5d520c4e52c57b28a9559085';
 const NEXUS_THEME_DISABLED_MARKER = '.nexus-theme-disabled';
 const NEXUS_THEME_SETTINGS_FILE = '.nexus-theme-settings.json';
@@ -906,7 +906,7 @@ function nexusThemeCustomCss(?array $settings = null): string
     $authLogoHeight = number_format(5.5 * $settings['branding']['logo_size'] / 100, 2, '.', '') . 'rem';
     $clientLogoHeight = number_format(3 * $settings['branding']['logo_size'] / 100, 2, '.', '') . 'rem';
     $clientLogoMargin = $settings['branding']['logo_alignment'] === 'center' ? '0 auto' : ($settings['branding']['logo_alignment'] === 'right' ? '0 0 0 auto' : '0 auto 0 0');
-    $css .= '.nexus-auth .login-logo{align-items:center;display:flex;justify-content:' . $logoJustify . '}.nexus-auth .login-logo img{max-height:' . $authLogoHeight . '}.nexus-client .nexus-client-logo{display:block;float:none!important;margin:' . $clientLogoMargin . ';max-height:' . $clientLogoHeight . ';object-fit:contain}' . "\n";
+    $css .= '.nexus-auth .login-logo{align-items:center;display:flex;justify-content:' . $logoJustify . '}.nexus-auth .login-logo img{max-height:' . $authLogoHeight . '}.nexus-client .nexus-client-nav-logo{max-height:' . $clientLogoHeight . '}.nexus-client .nexus-client-logo{display:block;float:none!important;margin:' . $clientLogoMargin . ';max-height:' . $clientLogoHeight . ';object-fit:contain}' . "\n";
     if ($settings['branding']['login_background_path'] !== '') {
         $overlay = number_format($settings['branding']['login_background_overlay'] / 100, 2, '.', '');
         $background = nexusThemeVersionedAssetUrl($settings['branding']['login_background_path'], $settings);
