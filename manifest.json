@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "package_id": "org.nexus-theme-manager.itflow",
-  "package_version": "3.3.0",
-  "theme_version": "26.08.16",
+  "package_version": "3.4.0",
+  "theme_version": "26.08.17",
   "name": "Nexus Theme Manager for IT Flow",
   "vendor": "Nexus Theme Manager contributors",
   "compatible_itflow": {
@@ -12,7 +12,7 @@
   "files": [
     {
       "path": "includes/nexus_theme.php",
-      "payload_sha256": "64d919fe10314926c56c93629b7781d31792d3926a43753922474c4f9ac949be",
+      "payload_sha256": "dfe906b1cf214a50d9c8854d27179823412e5f839265f4a60c2219f29767ebda",
       "baseline_sha256": null,
       "php": true
     },
@@ -24,7 +24,7 @@
     },
     {
       "path": "css/nexus-theme.css",
-      "payload_sha256": "6ac0a8a4e0d2ea8982e76f1ba545df731618e97c6052dd8c352e68f2245f33fb",
+      "payload_sha256": "8156ea5375e2364399c7767e6a1650487434b279dad47a626f65b264bcb63a79",
       "baseline_sha256": null,
       "php": false
     },
@@ -50,6 +50,12 @@
       "path": "agent/user/mfa_enforcement.php",
       "payload_sha256": "0b56d038854fd84a1ab9aa1d1ca1f181f2e874f3848302038cdaf565383005dd",
       "baseline_sha256": "3e05780ead5a74897ab1dcc7df3160faf82efeb35284100c10c521ee3b5ce948",
+      "php": true
+    },
+    {
+      "path": "agent/tickets.php",
+      "payload_sha256": "5d2d96ed423e2589da573ff2d41237cbfaeb8bcb7f81b7294d3cd56d6e82a24b",
+      "baseline_sha256": "b6239a7afcd8d01af6a3f37daa1e149f4b00becb1ba38a8a1c221fc473d7f366",
       "php": true
     },
     {

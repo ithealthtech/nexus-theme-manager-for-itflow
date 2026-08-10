@@ -1614,6 +1614,101 @@ body.nexus-client {
 .nexus-motion-callout > i { color: var(--nexus-cyan); margin-top: 0.2rem; }
 .nexus-motion-callout p { color: var(--nexus-muted); font-size: 0.78rem; }
 
+.nexus-agent .nexus-ticket-queue-summary { margin-bottom: 1.15rem; }
+
+.nexus-agent .nexus-ticket-queue-heading {
+    align-items: flex-end;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    padding: 0 0.15rem;
+}
+
+.nexus-agent .nexus-ticket-queue-heading h2 {
+    font-size: 1.35rem;
+    margin: 0.18rem 0 0;
+}
+
+.nexus-agent .nexus-ticket-queue-live {
+    align-items: center;
+    background: color-mix(in srgb, var(--nexus-success) 12%, var(--nexus-surface));
+    border: 1px solid color-mix(in srgb, var(--nexus-success) 32%, var(--nexus-border));
+    border-radius: 999px;
+    color: color-mix(in srgb, var(--nexus-success) 78%, var(--nexus-text));
+    display: inline-flex;
+    font-size: 0.68rem;
+    font-weight: 800;
+    gap: 0.42rem;
+    letter-spacing: 0.04em;
+    padding: 0.34rem 0.65rem;
+    text-transform: uppercase;
+}
+
+.nexus-agent .nexus-ticket-queue-live i { font-size: 0.42rem; }
+
+.nexus-agent .nexus-ticket-queue-grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.nexus-agent .nexus-ticket-metric {
+    --nexus-ticket-metric-accent: var(--nexus-cyan);
+    border-top: 3px solid var(--nexus-ticket-metric-accent) !important;
+    margin-bottom: 0;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.nexus-agent .nexus-ticket-metric-waiting { --nexus-ticket-metric-accent: var(--nexus-violet); }
+.nexus-agent .nexus-ticket-metric-priority { --nexus-ticket-metric-accent: var(--nexus-danger); }
+.nexus-agent .nexus-ticket-metric-response { --nexus-ticket-metric-accent: var(--nexus-success); }
+
+.nexus-agent .nexus-ticket-metric .card-body {
+    align-items: center;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+    min-height: 5.4rem;
+    padding: 0.85rem 0.95rem;
+}
+
+.nexus-agent .nexus-ticket-metric .card-body > div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.nexus-agent .nexus-ticket-metric strong {
+    color: var(--nexus-text);
+    font-family: var(--nexus-font-display);
+    font-size: clamp(1.35rem, 2vw, 1.85rem);
+    letter-spacing: -0.04em;
+    line-height: 1;
+}
+
+.nexus-agent .nexus-ticket-metric .card-body > div > span {
+    color: var(--nexus-copy);
+    font-size: 0.72rem;
+    margin-top: 0.42rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nexus-agent .nexus-ticket-metric-icon {
+    align-items: center;
+    background: color-mix(in srgb, var(--nexus-ticket-metric-accent) 12%, var(--nexus-surface-2));
+    border: 1px solid color-mix(in srgb, var(--nexus-ticket-metric-accent) 26%, var(--nexus-border));
+    border-radius: 0.85rem;
+    color: var(--nexus-ticket-metric-accent);
+    display: inline-flex;
+    flex: 0 0 3rem;
+    font-size: 1.25rem;
+    height: 3rem;
+    justify-content: center;
+}
+
 .nexus-section-heading {
     align-items: center;
     display: flex;
@@ -1960,6 +2055,7 @@ body.nexus-client {
     .nexus-workspace-navigation-note { display: none; }
     .nexus-workspace-heading .card-body { padding-bottom: 1rem; padding-top: 1rem; }
     .nexus-studio-workspace[data-active-section="system"] .nexus-preview-sticky { grid-template-columns: 1fr; }
+    .nexus-agent .nexus-ticket-queue-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 767.98px) {
@@ -1992,6 +2088,12 @@ body.nexus-client {
     .nexus-studio-editor > .card-body { padding: 1rem; }
     .nexus-studio-editor > .card-footer { align-items: stretch !important; flex-direction: column; gap: 0.75rem; }
     .nexus-studio-editor > .card-footer .btn { width: 100%; }
+}
+
+@media (max-width: 575.98px) {
+    .nexus-agent .nexus-ticket-queue-heading { align-items: flex-start; }
+    .nexus-agent .nexus-ticket-queue-grid { grid-template-columns: 1fr; }
+    .nexus-agent .nexus-ticket-queue-live { margin-left: 0.75rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

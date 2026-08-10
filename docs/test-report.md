@@ -1,8 +1,8 @@
 # Nexus Theme Manager for IT Flow Verification Report
 
-- Date: 2026-08-09
-- Package version: 2.5.1
-- Payload version: 26.08.6
+- Date: 2026-08-10
+- Package version: 3.4.0
+- Payload version: 26.08.17
 - Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 - Test runtime: PHP 8.4.24 CLI
 
@@ -14,13 +14,13 @@
 | `updater.php` syntax | Pass |
 | Lifecycle test syntax | Pass |
 | Updater security test syntax | Pass |
-| 17 payload PHP files | Pass |
-| 13 baseline PHP templates | Pass |
+| 22 payload PHP files | Pass |
+| 16 baseline PHP templates | Pass |
 | Three shell entrypoints | Syntax pass |
-| Lifecycle simulation | 109 passed, 0 failed |
-| GUI updater security suite | 29 passed, 0 failed |
-| Manifest payload hashes | 18/18 verified |
-| Manifest baseline hashes | 13/13 verified |
+| Lifecycle simulation | 201 passed, 0 failed |
+| GUI updater security suite | 32 passed, 0 failed |
+| Manifest payload hashes | 23/23 verified |
+| Manifest baseline hashes | 16/16 verified |
 | Old organization name/domain/internal namespace scan | No matches |
 | Package-level SHA-256 manifest | Verified |
 
@@ -32,12 +32,12 @@ The automated suite creates isolated ITFlow fixtures and protected state roots, 
 |---|---|
 | Non-mutating compatibility preflight | Pass |
 | Administration permission, CSRF, no-shell, and menu invariants | Pass |
-| Exact 18-file install and checksum verification | Pass |
+| Exact 23-file install and checksum verification | Pass |
 | Duplicate install refusal | Pass |
 | Administrator web control pause/reactivate | Pass |
 | Customization validation, persistence, CSS generation, presets, and upgrade preservation | Pass |
 | Raster logo upload acceptance and non-image rejection through isolated HTTP runtime | Pass |
-| Disable restores 13 originals and removes five theme-owned files | Pass |
+| Disable restores 16 originals and removes seven theme-owned files | Pass |
 | Enable reapplies the exact payload | Pass |
 | Post-install drift detection | Pass |
 | Conflict-safe uninstall refusal | Pass |

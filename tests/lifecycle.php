@@ -112,6 +112,7 @@ try {
     $adminPostSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'post' . DIRECTORY_SEPARATOR . 'nexus.php');
     $adminNavSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'side_nav.php');
     $themeCssSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'nexus-theme.css');
+    $agentTicketsSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'agent' . DIRECTORY_SEPARATOR . 'tickets.php');
     $agentHeaderSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'header.php');
     $clientHeaderSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'client' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'header.php');
     $guestHeaderSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'guest' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'guest_header.php');
@@ -121,6 +122,8 @@ try {
     $loginSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'login.php');
     $resetSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'client' . DIRECTORY_SEPARATOR . 'login_reset.php');
     $mfaSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'agent' . DIRECTORY_SEPARATOR . 'user' . DIRECTORY_SEPARATOR . 'mfa_enforcement.php');
+    $managerSource = (string)file_get_contents($manager);
+    expect(count($manifest['files']) === 23 && str_contains($managerSource, 'const NEXUS_MANAGED_FILE_COUNT = 23;'), 'manager accepts the complete bounded 23-file manifest');
     expect(str_contains($adminPageSource, "require_once 'includes/inc_all_admin.php'"), 'administration page uses ITFlow administrator permission enforcement');
     expect(str_contains($adminPostSource, 'validateCSRFToken()'), 'administration action validates the ITFlow CSRF token');
     expect(!preg_match('/\\b(?:exec|shell_exec|system|passthru|proc_open)\\s*\\(/', $adminPostSource), 'administration action cannot launch lifecycle shell commands');
@@ -150,6 +153,10 @@ try {
     expect(str_contains($themeCssSource, '.nexus-agent.nexus-header-gradient .main-header') && str_contains($themeCssSource, '.nexus-agent.nexus-header-glass .main-header'), 'header treatments have distinct rendered styles');
     expect(str_contains($themeCssSource, '.nexus-agent.nexus-navigation-pill .nav-sidebar .nav-link.active') && str_contains($themeCssSource, '.nexus-agent.nexus-navigation-rail .nav-sidebar .nav-link.active') && str_contains($themeCssSource, '.nexus-agent.nexus-navigation-outline .nav-sidebar .nav-link.active'), 'active navigation treatments cover top-level and nested links');
     expect(str_contains($themeCssSource, '.nexus-agent.nexus-sidebar-compact .nav-sidebar .nav-icon') && str_contains($themeCssSource, '.nexus-preview-shell.is-compact .nexus-preview-sidebar'), 'compact sidebar changes labels, icons, spacing, and preview width');
+    expect(str_contains($agentTicketsSource, 'nexus-ticket-queue-summary') && str_contains($agentTicketsSource, 'Ticket queue') && str_contains($themeCssSource, '.nexus-agent .nexus-ticket-queue-grid'), 'technician tickets render the responsive Nexus queue summary shown in the theme preview');
+    expect(str_contains($agentTicketsSource, "ticket_reply_type IN ('Public', 'Client')") && str_contains($agentTicketsSource, "= 'Public' THEN 1 ELSE 0"), 'waiting-on-client counts use the latest client-visible reply direction');
+    expect(str_contains($agentTicketsSource, "ticket_priority IN ('High', 'Urgent')") && str_contains($agentTicketsSource, 'TIMESTAMPDIFF(SECOND, ticket_created_at, ticket_first_response_at)'), 'queue metrics use live priority and first-response data');
+    expect(str_contains($agentTicketsSource, 'if (!empty($nexus_theme_enabled))') && str_contains($agentTicketsSource, '$nexus_ticket_metrics = null;'), 'pausing Nexus removes the queue summary and skips its aggregate queries');
     expect(str_contains($adminPageSource, 'nexus_logo_light') && str_contains($adminPageSource, 'nexus_logo_dark') && str_contains($adminPageSource, 'nexus_login_background'), 'Theme Studio exposes responsive logos and custom login imagery');
     expect(str_contains($adminPostSource, "['branding']['asset_revision'] = bin2hex(random_bytes(8))"), 'asset uploads and removals rotate the browser cache revision');
     foreach ([$adminPageSource, $loginSource, $resetSource, $mfaSource, $agentHeaderSource, $clientHeaderSource] as $assetSurfaceSource) {

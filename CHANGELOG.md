@@ -2,6 +2,24 @@
 
 All notable changes to this project are documented here.
 
+## [3.4.0] - 2026-08-10
+
+### Added
+
+- The real technician Tickets page now includes the four-card Ticket queue pulse previously shown only in the Theme Studio preview.
+- Open, waiting-on-client, High/Urgent, and median first-response values are calculated from live ITFlow ticket data within the signed-in technician's client-access scope.
+- The queue row adapts from four columns to two and then one on smaller screens.
+
+### Lifecycle
+
+- Web Pause skips both the queue queries and its markup immediately.
+- CLI Disable and Uninstall restore the pinned ITFlow `agent/tickets.php` baseline byte-for-byte; Enable reapplies the managed page.
+
+### Validation
+
+- Added source assertions for live priority, reply-direction, response-time, access-state, and responsive styling behavior.
+- Re-ran PHP syntax, lifecycle, updater, manifest, package, and GitHub Actions checks for the expanded managed-file set.
+
 ## [3.3.0] - 2026-08-10
 
 ### Added
@@ -318,6 +336,7 @@ All notable changes to this project are documented here.
 [3.1.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.1.0
 [3.1.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.1.1
 [3.2.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.2.0
+[3.4.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.4.0
 [3.3.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.3.0
 [3.0.2]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.2
 [3.0.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.1
