@@ -698,7 +698,7 @@ final class ThemeManager
                 throw new ThemeManagerException("Manifest key is missing: $key", NEXUS_EXIT_VERIFY);
             }
         }
-        if ($manifest['schema'] !== 1 || !is_array($manifest['files']) || count($manifest['files']) !== 17) {
+        if ($manifest['schema'] !== 1 || !is_array($manifest['files']) || count($manifest['files']) !== 18) {
             throw new ThemeManagerException('Manifest schema or file count is invalid.', NEXUS_EXIT_VERIFY);
         }
 
@@ -929,7 +929,7 @@ final class ThemeManager
 function nexusUsage(): void
 {
     $usage = <<<'TEXT'
-Nexus Theme Manager for IT Flow 2.3.0
+Nexus Theme Manager for IT Flow 2.5.0
 
 Usage:
   php manager.php <command> --root /path/to/itflow [options]

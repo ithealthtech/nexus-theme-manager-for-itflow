@@ -1,22 +1,25 @@
 # Nexus Theme Manager for IT Flow Verification Report
 
 - Date: 2026-08-09
-- Package version: 2.3.0
-- Payload version: 26.08.4
+- Package version: 2.5.0
+- Payload version: 26.08.6
 - Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
-- Test runtime: PHP 8.4.15 CLI
+- Test runtime: PHP 8.4.16 CLI
 
 ## Release checks
 
 | Check | Result |
 |---|---|
 | `manager.php` syntax | Pass |
+| `updater.php` syntax | Pass |
 | Lifecycle test syntax | Pass |
-| 16 payload PHP files | Pass |
+| Updater security test syntax | Pass |
+| 17 payload PHP files | Pass |
 | 13 baseline PHP templates | Pass |
 | Three shell entrypoints | Syntax pass |
-| Lifecycle simulation | 78 passed, 0 failed |
-| Manifest payload hashes | 17/17 verified |
+| Lifecycle simulation | 109 passed, 0 failed |
+| GUI updater security suite | 26 passed, 0 failed |
+| Manifest payload hashes | 18/18 verified |
 | Manifest baseline hashes | 13/13 verified |
 | Old organization name/domain/internal namespace scan | No matches |
 | Package-level SHA-256 manifest | Verified |
@@ -29,10 +32,12 @@ The automated suite creates isolated ITFlow fixtures and protected state roots, 
 |---|---|
 | Non-mutating compatibility preflight | Pass |
 | Administration permission, CSRF, no-shell, and menu invariants | Pass |
-| Exact 17-file install and checksum verification | Pass |
+| Exact 18-file install and checksum verification | Pass |
 | Duplicate install refusal | Pass |
 | Administrator web control pause/reactivate | Pass |
-| Disable restores 13 originals and removes four theme-owned files | Pass |
+| Customization validation, persistence, CSS generation, presets, and upgrade preservation | Pass |
+| Raster logo upload acceptance and non-image rejection through isolated HTTP runtime | Pass |
+| Disable restores 13 originals and removes five theme-owned files | Pass |
 | Enable reapplies the exact payload | Pass |
 | Post-install drift detection | Pass |
 | Conflict-safe uninstall refusal | Pass |
@@ -43,8 +48,11 @@ The automated suite creates isolated ITFlow fixtures and protected state roots, 
 | Adopted web-state preservation and uninstall cleanup | Pass |
 | Non-exact adoption refusal | Pass |
 | Package tamper detection | Pass |
+| GUI request allow-listing and protected-service setup requirement | Pass |
+| Release version, checksum, archive, manifest, CLI, and no-shell invariants | Pass |
+| systemd filesystem hardening and automatic rollback path | Pass |
 
-## Rebrand verification
+## Identity and customization verification
 
 - Public name: `Nexus Theme Manager for IT Flow`.
 - Package ID: `org.nexus-theme-manager.itflow`.
@@ -53,7 +61,7 @@ The automated suite creates isolated ITFlow fixtures and protected state roots, 
 - Default Linux state root: `/var/lib/nexus-itflow-theme`.
 - Windows fallback state: `.nexus-theme-manager-state` beneath the fixture root.
 - No company-specific domain, navigation destination, footer destination, package identifier, CSS prefix, or temporary-file prefix remains in the current tree.
-- Company names, logos, permissions, modules, and white-label behavior remain driven by ITFlow configuration and session data.
+- ITFlow company identity remains the fallback; Nexus overrides are isolated, removable, and never rewrite company data.
 
 ## Accessibility and responsive invariants
 
@@ -73,7 +81,7 @@ The automated package is ready for a staging migration. A production operator mu
 
 1. Back up the ITFlow application and database.
 2. Verify and uninstall version 1.0.0 with its original manager.
-3. Run the Nexus 2.3.0 `doctor` command.
+3. Run the Nexus 2.5.0 `doctor` command.
 4. Install Nexus and reload the PHP/web service gracefully.
-5. Smoke-test login, MFA, password recovery, customer tickets, technician navigation, **Administration → NEXUS → Theme Manager**, pause/reactivate, and configured integrations.
+5. Smoke-test login, MFA, password recovery, customer tickets, technician navigation, **Administration → NEXUS → Theme Manager**, customization save/reset, logo upload/removal, pause/reactivate, update check/status, and configured integrations.
 6. Retain the archived 1.0.0 recovery state until acceptance is complete.

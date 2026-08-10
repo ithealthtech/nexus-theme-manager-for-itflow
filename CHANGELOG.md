@@ -2,6 +2,50 @@
 
 All notable changes to this project are documented here.
 
+## [2.5.0] - 2026-08-09
+
+### Added
+
+- Added **Check for updates** and **Install version** controls with live progress and result reporting to Theme Studio.
+- Added a per-instance systemd path service and root-owned updater helper for privileged update execution outside the web process.
+- Added strict release-tag, asset-name, SHA-256, archive-layout, and package-manifest validation.
+- Added automatic restoration and verification of the previous Nexus release when new-version activation fails.
+- Added a focused updater security suite alongside expanded lifecycle coverage for the web request bridge.
+
+### Security
+
+- The browser may queue only fixed `check` or `update` actions; it cannot provide a repository, URL, command, path, version, or lifecycle argument.
+- The helper accepts only the latest published release from the fixed Nexus GitHub repository and refuses unexpected archive content.
+- The root service uses a private temporary directory, protected home directories, a strict filesystem view, and explicit writable paths.
+
+### Changed
+
+- The standard latest-release installer now enables GUI updates automatically on supported systemd Linux hosts; `--no-gui-updater` opts out.
+- Bumped the manager to 2.5.0 and the theme payload to 26.08.6 without changing the pinned ITFlow 26.08 baseline.
+
+## [2.4.0] - 2026-08-09
+
+### Added
+
+- Rebuilt the administration manager as a full Theme Studio with live authentication preview.
+- Added secure PNG, JPEG, and WebP logo upload, placement controls, branding fallback, and logo removal.
+- Added editable brand identity, login copy, and client-portal copy.
+- Added five curated color presets, seven editable palette roles, and live accessibility contrast feedback.
+- Added corner style, content density, interface scale, and reduced-motion controls.
+- Added validated configuration import, client-side JSON export, and one-click defaults reset.
+- Added a CSP-compatible same-origin generated stylesheet for validated custom properties.
+
+### Security
+
+- Customization continues to require ITFlow administrator access, CSRF validation, and audit logging.
+- Settings are allow-listed, size-limited, and written atomically; uploaded images are inspected by content and restricted to safe raster formats.
+- Arbitrary CSS, SVG, executable uploads, lifecycle shell access, and PHP file replacement remain unavailable to the web service.
+
+### Changed
+
+- Expanded the managed payload from 17 to 18 files while retaining the same verified ITFlow 26.08 baseline.
+- Preserved customization and uploaded branding across CLI disable, uninstall, and package upgrades.
+
 ## [2.3.0] - 2026-08-09
 
 ### Added
@@ -60,3 +104,5 @@ All notable changes to this project are documented here.
 [2.1.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.1.0
 [2.2.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.2.0
 [2.3.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.3.0
+[2.4.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.4.0
+[2.5.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.0

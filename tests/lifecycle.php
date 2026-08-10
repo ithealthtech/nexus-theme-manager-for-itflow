@@ -138,6 +138,94 @@ try {
     nexusThemeSetEnabled(true, $fixture);
     expect(nexusThemeIsEnabled($fixture), 'web control reactivates the Nexus visual layer');
 
+    $themeDefaults = nexusThemeSettings($fixture);
+    expect($themeDefaults['preset'] === 'aurora', 'theme customization starts with the Aurora preset');
+    expect($themeDefaults['branding']['logo_path'] === '', 'theme customization starts without a logo override');
+
+    $customTheme = $themeDefaults;
+    $customTheme['preset'] = 'custom';
+    $customTheme['branding']['brand_name'] = '<b>Nexus Support</b>';
+    $customTheme['branding']['tagline'] = "Always ready\nfor you";
+    $customTheme['branding']['logo_path'] = '/outside/unsafe.svg';
+    $customTheme['content']['login_heading'] = 'Your support hub';
+    $customTheme['colors']['primary'] = '#12ABEF';
+    $customTheme['colors']['secondary'] = 'not-a-color';
+    $customTheme['appearance']['radius'] = 'rounded';
+    $customTheme['appearance']['density'] = 'compact';
+    $customTheme['appearance']['font_scale'] = 500;
+    $customTheme['appearance']['reduce_motion'] = true;
+    $savedTheme = nexusThemeSaveSettings($customTheme, $fixture);
+    expect($savedTheme['branding']['brand_name'] === 'Nexus Support', 'theme customization strips markup from brand text');
+    expect($savedTheme['branding']['tagline'] === 'Always ready for you', 'theme customization normalizes single-line brand text');
+    expect($savedTheme['branding']['logo_path'] === '', 'theme customization rejects untrusted logo paths');
+    expect($savedTheme['colors']['primary'] === '#12abef', 'theme customization normalizes valid colors');
+    expect($savedTheme['colors']['secondary'] === $themeDefaults['colors']['secondary'], 'theme customization rejects invalid colors');
+    expect($savedTheme['appearance']['font_scale'] === 110, 'theme customization clamps interface scale');
+    expect(nexusThemeSettings($fixture)['content']['login_heading'] === 'Your support hub', 'theme customization persists atomically');
+    $firstSettingsVersion = nexusThemeSettingsVersion($fixture);
+    $savedTheme['content']['login_heading'] = 'Support, your way';
+    nexusThemeSaveSettings($savedTheme, $fixture);
+    expect(nexusThemeSettings($fixture)['content']['login_heading'] === 'Support, your way', 'theme customization safely replaces existing settings');
+    expect(nexusThemeSettingsVersion($fixture) !== $firstSettingsVersion, 'theme customization changes its generated stylesheet cache key');
+    file_put_contents(nexusThemeSettingsPath($fixture), '{"preset":"custom","colors":{"primary":"red;}body{display:none"}}');
+    $tamperedThemeSettings = nexusThemeSettings($fixture);
+    expect($tamperedThemeSettings['colors']['primary'] === $themeDefaults['colors']['primary'], 'runtime revalidates manually tampered settings');
+    expect(!str_contains(nexusThemeCustomCss($tamperedThemeSettings), 'display:none'), 'generated stylesheet excludes injected declarations');
+    nexusThemeSaveSettings($savedTheme, $fixture);
+    expect(str_contains(nexusThemeCustomCss($savedTheme), '--nexus-cyan:#12abef'), 'theme customization renders validated CSS properties');
+    expect(nexusThemeBodyClasses($savedTheme) === 'nexus-density-compact nexus-motion-reduced', 'theme customization renders safe behavior classes');
+    expect(nexusThemeBrandName('ITFlow', $savedTheme) === 'Nexus Support', 'custom brand name overrides the ITFlow fallback');
+    expect(nexusThemeContrastColor('#ffffff') === '#0b0a17' && nexusThemeContrastColor('#000000') === '#ffffff', 'theme customization derives readable accent contrast');
+    expect(nexusThemeMixColors('#ffffff', '#000000', 50) === '#808080', 'theme customization derives supporting palette colors');
+    expect(nexusThemeValidateSettings(['preset' => 'ocean'])['colors']['primary'] === nexusThemePresets()['ocean']['primary'], 'curated presets resolve to their protected palette');
+
+    expect(!nexusUpdaterReady($fixture) && nexusUpdaterStatus($fixture)['state'] === 'not_configured', 'GUI updater reports its one-time setup requirement');
+    try {
+        nexusUpdaterQueue('check', $fixture);
+        throw new RuntimeException('queue unexpectedly accepted without updater service');
+    } catch (RuntimeException $error) {
+        expect(str_contains($error->getMessage(), 'not installed'), 'GUI updater refuses requests before protected service setup');
+    }
+    nexusThemeAtomicWrite(nexusUpdaterControlPath(NEXUS_UPDATER_READY_FILE, $fixture), json_encode([
+        'schema' => 1,
+        'instance_id' => str_repeat('a', 16),
+    ], JSON_THROW_ON_ERROR));
+    expect(nexusUpdaterReady($fixture), 'GUI updater recognizes a valid protected-service marker');
+    $updateRequestId = nexusUpdaterQueue('check', $fixture);
+    $queuedUpdate = json_decode((string)file_get_contents(nexusUpdaterControlPath(NEXUS_UPDATER_REQUEST_FILE, $fixture)), true, 8, JSON_THROW_ON_ERROR);
+    expect($queuedUpdate['action'] === 'check' && $queuedUpdate['request_id'] === $updateRequestId, 'GUI updater queues only the selected allow-listed action');
+    try {
+        nexusUpdaterQueue('update', $fixture);
+        throw new RuntimeException('duplicate queue unexpectedly accepted');
+    } catch (RuntimeException $error) {
+        expect(str_contains($error->getMessage(), 'already queued'), 'GUI updater refuses duplicate queued operations');
+    }
+    unlink(nexusUpdaterControlPath(NEXUS_UPDATER_REQUEST_FILE, $fixture));
+    nexusThemeAtomicWrite(nexusUpdaterControlPath(NEXUS_UPDATER_STATUS_FILE, $fixture), json_encode([
+        'schema' => 1,
+        'state' => 'running',
+        'message' => '<b>Installing</b>',
+        'current_version' => '2.5.0',
+        'latest_version' => '2.6.0',
+        'release_url' => 'https://evil.invalid/release',
+        'updated_at' => gmdate('c'),
+    ], JSON_THROW_ON_ERROR));
+    $runningUpdate = nexusUpdaterStatus($fixture);
+    expect($runningUpdate['message'] === 'Installing' && $runningUpdate['release_url'] === null, 'GUI updater sanitizes privileged-service status before display');
+    try {
+        nexusUpdaterQueue('update', $fixture);
+        throw new RuntimeException('busy queue unexpectedly accepted');
+    } catch (RuntimeException $error) {
+        expect(str_contains($error->getMessage(), 'already running'), 'GUI updater refuses concurrent operations while the service is busy');
+    }
+    nexusThemeAtomicWrite(nexusUpdaterControlPath(NEXUS_UPDATER_STATUS_FILE, $fixture), json_encode([
+        'schema' => 1,
+        'state' => 'running',
+        'message' => 'Installing',
+        'updated_at' => gmdate('c', time() - 1800),
+    ], JSON_THROW_ON_ERROR));
+    expect(nexusUpdaterStatus($fixture)['state'] === 'failed', 'GUI updater turns stale progress into a recoverable failure state');
+
     runManager($manager, array_merge(['verify'], $common), 0);
     [$statusJson] = runManager($manager, array_merge(['status'], $common, ['--json']), 0);
     $status = json_decode($statusJson, true, 512, JSON_THROW_ON_ERROR);
@@ -151,6 +239,7 @@ try {
     nexusThemeSetEnabled(false, $fixture);
     runManager($manager, array_merge(['disable'], $common, ['--yes']), 0);
     expect(nexusThemeIsEnabled($fixture), 'CLI disable clears the web theme-control marker');
+    expect(is_file(nexusThemeSettingsPath($fixture)), 'CLI disable preserves administrator customization');
     foreach ($manifest['files'] as $entry) {
         $target = $fixture . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $entry['path']);
         if ($entry['baseline_sha256'] === null) {

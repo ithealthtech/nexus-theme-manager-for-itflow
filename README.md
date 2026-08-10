@@ -4,17 +4,26 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 [![ITFlow compatibility](https://img.shields.io/badge/ITFlow-26.08-2f7d32.svg)](https://github.com/itflow-org/itflow)
 
-Nexus Theme Manager is a lifecycle-managed ITFlow interface package with a polished, administrator-only control panel and a protected root-only installer. Administrators can activate or pause the visual theme inside ITFlow without granting the web service permission to install, replace, or remove application code.
+Nexus Theme Manager is a lifecycle-managed ITFlow interface package with a full administrator-only Theme Studio, protected root-only installer, and verified GUI update workflow. Administrators can control branding, upload a custom logo, build a color system, tune layout density and scale, personalize portal copy, preview changes live, activate or pause the theme, and install verified Nexus releases without granting the web service permission to execute commands or directly replace application code.
 
 ITFlow 26.08 does not expose a native plugin or theme-hook loader. Nexus therefore provides plugin-style lifecycle behavior around the exact supported templates: compatibility checks, immutable package checksums, out-of-web-root backups, atomic file replacement, enable/disable, conflict-safe uninstall, PHP linting, and operation locking.
 
 ## Administration manager
 
-![Nexus Theme Manager administration page](docs/images/nexus-admin-manager.png)
+![Nexus Theme Studio administration page](docs/images/nexus-gui-updater.png)
 
-After installation, open **Administration → NEXUS → Theme Manager**. The page shows the active package and theme versions, exact ITFlow compatibility baseline, core asset health, protected lifecycle commands, and a CSRF-protected control for activating or pausing the Nexus visual layer across login, technician, administration, and client surfaces.
+After installation, open **Administration → NEXUS → Theme Manager**. Theme Studio provides:
 
-Package installation, file replacement, rollback, and uninstall remain root-only CLI operations. The administration page can change presentation state, but it cannot bypass compatibility checks or modify the protected recovery state.
+- Custom PNG, JPEG, or WebP logo upload with content inspection, size and dimension limits, safe fixed filenames, and ITFlow-branding fallback.
+- Display name, tagline, logo placement, login messaging, and client-portal messaging controls.
+- Seven-part color system with five curated presets, free-form color controls, instant preview, and live WCAG contrast feedback.
+- Sharp, balanced, or rounded corners; compact, comfortable, or spacious density; 90–110% interface scaling; and reduced motion.
+- Configuration export, validated JSON import, one-click reset, asset health, and theme pause/activation.
+- Atomic settings writes, administrator permissions, CSRF protection, audit logging, and a CSP-compatible same-origin generated stylesheet.
+
+Theme Studio also checks for Nexus releases and can queue an update. A root-owned systemd path service handles the privileged work with a fixed GitHub repository, exact release filenames, archive and manifest validation, SHA-256 verification, compatibility checks, and automatic rollback. The web request cannot supply a URL, command, file path, release version, or lifecycle flag.
+
+Theme settings and uploaded branding are stored in ITFlow's writable `uploads` area and survive CLI disable, uninstall, and version upgrades. Use **Reset** or **Remove logo** in Theme Studio when you intentionally want to remove them.
 
 ## Technician theme preview
 
@@ -28,8 +37,8 @@ This screenshot was captured from an isolated local ITFlow 26.08/AdminLTE test e
 |---|---|
 | ITFlow release | 26.08 |
 | ITFlow commit | `89b080b430aaafba5d520c4e52c57b28a9559085` |
-| Theme manager | 2.3.0 |
-| Theme payload | 26.08.4 |
+| Theme manager | 2.5.0 |
+| Theme payload | 26.08.6 |
 | Runtime | PHP 8.1 or newer; CLI SAPI for lifecycle operations and the normal ITFlow web SAPI for administration controls |
 | Target systems | Debian/Ubuntu production installs; lifecycle tests also run on Windows |
 
@@ -45,7 +54,7 @@ Install the command-line prerequisites, set `nexus_version` to the release you w
 sudo apt-get update
 sudo apt-get install -y ca-certificates curl unzip
 
-nexus_version="2.3.0"
+nexus_version="2.5.0"
 nexus_asset="Nexus-Theme-Manager-for-ITFlow-${nexus_version}"
 nexus_download_dir="$HOME/Downloads/nexus-theme-manager"
 
@@ -66,7 +75,7 @@ Continue only if `sha256sum` reports `OK`. The final `cd` places the shell in th
 
 ### Automated latest-release install
 
-The repository also includes a root-only bootstrap script that resolves the latest GitHub release, downloads and verifies the versioned archive, extracts it to the expected directory under `/opt`, runs `doctor`, installs the theme, and verifies the result:
+The repository also includes a root-only bootstrap script that resolves the latest GitHub release, downloads and verifies the versioned archive, extracts it to the expected directory under `/opt`, runs `doctor`, installs and verifies the theme, and enables the protected GUI updater:
 
 ```bash
 curl --fail --location --remote-name \
@@ -75,15 +84,16 @@ chmod +x install-latest.sh
 sudo ./install-latest.sh --root /var/www/itflow.example.com
 ```
 
-To store manager state somewhere other than `/var/lib/nexus-itflow-theme`, add `--state-root PATH`. The script refuses an existing versioned extraction directory and never skips checksum or compatibility validation.
+To store manager state somewhere other than `/var/lib/nexus-itflow-theme`, add `--state-root PATH`. Add `--no-gui-updater` only when you intentionally do not want the systemd updater. The script refuses an existing versioned extraction directory and never skips checksum or compatibility validation.
 
-### Upgrade from 2.2.0
+### Upgrade from 2.2.0, 2.3.0, or 2.4.0
 
-The protected manager does not overwrite an active package in place. Verify and uninstall 2.2.0 with its original manager, then run the latest-release installer:
+The protected manager does not overwrite an active package in place. Set `installed_version` to the active Nexus release, verify and uninstall it with its original manager, then run the latest-release installer:
 
 ```bash
-sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.2.0/manager.php verify --root /var/www/itflow.example.com
-sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.2.0/manager.php uninstall --root /var/www/itflow.example.com --yes
+installed_version="2.3.0"
+sudo php "/opt/Nexus-Theme-Manager-for-ITFlow-${installed_version}/manager.php" verify --root /var/www/itflow.example.com
+sudo php "/opt/Nexus-Theme-Manager-for-ITFlow-${installed_version}/manager.php" uninstall --root /var/www/itflow.example.com --yes
 sudo ./install-latest.sh --root /var/www/itflow.example.com
 ```
 
@@ -92,8 +102,9 @@ The bootstrap installer detects existing protected Nexus state before downloadin
 ## Package layout
 
 - `manager.php`: lifecycle manager
+- `updater.php`: fixed-policy root helper and systemd service installer for GUI updates
 - `manifest.json`: compatibility and immutable file checksums
-- `payload/`: 17 managed theme, administration, and integration files
+- `payload/`: 18 managed theme, customization, administration, and integration files
 - `baseline/`: exact supported upstream templates used for compatibility and testing
 - `docs/`: design, changed-file, and test documentation
 - `install.sh` / `uninstall.sh`: lifecycle command wrappers for an extracted package
@@ -102,7 +113,7 @@ The bootstrap installer detects existing protected Nexus state before downloadin
 ## Install
 
 1. Create and verify an ITFlow application/database backup.
-2. Extract this ZIP outside the ITFlow document root, for example `/opt/Nexus-Theme-Manager-for-ITFlow-2.3.0`.
+2. Extract this ZIP outside the ITFlow document root, for example `/opt/Nexus-Theme-Manager-for-ITFlow-2.5.0`.
 3. Run the non-mutating preflight:
 
 ```bash
@@ -115,20 +126,28 @@ sudo php manager.php doctor --root /var/www/itflow.example.com
 sudo php manager.php install --root /var/www/itflow.example.com --yes
 ```
 
-5. Clear PHP opcode caches with the server's normal graceful reload, for example:
+5. Enable protected GUI updates on a systemd Linux host:
+
+```bash
+sudo php updater.php install-service --root /var/www/itflow.example.com
+```
+
+The `install.sh` wrapper performs steps 4 and 5 automatically when it runs as root on a systemd Linux host.
+
+6. Clear PHP opcode caches with the server's normal graceful reload, for example:
 
 ```bash
 sudo systemctl reload apache2
 ```
 
-6. Verify the manager and smoke-test login, customer, technician, and administration pages:
+7. Verify the manager and smoke-test login, customer, technician, and administration pages:
 
 ```bash
 sudo php manager.php verify --root /var/www/itflow.example.com
 sudo php manager.php status --root /var/www/itflow.example.com
 ```
 
-7. Open **Administration → NEXUS → Theme Manager** and confirm that the theme is Active and all five core administration assets are present.
+8. Open **Administration → NEXUS → Theme Manager** and confirm that the theme is Active, all five core administration assets are present, and the update card reports **Ready**.
 
 State and original-file backups default to `/var/lib/nexus-itflow-theme/<instance-id>`, outside the web root. Use `--state-root PATH` consistently on every command only when the default is unsuitable.
 
@@ -156,14 +175,30 @@ sudo php manager.php disable --root /var/www/itflow.example.com --yes
 # Reapply the theme after a disable
 sudo php manager.php enable --root /var/www/itflow.example.com --yes
 
-# Remove the theme and archive recovery state outside the web root
-sudo php manager.php uninstall --root /var/www/itflow.example.com --yes
+# Remove the theme and GUI updater; archive recovery state outside the web root
+sudo ./uninstall.sh --root /var/www/itflow.example.com --yes
 
 # Full removal, including recovery state
-sudo php manager.php uninstall --root /var/www/itflow.example.com --yes --purge
+sudo ./uninstall.sh --root /var/www/itflow.example.com --yes --purge
 ```
 
 Add `--json` to any command for automation-friendly output.
+
+## GUI updates
+
+Open **Administration → NEXUS → Theme Manager**, then use **Check for updates**. When a newer published release is available, select **Install version**. The page shows download, verification, rollback, installation, and completion state and refreshes while work is running.
+
+The browser writes only an allow-listed `check` or `update` request to ITFlow's uploads directory. A root-owned systemd path unit notices that fixed request file and launches the updater helper outside the web process. The helper always resolves the latest release from `ithealthtech/nexus-theme-manager-for-itflow`, requires an exact semantic version and asset layout, verifies the published SHA-256 file and package manifest, runs the current manager's `verify`, and runs the new manager's `doctor`, `install`, and `verify`. If activation fails, it attempts to restore and verify the previous release automatically.
+
+Remove the system service without uninstalling the theme with:
+
+```bash
+sudo php updater.php remove-service --root /var/www/itflow.example.com
+```
+
+GUI updates require Linux, systemd, root access during one-time service setup, and `/usr/bin/curl`, `/usr/bin/unzip`, and `/usr/bin/systemctl`. If setup is absent, Theme Studio displays the exact setup command instead of presenting a non-working install action.
+
+The updater screenshot was captured from an isolated local ITFlow/AdminLTE preview with sanitized demonstration version data; it did not contact or modify a live server.
 
 ## Migrating from version 1.0.0
 
@@ -179,15 +214,15 @@ sudo php /opt/theme-manager-1.0.0/manager.php uninstall --root /var/www/itflow.e
 2. Run the current preflight and install.
 
 ```bash
-sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.3.0/manager.php doctor --root /var/www/itflow.example.com
-sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.3.0/manager.php install --root /var/www/itflow.example.com --yes
+sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.5.0/manager.php doctor --root /var/www/itflow.example.com
+sudo php /opt/Nexus-Theme-Manager-for-ITFlow-2.5.0/manager.php install --root /var/www/itflow.example.com --yes
 ```
 
 The new protected state root is `/var/lib/nexus-itflow-theme`. Keep the archived 1.0.0 recovery state until the Nexus installation and portal smoke tests pass.
 
 ### Adopting an existing exact installation
 
-If this same payload was installed manually before the lifecycle manager existed, run `adopt` instead of `install`. Adoption requires all 17 live files to match the package exactly, writes only protected manager state and baseline backups, and does not rewrite an ITFlow file.
+If this same payload was installed manually before the lifecycle manager existed, run `adopt` instead of `install`. Adoption requires all 18 live files to match the package exactly, writes only protected manager state and baseline backups, and does not rewrite an ITFlow file.
 
 ```bash
 sudo php manager.php adopt --root /var/www/itflow.example.com --yes
@@ -207,8 +242,9 @@ sudo php manager.php verify --root /var/www/itflow.example.com
 - A per-instance lock prevents concurrent lifecycle operations.
 - A failed install attempts automatic rollback before returning an error.
 - In-app theme changes require an authenticated ITFlow administrator, a valid CSRF token, and a writable ITFlow uploads directory.
-- The web control writes only a fixed presentation-state marker; it cannot install, update, uninstall, or rewrite PHP files.
-- No database, schema, configuration, vendor, JavaScript, or remote asset is added.
+- The web process can write only fixed presentation/settings files and an allow-listed update request. It cannot provide commands, URLs, paths, versions, or lifecycle flags to the root helper.
+- GUI updates accept only the latest release from the fixed Nexus GitHub repository, verify its outer checksum and internal manifest, and preserve the previous package for rollback.
+- No database, schema, vendor, application JavaScript, or third-party runtime asset is added. GUI setup adds only the documented per-instance systemd units, root-only updater configuration, and stable helper copy.
 
 ## ITFlow updates
 

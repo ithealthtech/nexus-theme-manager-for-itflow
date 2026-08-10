@@ -8,6 +8,9 @@ header("X-Frame-Options: DENY"); // Legacy
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
 $nexus_theme_enabled = nexusThemeIsEnabled();
+$nexus_theme_settings = nexusThemeSettings();
+$nexus_brand_name = nexusThemeBrandName($session_company_name, $nexus_theme_settings);
+$nexus_logo_url = nexusThemeLogoUrl($nexus_theme_settings, $session_company_logo ? '/uploads/settings/' . $session_company_logo : '');
 ?>
 
 <!DOCTYPE html>
@@ -15,7 +18,7 @@ $nexus_theme_enabled = nexusThemeIsEnabled();
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title><?= escapeHtml($session_company_name) ?> | Client Portal</title>
+    <title><?= escapeHtml($nexus_theme_enabled ? $nexus_brand_name : $session_company_name) ?> | Client Portal</title>
 
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -33,17 +36,18 @@ $nexus_theme_enabled = nexusThemeIsEnabled();
     <link rel="stylesheet" href="/libs/adminlte/css/adminlte.min.css">
     <?php if ($nexus_theme_enabled) { ?>
         <link rel="stylesheet" href="/css/nexus-theme.css">
+        <link rel="stylesheet" href="/css/nexus-theme-custom.php?v=<?= nexusThemeSettingsVersion() ?>">
     <?php } ?>
 
 </head>
-<body class="hold-transition <?= $nexus_theme_enabled ? 'nexus-theme nexus-client' : '' ?>">
+<body class="hold-transition <?= $nexus_theme_enabled ? 'nexus-theme nexus-client ' . nexusThemeBodyClasses($nexus_theme_settings) : '' ?>">
 <a class="sr-only sr-only-focusable" href="#main-content">Skip to main content</a>
 
 <!-- Navbar -->
 
 <nav class="navbar navbar-expand-lg navbar-dark nexus-client-nav">
     <div class="container">
-        <a class="navbar-brand" href="index.php"><?= escapeHtml($session_company_name) ?></a>
+        <a class="navbar-brand" href="index.php"><?= escapeHtml($nexus_theme_enabled ? $nexus_brand_name : $session_company_name) ?></a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle portal navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -150,11 +154,13 @@ $nexus_theme_enabled = nexusThemeIsEnabled();
         </div>
 
         <div class="col-md-11 p-0">
-                <?php if ($session_company_logo) { ?>
+                <?php if ($nexus_theme_enabled && $nexus_theme_settings['branding']['show_portal_logo'] && $nexus_logo_url !== '') { ?>
+                    <img height="48" width="142" class="img-fluid float-right nexus-client-logo" src="<?= escapeHtml($nexus_logo_url) ?>" alt="<?= escapeHtml($nexus_theme_settings['branding']['logo_alt'] ?: $nexus_brand_name . ' logo') ?>">
+                <?php } elseif (!$nexus_theme_enabled && $session_company_logo) { ?>
                     <img height="48" width="142" class="img-fluid float-right nexus-client-logo" src="<?= "/uploads/settings/$session_company_logo" ?>" alt="<?= escapeHtml($session_company_name) ?> logo">
                 <?php } ?>
-            <p class="h4 mb-1">Welcome, <strong><?= stripslashes(escapeHtml($session_contact_name)) ?></strong></p>
-            <p class="mb-0 text-muted">Request support and follow your latest updates.</p>
+            <p class="h4 mb-1"><?= $nexus_theme_enabled ? escapeHtml($nexus_theme_settings['content']['portal_heading']) : 'Welcome' ?>, <strong><?= stripslashes(escapeHtml($session_contact_name)) ?></strong></p>
+            <?php if ($nexus_theme_enabled && $nexus_theme_settings['content']['portal_message'] !== '') { ?><p class="mb-0 text-muted"><?= nl2br(escapeHtml($nexus_theme_settings['content']['portal_message'])) ?></p><?php } ?>
         </div>
     </div>
 
