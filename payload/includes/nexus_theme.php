@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-const NEXUS_MANAGER_VERSION = '2.5.3';
-const NEXUS_THEME_VERSION = '26.08.7';
+const NEXUS_MANAGER_VERSION = '2.5.4';
+const NEXUS_THEME_VERSION = '26.08.8';
 const NEXUS_ITFLOW_COMMIT = '89b080b430aaafba5d520c4e52c57b28a9559085';
 const NEXUS_THEME_DISABLED_MARKER = '.nexus-theme-disabled';
 const NEXUS_THEME_SETTINGS_FILE = '.nexus-theme-settings.json';
@@ -170,6 +170,7 @@ function nexusThemeDefaults(): array
             'logo_path' => '',
             'logo_alt' => '',
             'show_login_logo' => true,
+            'show_agent_logo' => true,
             'show_portal_logo' => true,
         ],
         'content' => [
@@ -346,6 +347,9 @@ function nexusThemeValidateSettings(array $input): array
     }
     $result['branding']['logo_alt'] = nexusThemeCleanText($input['branding']['logo_alt'] ?? '', 120);
     $result['branding']['show_login_logo'] = !empty($input['branding']['show_login_logo']);
+    $result['branding']['show_agent_logo'] = array_key_exists('show_agent_logo', $input['branding'])
+        ? !empty($input['branding']['show_agent_logo'])
+        : $defaults['branding']['show_agent_logo'];
     $result['branding']['show_portal_logo'] = !empty($input['branding']['show_portal_logo']);
 
     $result['content']['login_eyebrow'] = nexusThemeCleanText($input['content']['login_eyebrow'] ?? '', 60);
@@ -547,5 +551,13 @@ function nexusThemeCustomCss(?array $settings = null): string
         $declarations[] = $name . ':' . $value;
     }
     $selector = '.nexus-theme,.nexus-theme.dark-mode,.nexus-theme.nexus-auth,.nexus-theme.nexus-client';
-    return 'html{font-size:' . $settings['appearance']['font_scale'] . '%}' . $selector . '{' . implode(';', $declarations) . "}\n";
+    $css = 'html{font-size:' . $settings['appearance']['font_scale'] . '%}' . $selector . '{' . implode(';', $declarations) . "}\n";
+    if ($settings['branding']['show_agent_logo'] && $settings['branding']['logo_path'] !== '') {
+        $logo = $settings['branding']['logo_path'];
+        $css .= '.nexus-agent .brand-link[href="/agent/dashboard.php"] .brand-image{background-color:transparent;background-image:url("' . $logo . '");background-position:center;background-repeat:no-repeat;background-size:contain;border-radius:0;flex:1 1 auto;height:2.6rem;margin-right:0;max-width:11rem;width:100%}'
+            . '.nexus-agent .brand-link[href="/agent/dashboard.php"] .brand-image::before{content:none}'
+            . '.nexus-agent .brand-link[href="/agent/dashboard.php"] .brand-text{clip:rect(0 0 0 0);clip-path:inset(50%);height:1px;overflow:hidden;position:absolute;white-space:nowrap;width:1px}'
+            . '@media (min-width:992px){.nexus-agent.sidebar-collapse .brand-link[href="/agent/dashboard.php"] .brand-image{flex:0 0 2rem;height:2rem;width:2rem}}' . "\n";
+    }
+    return $css;
 }

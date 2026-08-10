@@ -151,6 +151,10 @@ try {
     $themeDefaults = nexusThemeSettings($fixture);
     expect($themeDefaults['preset'] === 'aurora', 'theme customization starts with the Aurora preset');
     expect($themeDefaults['branding']['logo_path'] === '', 'theme customization starts without a logo override');
+    expect($themeDefaults['branding']['show_agent_logo'] === true, 'theme customization shows a custom logo in technician navigation by default');
+    $legacyTheme = $themeDefaults;
+    unset($legacyTheme['branding']['show_agent_logo']);
+    expect(nexusThemeValidateSettings($legacyTheme)['branding']['show_agent_logo'] === true, 'existing settings inherit technician navigation logo placement when upgraded');
 
     $customTheme = $themeDefaults;
     $customTheme['preset'] = 'custom';
@@ -185,6 +189,12 @@ try {
     expect(str_contains(nexusThemeCustomCss($savedTheme), '--nexus-cyan:#12abef'), 'theme customization renders validated CSS properties');
     expect(nexusThemeBodyClasses($savedTheme) === 'nexus-density-compact nexus-motion-reduced', 'theme customization renders safe behavior classes');
     expect(nexusThemeBrandName('ITFlow', $savedTheme) === 'Nexus Support', 'custom brand name overrides the ITFlow fallback');
+    $agentLogoTheme = $savedTheme;
+    $agentLogoTheme['branding']['logo_path'] = '/uploads/nexus-theme/logo.png';
+    $agentLogoCss = nexusThemeCustomCss(nexusThemeValidateSettings($agentLogoTheme));
+    expect(str_contains($agentLogoCss, 'background-image:url("/uploads/nexus-theme/logo.png")') && str_contains($agentLogoCss, 'clip-path:inset(50%)'), 'custom logo replaces visible technician navigation title while preserving its accessible name');
+    $agentLogoTheme['branding']['show_agent_logo'] = false;
+    expect(!str_contains(nexusThemeCustomCss(nexusThemeValidateSettings($agentLogoTheme)), 'background-image:url("/uploads/nexus-theme/logo.png")'), 'technician navigation logo placement can be disabled independently');
     expect(nexusThemeContrastColor('#ffffff') === '#0b0a17' && nexusThemeContrastColor('#000000') === '#ffffff', 'theme customization derives readable accent contrast');
     expect(nexusThemeMixColors('#ffffff', '#000000', 50) === '#808080', 'theme customization derives supporting palette colors');
     expect(nexusThemeValidateSettings(['preset' => 'ocean'])['colors']['primary'] === nexusThemePresets()['ocean']['primary'], 'curated presets resolve to their protected palette');

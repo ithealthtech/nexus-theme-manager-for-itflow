@@ -731,6 +731,13 @@ body.nexus-client {
     min-height: 4.15rem;
 }
 
+.nexus-agent .main-sidebar .brand-link[href="/agent/dashboard.php"] {
+    align-items: center;
+    display: flex;
+    overflow: hidden;
+    padding: 0.65rem 0.85rem;
+}
+
 .nexus-agent .main-sidebar .nexus-admin-back {
     align-items: center;
     background: rgba(255, 255, 255, 0.055);
@@ -774,13 +781,29 @@ body.nexus-client {
     width: 1px;
 }
 
-.nexus-agent .brand-link .brand-image {
-    border: 2px solid var(--nexus-cyan);
-    height: 1rem;
-    margin: 0.65rem 0.75rem 0 0.35rem;
+.nexus-agent .brand-link[href="/agent/dashboard.php"] .brand-image {
+    align-items: center;
+    background: var(--nexus-gradient);
+    border: 0;
+    border-radius: 0.55rem;
+    color: var(--nexus-ink);
+    display: flex;
+    flex: 0 0 2rem;
+    float: none;
+    height: 2rem;
+    justify-content: center;
+    margin: 0 0.7rem 0 0;
+    max-height: none;
     opacity: 1;
-    transform: skew(-14deg);
-    width: 1.15rem;
+    transform: none;
+    width: 2rem;
+}
+
+.nexus-agent .brand-link[href="/agent/dashboard.php"] .brand-image::before {
+    content: "\f5fd";
+    font-family: "Font Awesome 5 Free";
+    font-size: 0.9rem;
+    font-weight: 900;
 }
 
 .nexus-agent .brand-link .brand-text {
@@ -788,6 +811,50 @@ body.nexus-client {
     font-style: italic;
     font-weight: 800 !important;
     letter-spacing: 0.01em;
+}
+
+.nexus-agent .brand-link[href="/agent/dashboard.php"] .brand-text {
+    flex: 1 1 auto;
+    font-size: 1rem;
+    line-height: 1.25;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.nexus-agent .main-header [data-widget="pushmenu"] {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 0.65rem;
+    display: inline-flex;
+    height: 2.35rem;
+    justify-content: center;
+    margin: 0.45rem 0.35rem;
+    padding: 0;
+    width: 2.35rem;
+}
+
+.nexus-agent .main-header [data-widget="pushmenu"]:hover,
+.nexus-agent .main-header [data-widget="pushmenu"]:focus {
+    background: rgba(105, 191, 245, 0.14);
+    border-color: rgba(105, 191, 245, 0.3);
+    color: var(--nexus-white);
+}
+
+@media (min-width: 992px) {
+    .nexus-agent.sidebar-collapse .brand-link[href="/agent/dashboard.php"] {
+        justify-content: center;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .nexus-agent.sidebar-collapse .brand-link[href="/agent/dashboard.php"] .brand-image {
+        flex-basis: 2rem;
+        margin-right: 0;
+        width: 2rem;
+    }
 }
 
 .nexus-agent .nav-sidebar .nav-header {
