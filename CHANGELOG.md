@@ -2,6 +2,23 @@
 
 All notable changes to this project are documented here.
 
+## [2.5.4] - 2026-08-10
+
+### Added
+
+- Added an independent Theme Studio placement control for showing the uploaded logo in the technician navigation header.
+- Existing saved configurations inherit technician-navigation logo placement on upgrade without requiring a reset.
+
+### Fixed
+
+- Replaced the clipped technician-header wordmark with the configured custom logo while preserving the existing dashboard link and an accessible text name.
+- Added a polished fallback mark, bounded fallback title, compact collapsed state, and rounded navigation toggle so long company names no longer collide with the header controls.
+
+### Validation
+
+- Added lifecycle coverage for the placement default, legacy-settings upgrade path, generated logo CSS, accessible text treatment, and independent opt-out.
+- Browser-validated the expanded and narrow technician navigation layouts against the release stylesheet.
+
 ## [2.5.3] - 2026-08-10
 
 ### Fixed
@@ -148,6 +165,7 @@ All notable changes to this project are documented here.
 [2.3.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.3.0
 [2.4.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.4.0
 [2.5.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.0
+[2.5.4]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.4
 [2.5.3]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.3
 [2.5.2]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.2
 [2.5.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v2.5.1
