@@ -2,6 +2,27 @@
 
 All notable changes to this project are documented here.
 
+## [3.5.0] - 2026-08-20
+
+### Added
+
+- Added a private draft workspace that keeps every saved design change off live authentication, technician, client, and guest surfaces until an administrator explicitly publishes it.
+- Added named, atomic publications and durable history for up to 50 revisions, including actor, timestamp, settings hash, exact field-level comparison, and restore-to-draft controls.
+- Added filesystem-serialized draft-version checks so a stale administrator tab or simultaneous request cannot silently overwrite newer Theme Studio work.
+- Added exact sandboxed previews for authentication, technician, authenticated-client, and guest-invoice surfaces.
+
+### Changed
+
+- Preview documents and live pages now derive identity, body classes, logo selection, and layout state from the same validated presentation model and load the same Nexus and custom stylesheets.
+- Uploaded branding now uses immutable filenames so draft media, published media, and revision restores cannot collide in browser or proxy caches.
+- Preset application, configuration import, asset removal, and reset now update the private draft and require the same concurrency token as primary design saves.
+- Replaced the legacy simulated preview rules with server-rendered runtime snapshots and a clear stale-preview message while form edits remain unsaved.
+
+### Validation
+
+- Added lifecycle coverage for draft isolation, exact comparisons, stale-write rejection, immutable asset cleanup, four-surface preview generation, atomic publication, revision capture, restoration, and discard behavior.
+- Browser-validated preview switching and revision comparison at desktop width, then verified responsive controls and zero page-level horizontal overflow at 390px.
+
 ## [3.4.1] - 2026-08-20
 
 ### Changed
@@ -355,3 +376,4 @@ All notable changes to this project are documented here.
 [3.0.2]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.2
 [3.0.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.1
 [3.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.0
+[3.5.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.5.0
