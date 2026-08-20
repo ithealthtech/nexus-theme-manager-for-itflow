@@ -17,7 +17,10 @@ $nexusSavedPresets = nexusThemeSavedPresets();
 $nexusSavedPresetsJson = nexusThemeExportPresets();
 $nexusSchedule = nexusThemeSchedule();
 $nexusCanRollback = nexusThemeCanRollback();
-$nexusBrandName = nexusThemeBrandName($session_company_name, $nexusSettings);
+$nexusBrandPlaceholder = 'Nexus MSP';
+$nexusStudioBrandName = $nexusSettings['branding']['brand_name'] !== ''
+    ? $nexusSettings['branding']['brand_name']
+    : $nexusBrandPlaceholder;
 $nexusManagedAssets = [
     'Theme stylesheet' => '/css/nexus-theme.css',
     'Customization stylesheet' => '/css/nexus-theme-custom.php',
@@ -138,10 +141,10 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
                             <div class="tab-pane fade show active" id="nexus-brand" role="tabpanel">
                                 <div class="nexus-section-heading"><span class="nexus-section-icon"><i class="fas fa-signature"></i></span><div><h2 class="h5 mb-1">Brand identity</h2><p class="text-muted mb-0">Override ITFlow branding wherever Nexus is active.</p></div></div>
                                 <div class="form-row mt-4">
-                                    <div class="form-group col-md-7"><label for="nexus-brand-name">Display name</label><input class="form-control nexus-preview-input" id="nexus-brand-name" name="nexus[branding][brand_name]" maxlength="80" value="<?= escapeHtml($nexusSettings['branding']['brand_name']) ?>" placeholder="<?= escapeHtml($session_company_name) ?>" data-preview="brand"><small class="form-text">Leave blank to inherit the ITFlow company name.</small></div>
-                                    <div class="form-group col-md-5"><label for="nexus-logo-alt">Logo alt text</label><input class="form-control" id="nexus-logo-alt" name="nexus[branding][logo_alt]" maxlength="120" value="<?= escapeHtml($nexusSettings['branding']['logo_alt']) ?>" placeholder="<?= escapeHtml($nexusBrandName) ?> logo"></div>
+                                    <div class="form-group col-md-7"><label for="nexus-brand-name">Display name</label><input class="form-control nexus-preview-input" id="nexus-brand-name" name="nexus[branding][brand_name]" maxlength="80" value="<?= escapeHtml($nexusSettings['branding']['brand_name']) ?>" placeholder="<?= escapeHtml($nexusBrandPlaceholder) ?>" data-preview="brand"><small class="form-text">Leave blank to preserve ITFlow's native company name on live pages; Nexus MSP is preview text only.</small></div>
+                                    <div class="form-group col-md-5"><label for="nexus-logo-alt">Logo alt text</label><input class="form-control" id="nexus-logo-alt" name="nexus[branding][logo_alt]" maxlength="120" value="<?= escapeHtml($nexusSettings['branding']['logo_alt']) ?>" placeholder="<?= escapeHtml($nexusBrandPlaceholder) ?> logo"></div>
                                 </div>
-                                <div class="form-row"><div class="form-group col-md-7"><label for="nexus-tagline">Brand tagline</label><input class="form-control nexus-preview-input" id="nexus-tagline" name="nexus[branding][tagline]" maxlength="140" value="<?= escapeHtml($nexusSettings['branding']['tagline']) ?>" data-preview="tagline"></div><div class="form-group col-md-5"><label for="nexus-browser-title">Browser title</label><input class="form-control" id="nexus-browser-title" name="nexus[branding][browser_title]" maxlength="80" value="<?= escapeHtml($nexusSettings['branding']['browser_title']) ?>" placeholder="<?= escapeHtml($nexusBrandName) ?>"></div></div>
+                                <div class="form-row"><div class="form-group col-md-7"><label for="nexus-tagline">Brand tagline</label><input class="form-control nexus-preview-input" id="nexus-tagline" name="nexus[branding][tagline]" maxlength="140" value="<?= escapeHtml($nexusSettings['branding']['tagline']) ?>" data-preview="tagline"></div><div class="form-group col-md-5"><label for="nexus-browser-title">Browser title</label><input class="form-control" id="nexus-browser-title" name="nexus[branding][browser_title]" maxlength="80" value="<?= escapeHtml($nexusSettings['branding']['browser_title']) ?>" placeholder="<?= escapeHtml($nexusBrandPlaceholder) ?>"></div></div>
                                 <div class="nexus-logo-dropzone">
                                     <div class="nexus-logo-current nexus-logo-current-dark" id="nexus-logo-preview">
                                         <?php if ($nexusLogoUrl !== '') { ?><img src="<?= escapeHtml($nexusLogoUrl) ?>" alt="Current custom logo"><?php } else { ?><span><i class="fas fa-layer-group"></i></span><?php } ?>
@@ -226,13 +229,13 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
                                 <div class="nexus-preview-canvas nexus-preview-panel" data-preview-panel="auth">
                                     <div class="nexus-preview-brand">
                                         <?php if ($nexusLogoUrl !== '') { ?><img src="<?= escapeHtml($nexusLogoUrl) ?>" alt="Preview logo"><?php } else { ?><span class="nexus-preview-symbol"><i class="fas fa-layer-group"></i></span><?php } ?>
-                                        <strong data-preview-target="brand"><?= escapeHtml($nexusBrandName) ?></strong>
+                                        <strong data-preview-target="brand"><?= escapeHtml($nexusStudioBrandName) ?></strong>
                                     </div>
                                     <div class="nexus-preview-login-card"><span class="nexus-preview-eyebrow" data-preview-target="eyebrow"><?= escapeHtml($nexusSettings['content']['login_eyebrow']) ?></span><h3 data-preview-target="heading"><?= escapeHtml($nexusSettings['content']['login_heading']) ?></h3><p data-preview-target="message"><?= escapeHtml($nexusSettings['content']['login_message']) ?></p><span class="nexus-preview-label">Email address</span><div class="nexus-preview-field"></div><span class="nexus-preview-label">Password</span><div class="nexus-preview-field"></div><button type="button" tabindex="-1">Sign in</button></div>
                                     <small data-preview-target="tagline"><?= escapeHtml($nexusSettings['branding']['tagline']) ?></small>
                                 </div>
                                 <div class="nexus-preview-shell nexus-preview-panel d-none" data-preview-panel="navigation" data-width="<?= (int)$nexusSettings['appearance']['sidebar_width'] ?>" data-menu-density="<?= escapeHtml($nexusSettings['appearance']['menu_density']) ?>" data-content-density="<?= escapeHtml($nexusSettings['appearance']['density']) ?>" data-header-style="<?= escapeHtml($nexusSettings['appearance']['header_style']) ?>" data-navigation-style="<?= escapeHtml($nexusSettings['appearance']['navigation_style']) ?>">
-                                    <aside class="nexus-preview-sidebar"><div class="nexus-preview-shell-brand"><?php if ($nexusNavigationLogoUrl !== '') { ?><img src="<?= escapeHtml($nexusNavigationLogoUrl) ?>" alt="Navigation logo preview"><?php } else { ?><i class="fas fa-layer-group"></i><strong data-preview-target="brand"><?= escapeHtml($nexusBrandName) ?></strong><?php } ?></div><small>Workspace</small><a class="active"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a><a><i class="fas fa-users"></i><span>Clients</span></a><a><i class="fas fa-ticket-alt"></i><span>Tickets</span></a><small>Finance</small><a><i class="fas fa-file-invoice-dollar"></i><span>Invoices</span></a><a><i class="fas fa-chart-line"></i><span>Reports</span></a></aside>
+                                    <aside class="nexus-preview-sidebar"><div class="nexus-preview-shell-brand"><?php if ($nexusNavigationLogoUrl !== '') { ?><img src="<?= escapeHtml($nexusNavigationLogoUrl) ?>" alt="Navigation logo preview"><?php } else { ?><i class="fas fa-layer-group"></i><strong data-preview-target="brand"><?= escapeHtml($nexusStudioBrandName) ?></strong><?php } ?></div><small>Workspace</small><a class="active"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></a><a><i class="fas fa-users"></i><span>Clients</span></a><a><i class="fas fa-ticket-alt"></i><span>Tickets</span></a><small>Finance</small><a><i class="fas fa-file-invoice-dollar"></i><span>Invoices</span></a><a><i class="fas fa-chart-line"></i><span>Reports</span></a></aside>
                                     <div class="nexus-preview-main"><header><i class="fas fa-bars"></i><span>Workspace</span><strong data-preview-header-label>Solid</strong><i class="fas fa-bell"></i><i class="fas fa-user-circle"></i></header><main><div class="nexus-preview-page-heading"></div><div class="nexus-preview-stat-grid"><i></i><i></i><i></i></div><div class="nexus-preview-content-block"></div></main></div>
                                 </div>
                             </div>
@@ -362,7 +365,7 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
     }
 
     function setPreviewText(key, value) {
-        studio.querySelectorAll('[data-preview-target="' + key + '"]').forEach(function (target) { target.textContent = value || (key === 'brand' ? <?= json_encode($session_company_name, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?> : ''); });
+        studio.querySelectorAll('[data-preview-target="' + key + '"]').forEach(function (target) { target.textContent = value || (key === 'brand' ? <?= json_encode($nexusBrandPlaceholder, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?> : ''); });
     }
     function rgb(hex) { return [1, 3, 5].map(function (offset) { var value = parseInt(hex.slice(offset, offset + 2), 16) / 255; return value <= 0.03928 ? value / 12.92 : Math.pow((value + 0.055) / 1.055, 2.4); }); }
     function contrast(first, second) { var a = rgb(first), b = rgb(second); var one = 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2]; var two = 0.2126 * b[0] + 0.7152 * b[1] + 0.0722 * b[2]; return (Math.max(one, two) + 0.05) / (Math.min(one, two) + 0.05); }

@@ -2045,12 +2045,18 @@ body.nexus-client {
 }
 
 @media (max-width: 1199.98px) {
+    .nexus-manager-page,
+    .nexus-studio-workspace,
+    .nexus-workspace-content,
+    .nexus-workspace-row,
+    .nexus-workspace-row > [class*="col-"] { max-width: 100%; min-width: 0; }
+    .nexus-manager-page { overflow-x: hidden; overflow-x: clip; }
     .nexus-studio-workspace { display: block; }
     .nexus-workspace-navigation { margin-bottom: 1rem; position: static; }
     .nexus-workspace-navigation-title { padding-bottom: 0.6rem; }
-    .nexus-studio-tabs { flex-direction: row; overflow-x: auto; padding-bottom: 0.25rem; scrollbar-width: thin; }
+    .nexus-studio-tabs { flex-direction: row; max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; padding-bottom: 0.25rem; scroll-snap-type: inline proximity; scrollbar-width: thin; }
     .nexus-workspace-nav-label { display: none; }
-    .nexus-studio-tabs .nav-link { flex: 0 0 auto; min-width: 9.5rem; transform: none; }
+    .nexus-studio-tabs .nav-link { flex: 0 0 auto; min-width: 9.5rem; scroll-snap-align: start; transform: none; }
     .nexus-studio-tabs .nav-link small { display: none; }
     .nexus-workspace-navigation-note { display: none; }
     .nexus-workspace-heading .card-body { padding-bottom: 1rem; padding-top: 1rem; }
@@ -2059,9 +2065,19 @@ body.nexus-client {
 }
 
 @media (max-width: 767.98px) {
+    .nexus-manager-page { padding-bottom: 1rem; }
+    .nexus-manager-hero .card-body { padding: 1.35rem !important; }
+    .nexus-manager-hero .lead { font-size: 0.92rem; line-height: 1.55; margin-bottom: 1rem !important; }
+    .nexus-manager-hero .col-lg-4 { margin-top: 1rem !important; text-align: left; }
     .nexus-manager-hero .btn-lg {
         width: 100%;
     }
+
+    .nexus-manager-metrics { margin-left: -0.35rem; margin-right: -0.35rem; }
+    .nexus-manager-metrics > div { margin-bottom: 0.7rem; padding-left: 0.35rem; padding-right: 0.35rem; }
+    .nexus-manager-metrics .card-body { min-height: 6rem; padding: 0.85rem; }
+    .nexus-manager-metrics .h4 { font-size: 1.05rem; overflow-wrap: anywhere; }
+    .nexus-manager-metric-icon { height: 2.25rem; width: 2.25rem; }
 
     .nexus-manager-control-row {
         align-items: flex-start;
@@ -2082,18 +2098,74 @@ body.nexus-client {
         flex-direction: column;
     }
 
-    .nexus-workspace-heading .card-body { align-items: flex-start; }
+    .nexus-logo-dropzone .flex-grow-1,
+    .nexus-logo-dropzone .form-control-file { max-width: 100%; min-width: 0; width: 100%; }
+    .nexus-logo-dropzone > .btn { width: 100%; }
+
+    .nexus-workspace-navigation > .card-body { overflow: hidden; padding: 0.75rem !important; }
+    .nexus-workspace-navigation-title { padding: 0.1rem 0.25rem 0.6rem; }
+    .nexus-studio-tabs { margin-left: -0.15rem; margin-right: -0.15rem; padding-left: 0.15rem; padding-right: 0.15rem; }
+    .nexus-studio-tabs .nav-link { gap: 0.45rem; min-width: 7.75rem; padding: 0.5rem; }
+    .nexus-studio-tabs .nav-link > i { flex-basis: 1.9rem; height: 1.9rem; }
+    .nexus-studio-tabs .nav-link strong { font-size: 0.76rem; }
+
+    .nexus-workspace-heading .card-body { align-items: flex-start; flex-direction: column; gap: 0.65rem; }
     .nexus-workspace-heading p { font-size: 0.78rem; }
-    .nexus-workspace-step { margin-left: 0.75rem; }
+    .nexus-workspace-step { margin-left: 0; }
+    .nexus-workspace-row { margin-left: 0; margin-right: 0; }
+    .nexus-workspace-row > [class*="col-"] { padding-left: 0; padding-right: 0; }
+    .nexus-studio-editor { min-height: 0; }
     .nexus-studio-editor > .card-body { padding: 1rem; }
-    .nexus-studio-editor > .card-footer { align-items: stretch !important; flex-direction: column; gap: 0.75rem; }
+    .nexus-studio-editor > .card-footer { align-items: stretch !important; flex-direction: column; gap: 0.75rem; position: static; }
     .nexus-studio-editor > .card-footer .btn { width: 100%; }
+
+    .nexus-section-heading { align-items: flex-start; gap: 0.7rem; }
+    .nexus-section-icon { height: 2.35rem; width: 2.35rem; }
+    .nexus-contrast-report { align-items: flex-start; }
+
+    .nexus-preview-sticky { position: static; }
+    .nexus-preview-card .card-header { align-items: flex-start !important; flex-wrap: wrap; gap: 0.75rem; }
+    .nexus-preview-card .btn-group { display: flex; width: 100%; }
+    .nexus-preview-card .btn-group .btn { flex: 1 1 50%; }
+    .nexus-preview-canvas { min-height: 28rem; padding: 1.35rem 0.8rem 1rem; }
+    .nexus-preview-login-card { max-width: 100%; padding: 1.15rem; }
+    .nexus-preview-shell { height: 26rem; }
+    .nexus-preview-main header { gap: 0.42rem; padding: 0 0.55rem; }
+    .nexus-preview-main main { padding: 0.7rem; }
+
+    .nexus-update-card .card-header { align-items: flex-start !important; flex-wrap: wrap; gap: 0.65rem; }
+    .nexus-update-versions { grid-template-columns: 1fr; }
+    .nexus-update-versions > i { transform: rotate(90deg); }
+    .nexus-update-versions div:last-child { text-align: left; }
+    .nexus-manager-command { max-width: 100%; overflow-wrap: anywhere; }
+    .nexus-saved-preset-list > div { align-items: flex-start; flex-wrap: wrap; gap: 0.4rem; }
+    .nexus-design-operations .form-row > [class*="col-"] { flex: 0 0 100%; margin-bottom: 0.65rem; max-width: 100%; }
+    .nexus-design-operations .d-flex.align-items-center.justify-content-between { align-items: flex-start !important; flex-direction: column; gap: 0.65rem; }
+    .nexus-workspace-panel .btn-group.w-100 { display: grid; grid-template-columns: 1fr; }
+    .nexus-workspace-panel .btn-group.w-100 > .btn { border-radius: var(--nexus-radius) !important; margin: 0 0 0.45rem; width: 100%; }
+
+    .nexus-theme .modal-dialog { margin: 0.5rem; }
+    .nexus-theme .modal-footer { align-items: stretch; flex-direction: column; }
+    .nexus-theme .modal-footer .btn { margin: 0 0 0.5rem !important; width: 100%; }
 }
 
 @media (max-width: 575.98px) {
-    .nexus-agent .nexus-ticket-queue-heading { align-items: flex-start; }
+    .nexus-manager-mark { border-radius: 0.75rem; flex: 0 0 2.5rem; height: 2.5rem; width: 2.5rem; }
+    .nexus-manager-hero h1 { font-size: 1.55rem; }
+    .nexus-manager-meta { line-height: 1.45; }
+    .nexus-manager-metrics .text-uppercase { font-size: 0.62rem; }
+    .nexus-studio-tabs .nav-link { min-width: 7.15rem; }
+    .nexus-workspace-heading .card-body { padding-left: 0.85rem; padding-right: 0.85rem; }
+    .nexus-preview-brand { flex-wrap: wrap; }
+    .nexus-preview-shell { height: 23rem; }
+    .nexus-preview-sidebar { padding-left: 0.3rem; padding-right: 0.3rem; }
+    .nexus-preview-sidebar > a { gap: 0.25rem; padding-left: 0.35rem; padding-right: 0.35rem; }
+    .nexus-preview-main header strong { display: none; }
+
+    .nexus-agent .nexus-ticket-queue-heading { align-items: flex-start; flex-direction: column; gap: 0.6rem; }
     .nexus-agent .nexus-ticket-queue-grid { grid-template-columns: 1fr; }
-    .nexus-agent .nexus-ticket-queue-live { margin-left: 0.75rem; }
+    .nexus-agent .nexus-ticket-queue-live { margin-left: 0; }
+    .nexus-agent .nexus-ticket-metric .card-body { min-height: 4.8rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {

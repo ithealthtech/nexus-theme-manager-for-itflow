@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented here.
 
+## [3.4.1] - 2026-08-20
+
+### Changed
+
+- Empty branding fields and Theme Studio previews now use the neutral `Nexus MSP` placeholder instead of exposing the configured ITFlow company name.
+- Leaving the display-name field blank still preserves ITFlow's native company identity on live pages.
+
+### Fixed
+
+- Theme Studio no longer creates document-level horizontal overflow at phone and tablet widths; its seven-section submenu remains independently swipeable with scroll snapping.
+- Mobile save actions no longer stick over form controls, and preview, upload, scheduling, updater, configuration, and modal actions now stack into touch-friendly layouts.
+- The technician Ticket queue now uses a clean vertical heading and compact one-column metric layout on phones while retaining two columns on tablets.
+
 ## [3.4.0] - 2026-08-10
 
 ### Added
@@ -336,6 +349,7 @@ All notable changes to this project are documented here.
 [3.1.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.1.0
 [3.1.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.1.1
 [3.2.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.2.0
+[3.4.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.4.1
 [3.4.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.4.0
 [3.3.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.3.0
 [3.0.2]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.2

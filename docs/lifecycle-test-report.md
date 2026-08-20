@@ -1,8 +1,8 @@
 # Lifecycle test report
 
-- Date: 2026-08-10
-- Manager version: 3.4.0
-- Payload version: 26.08.17
+- Date: 2026-08-20
+- Manager version: 3.4.1
+- Payload version: 26.08.18
 - PHP runtime: 8.4.24 CLI
 
 ## Syntax validation
@@ -18,7 +18,7 @@
 
 ## Automated lifecycle simulation
 
-Result: **201 assertions passed, 0 failed**
+Result: **206 assertions passed, 0 failed**
 
 The test creates isolated initialized ITFlow fixtures and state roots, then runs the manager as external CLI processes.
 
@@ -61,6 +61,6 @@ The lifecycle suite ran on Windows to exercise cross-platform path and replaceme
 
 ## GUI updater security suite
 
-Result: **29 assertions passed, 0 failed**
+Result: **32 assertions passed, 0 failed**
 
 The focused suite validates strict semantic versions, fixed request fields, unsafe request rejection, archive-root and traversal checks, checksum and checksum-filename enforcement, package manifest/version requirements, CLI argument allow-listing, web-entrypoint refusal, shell-free process execution, systemd filesystem hardening, generated unit syntax through `systemd-analyze verify` in Linux CI, and the automatic rollback path.
