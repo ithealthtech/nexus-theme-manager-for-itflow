@@ -17,6 +17,7 @@ require_once __DIR__ . "/includes/nexus_theme.php";
 nexusThemeApplyDueSchedule();
 $nexus_theme_enabled = nexusThemeIsEnabled();
 $nexus_theme_settings = nexusThemeSettings();
+$nexus_theme_presentation = nexusThemePresentationModel($nexus_theme_settings, $company_name);
 $nexus_native_favicon = is_file(__DIR__ . '/uploads/favicon.ico') ? '/uploads/favicon.ico' : '';
 $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon), $nexus_theme_settings) : $nexus_native_favicon;
 
@@ -713,7 +714,7 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
         <link rel="stylesheet" href="css/nexus-theme-custom.php?v=<?= nexusThemeSettingsVersion() ?>">
     <?php } ?>
 </head>
-<body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth ' . nexusThemeBodyClasses($nexus_theme_settings) : '' ?>">
+<body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth ' . $nexus_theme_presentation['body_classes'] : '' ?>">
 
 <div class="login-box">
     <?php
@@ -724,7 +725,7 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
         <?php if ($nexus_login_has_logo) { ?>
             <img alt="<?= escapeHtml($nexus_theme_enabled ? ($nexus_theme_settings['branding']['logo_alt'] ?: nexusThemeBrandName($company_name, $nexus_theme_settings) . ' logo') : $company_name . ' logo') ?>" height="110" width="380" class="img-fluid" src="<?= escapeHtml($nexus_login_logo) ?>">
         <?php } else { ?>
-            <span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml($nexus_theme_enabled ? nexusThemeBrandName($company_name, $nexus_theme_settings) : $company_name) ?></span>
+            <span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml($nexus_theme_enabled ? $nexus_theme_presentation['brand'] : $company_name) ?></span>
         <?php } ?>
     </div>
 

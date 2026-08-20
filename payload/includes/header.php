@@ -10,7 +10,8 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
 nexusThemeApplyDueSchedule();
 $nexus_theme_enabled = nexusThemeIsEnabled();
 $nexus_theme_settings = nexusThemeSettings();
-$nexus_brand_name = nexusThemeBrandName($session_company_name, $nexus_theme_settings);
+$nexus_theme_presentation = nexusThemePresentationModel($nexus_theme_settings, $session_company_name);
+$nexus_brand_name = $nexus_theme_presentation['brand'];
 $nexus_native_favicon = is_file($_SERVER['DOCUMENT_ROOT'] . '/uploads/favicon.ico') ? '/uploads/favicon.ico' : '';
 $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon), $nexus_theme_settings) : $nexus_native_favicon;
 
@@ -55,7 +56,7 @@ $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThe
     <script src="/libs/toastr/toastr.min.js"></script>
 </head>
 <body class="
-    hold-transition sidebar-mini layout-fixed layout-navbar-fixed <?= $nexus_theme_enabled ? 'nexus-theme nexus-agent ' . nexusThemeBodyClasses($nexus_theme_settings) : '' ?>
+    hold-transition sidebar-mini layout-fixed layout-navbar-fixed <?= $nexus_theme_enabled ? 'nexus-theme nexus-agent ' . $nexus_theme_presentation['body_classes'] : '' ?>
     accent-<?= escapeHtml($config_theme) ?>
     <?php if ($user_config_theme_dark) echo 'dark-mode'; ?>
 ">

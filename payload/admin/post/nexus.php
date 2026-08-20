@@ -35,7 +35,7 @@ if (isset($_POST['nexus_theme_save'])) {
     require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
 
     try {
-        $current = nexusThemeSettings();
+        $current = nexusThemeDraftSettings() ?? nexusThemeSettings();
         $submitted = is_array($_POST['nexus'] ?? null) ? $_POST['nexus'] : [];
         $submitted['branding'] = is_array($submitted['branding'] ?? null) ? $submitted['branding'] : [];
         foreach (['logo_path', 'logo_light_path', 'logo_dark_path', 'favicon_path', 'login_background_path', 'asset_revision'] as $asset) {
@@ -54,12 +54,12 @@ if (isset($_POST['nexus_theme_save'])) {
         }
         $submitted['branding']['logo_path'] = $submitted['branding']['logo_light_path'];
 
-        nexusThemeSaveSettings($submitted);
-        logAudit('Nexus Theme Manager', 'Edit', "$session_name updated Nexus theme customization");
-        flashAlert('Nexus customization saved and applied.');
+        nexusThemeSaveDraftSettings($submitted, null, (string)($_POST['nexus_draft_version'] ?? 'none'));
+        logAudit('Nexus Theme Manager', 'Edit', "$session_name saved a Nexus design draft");
+        flashAlert('Nexus draft saved. The published design is unchanged until you publish.');
     } catch (Throwable $error) {
         logApp('Nexus Theme Manager', 'error', $error->getMessage());
-        flashAlert('Nexus could not save the customization: ' . escapeHtml($error->getMessage()), 'error');
+        flashAlert('Nexus could not save the draft: ' . escapeHtml($error->getMessage()), 'error');
     }
     $nexusRedirect();
 }
@@ -74,15 +74,15 @@ if (isset($_POST['nexus_theme_remove_asset'])) {
         if (!isset($settingMap[$slot])) {
             throw new RuntimeException('Invalid Nexus asset action.');
         }
-        $settings = nexusThemeSettings();
+        $settings = nexusThemeDraftSettings() ?? nexusThemeSettings();
         $settings['branding'][$settingMap[$slot]] = '';
         if ($slot === 'logo-light') {
             $settings['branding']['logo_path'] = '';
         }
         $settings['branding']['asset_revision'] = bin2hex(random_bytes(8));
-        nexusThemeSaveSettings($settings);
-        logAudit('Nexus Theme Manager', 'Edit', "$session_name removed a Nexus custom image");
-        flashAlert('Custom image detached from the active design.');
+        nexusThemeSaveDraftSettings($settings, null, (string)($_POST['nexus_draft_version'] ?? 'none'));
+        logAudit('Nexus Theme Manager', 'Edit', "$session_name detached an image in the Nexus draft");
+        flashAlert('Custom image detached from the draft. Publish when the preview is ready.');
     } catch (Throwable $error) {
         logApp('Nexus Theme Manager', 'error', $error->getMessage());
         flashAlert('Nexus could not remove the image: ' . escapeHtml($error->getMessage()), 'error');
@@ -90,16 +90,29 @@ if (isset($_POST['nexus_theme_remove_asset'])) {
     $nexusRedirect();
 }
 
-if (isset($_POST['nexus_theme_rollback'])) {
+if (isset($_POST['nexus_theme_draft_action'])) {
     validateCSRFToken();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
     try {
-        nexusThemeRollback();
-        logAudit('Nexus Theme Manager', 'Edit', "$session_name restored the previous Nexus design");
-        flashAlert('Previous Nexus design restored.');
+        $action = (string)$_POST['nexus_theme_draft_action'];
+        if ($action === 'publish') {
+            nexusThemePublishDraft((string)$session_name, null, (string)($_POST['nexus_revision_name'] ?? 'Published draft'), (string)($_POST['nexus_draft_version'] ?? 'none'));
+            logAudit('Nexus Theme Manager', 'Edit', "$session_name published a Nexus design draft");
+            flashAlert('Nexus draft published atomically across live surfaces.');
+        } elseif ($action === 'discard') {
+            nexusThemeDiscardDraft(null, (string)($_POST['nexus_draft_version'] ?? 'none'));
+            logAudit('Nexus Theme Manager', 'Edit', "$session_name discarded a Nexus design draft");
+            flashAlert('Unpublished Nexus changes discarded.');
+        } elseif ($action === 'restore') {
+            nexusThemeRestoreRevisionToDraft((string)($_POST['nexus_revision_id'] ?? ''), null, (string)($_POST['nexus_draft_version'] ?? 'none'));
+            logAudit('Nexus Theme Manager', 'Edit', "$session_name restored a Nexus revision into the draft workspace");
+            flashAlert('Revision restored as an unpublished draft. Review its exact previews, then publish when ready.');
+        } else {
+            throw new RuntimeException('Invalid Nexus draft action.');
+        }
     } catch (Throwable $error) {
         logApp('Nexus Theme Manager', 'error', $error->getMessage());
-        flashAlert('Nexus could not restore the previous design: ' . escapeHtml($error->getMessage()), 'error');
+        flashAlert('Nexus could not complete the draft action: ' . escapeHtml($error->getMessage()), 'error');
     }
     $nexusRedirect();
 }
@@ -111,11 +124,11 @@ if (isset($_POST['nexus_preset_action'])) {
         $action = (string)$_POST['nexus_preset_action'];
         $id = (string)($_POST['nexus_preset_id'] ?? '');
         if ($action === 'save') {
-            nexusThemeSavePreset((string)($_POST['nexus_preset_name'] ?? ''), nexusThemeSettings());
+            nexusThemeSavePreset((string)($_POST['nexus_preset_name'] ?? ''), nexusThemeDraftSettings() ?? nexusThemeSettings());
             $message = 'Theme preset saved.';
         } elseif ($action === 'apply' && preg_match('/^[a-f0-9]{16}$/', $id) === 1) {
-            nexusThemeApplyPreset($id);
-            $message = 'Theme preset applied.';
+            nexusThemeApplyPreset($id, null, (string)($_POST['nexus_draft_version'] ?? 'none'));
+            $message = 'Theme preset loaded into the draft workspace.';
         } elseif ($action === 'delete' && preg_match('/^[a-f0-9]{16}$/', $id) === 1) {
             nexusThemeDeletePreset($id);
             $message = 'Theme preset deleted.';
@@ -162,9 +175,9 @@ if (isset($_POST['nexus_theme_reset'])) {
     require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
 
     try {
-        nexusThemeResetSettings();
-        logAudit('Nexus Theme Manager', 'Edit', "$session_name restored the Nexus customization defaults");
-        flashAlert('Nexus customization restored to its defaults.');
+        nexusThemeSaveDraftSettings(nexusThemeDefaults(), null, (string)($_POST['nexus_draft_version'] ?? 'none'));
+        logAudit('Nexus Theme Manager', 'Edit', "$session_name loaded Nexus defaults into the draft workspace");
+        flashAlert('Nexus defaults loaded as a draft. The published design is unchanged.');
     } catch (Throwable $error) {
         logApp('Nexus Theme Manager', 'error', $error->getMessage());
         flashAlert('Nexus could not restore defaults: ' . escapeHtml($error->getMessage()), 'error');
@@ -198,14 +211,14 @@ if (isset($_POST['nexus_theme_import'])) {
         if (!is_array($decoded)) {
             throw new RuntimeException('The imported configuration must be a JSON object.');
         }
-        $current = nexusThemeSettings();
+        $current = nexusThemeDraftSettings() ?? nexusThemeSettings();
         $decoded['branding'] = is_array($decoded['branding'] ?? null) ? $decoded['branding'] : [];
         foreach (['logo_path', 'logo_light_path', 'logo_dark_path', 'favicon_path', 'login_background_path', 'asset_revision'] as $asset) {
             $decoded['branding'][$asset] = $current['branding'][$asset];
         }
-        nexusThemeSaveSettings($decoded);
-        logAudit('Nexus Theme Manager', 'Edit', "$session_name imported Nexus theme customization");
-        flashAlert('Nexus customization imported and applied.');
+        nexusThemeSaveDraftSettings($decoded, null, (string)($_POST['nexus_draft_version'] ?? 'none'));
+        logAudit('Nexus Theme Manager', 'Edit', "$session_name imported a Nexus theme draft");
+        flashAlert('Nexus configuration imported as a draft. Review and publish when ready.');
     } catch (Throwable $error) {
         logApp('Nexus Theme Manager', 'error', $error->getMessage());
         flashAlert('Nexus could not import that configuration: ' . escapeHtml($error->getMessage()), 'error');

@@ -4,7 +4,8 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
 nexusThemeApplyDueSchedule();
 $nexus_guest_enabled = nexusThemeIsEnabled();
 $nexus_guest_settings = nexusThemeSettings();
-$nexus_guest_brand = nexusThemeBrandName($session_company_name, $nexus_guest_settings);
+$nexus_guest_presentation = nexusThemePresentationModel($nexus_guest_settings, $session_company_name);
+$nexus_guest_brand = $nexus_guest_presentation['brand'];
 $nexus_guest_logo_raw = nexusThemeLogoUrl($nexus_guest_settings, '', nexusThemeLogoVariantForColor($nexus_guest_settings['colors']['sidebar']));
 $nexus_guest_print_logo_raw = nexusThemeLogoUrl($nexus_guest_settings, '', 'dark');
 $nexus_guest_logo = nexusThemeVersionedAssetUrl($nexus_guest_logo_raw, $nexus_guest_settings);
@@ -47,7 +48,7 @@ if ($nexus_guest_enabled) {
     <script src="/libs/toastr/toastr.min.js"></script>
 
 </head>
-<body class="layout-top-nav <?= $nexus_guest_enabled ? 'nexus-theme nexus-guest ' . ($nexus_guest_is_invoice ? 'nexus-guest-invoice ' : '') . nexusThemeBodyClasses($nexus_guest_settings) : '' ?>">
+<body class="layout-top-nav <?= $nexus_guest_enabled ? 'nexus-theme nexus-guest ' . ($nexus_guest_is_invoice ? 'nexus-guest-invoice ' : '') . $nexus_guest_presentation['body_classes'] : '' ?>">
     <div class="wrapper text-sm">
         <?php if ($nexus_guest_enabled) { ?>
             <header class="nexus-guest-masthead d-print-none">

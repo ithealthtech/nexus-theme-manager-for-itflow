@@ -140,11 +140,11 @@ try {
     expect(str_contains($themeCssSource, '.nexus-auth .nexus-auth-title') && str_contains($themeCssSource, 'color: var(--nexus-white);'), 'authentication heading remains readable on the dark login card');
     expect(str_contains($themeCssSource, '.nexus-theme .modal.fade .modal-dialog') && str_contains($themeCssSource, '@keyframes nexus-notice-in'), 'theme includes modal and notification motion treatments');
     expect(str_contains($themeCssSource, '@media (prefers-reduced-motion: reduce)') && str_contains($themeCssSource, '.nexus-theme.nexus-motion-reduced'), 'motion treatments preserve user and operating-system reduced-motion preferences');
-    expect(str_contains($themeCssSource, 'linear-gradient(120deg, var(--nexus-night)') && str_contains($adminPageSource, 'function updateStudioPalette()'), 'Theme Studio hero follows saved and previewed palette colors');
-    expect(str_contains($adminPageSource, 'data-preview-panel="navigation"') && str_contains($themeCssSource, '.nexus-preview-shell'), 'Theme Studio includes a live sidebar and header preview');
-    expect(str_contains($adminPageSource, 'id="nexus-density"') && str_contains($adminPageSource, 'shell.dataset.contentDensity') && str_contains($themeCssSource, '[data-content-density="compact"]'), 'content density updates the navigation preview and rendered interface');
-    expect(str_contains($adminPageSource, 'shell.dataset.menuDensity') && str_contains($themeCssSource, '[data-menu-density="spacious"]'), 'menu density updates the navigation preview');
-    expect(str_contains($adminPageSource, "showPreviewMode('navigation')") && str_contains($adminPageSource, 'data-preview-header-label'), 'layout controls reveal the affected preview surface and identify the header treatment');
+    expect(str_contains($themeCssSource, 'linear-gradient(120deg, var(--nexus-night)') && str_contains($adminPageSource, 'function updateStudioPalette()'), 'Theme Studio hero follows the selected workspace palette');
+    expect(substr_count($adminPageSource, 'class="btn btn-outline-info nexus-preview-mode"') === 3 && str_contains($adminPageSource, 'data-mode="auth"') && str_contains($adminPageSource, 'data-mode="technician"') && str_contains($adminPageSource, 'data-mode="client"') && str_contains($adminPageSource, 'data-mode="invoice"'), 'Theme Studio exposes exact previews for four live surface families');
+    expect(str_contains($adminPageSource, 'nexusThemePreviewDocument(') && str_contains($adminPageSource, 'sandbox=""') && str_contains($adminPageSource, 'srcdoc='), 'Theme Studio renders isolated server-generated runtime previews');
+    expect(str_contains($adminPageSource, 'id="nexus-density"') && str_contains($adminPageSource, "showPreviewMode('technician')") && str_contains($themeCssSource, '.nexus-theme.nexus-density-compact'), 'layout controls map to the technician runtime preview and rendered interface');
+    expect(str_contains($adminPageSource, 'same validated settings model') && str_contains($adminPageSource, 'same') && str_contains($adminPageSource, 'Nexus stylesheet'), 'Theme Studio explains the runtime-parity preview contract');
     expect(substr_count($adminPageSource, 'data-workspace-section=') === 7 && str_contains($adminPageSource, 'data-workspace-section="operations"') && str_contains($adminPageSource, 'data-workspace-section="system"'), 'Theme Studio exposes seven focused design and management sections');
     expect(str_contains($adminPageSource, 'function showWorkspaceSection(') && str_contains($adminPageSource, 'window.history.replaceState') && str_contains($adminPageSource, 'window.location.hash'), 'Theme Studio section navigation is refresh-stable and deep-linkable');
     expect(str_contains($adminPageSource, 'id="nexus-motion"') && str_contains($adminPageSource, 'data-workspace-section="motion"'), 'motion controls live in their own focused Theme Studio section');
@@ -152,7 +152,7 @@ try {
     expect(str_contains($themeCssSource, 'grid-template-columns: 17rem minmax(0, 1fr)') && str_contains($themeCssSource, '@media (max-width: 1199.98px)'), 'Theme Studio navigation uses a desktop rail and responsive compact treatment');
     expect(str_contains($themeCssSource, '.nexus-agent.nexus-header-gradient .main-header') && str_contains($themeCssSource, '.nexus-agent.nexus-header-glass .main-header'), 'header treatments have distinct rendered styles');
     expect(str_contains($themeCssSource, '.nexus-agent.nexus-navigation-pill .nav-sidebar .nav-link.active') && str_contains($themeCssSource, '.nexus-agent.nexus-navigation-rail .nav-sidebar .nav-link.active') && str_contains($themeCssSource, '.nexus-agent.nexus-navigation-outline .nav-sidebar .nav-link.active'), 'active navigation treatments cover top-level and nested links');
-    expect(str_contains($themeCssSource, '.nexus-agent.nexus-sidebar-compact .nav-sidebar .nav-icon') && str_contains($themeCssSource, '.nexus-preview-shell.is-compact .nexus-preview-sidebar'), 'compact sidebar changes labels, icons, spacing, and preview width');
+    expect(str_contains($themeCssSource, '.nexus-agent.nexus-sidebar-compact .nav-sidebar .nav-icon') && str_contains($themeCssSource, '.nexus-runtime-preview-frame'), 'compact sidebar changes live labels and is rendered through the runtime preview');
     expect(str_contains($agentTicketsSource, 'nexus-ticket-queue-summary') && str_contains($agentTicketsSource, 'Ticket queue') && str_contains($themeCssSource, '.nexus-agent .nexus-ticket-queue-grid'), 'technician tickets render the responsive Nexus queue summary shown in the theme preview');
     expect(str_contains($agentTicketsSource, "ticket_reply_type IN ('Public', 'Client')") && str_contains($agentTicketsSource, "= 'Public' THEN 1 ELSE 0"), 'waiting-on-client counts use the latest client-visible reply direction');
     expect(str_contains($agentTicketsSource, "ticket_priority IN ('High', 'Urgent')") && str_contains($agentTicketsSource, 'TIMESTAMPDIFF(SECOND, ticket_created_at, ticket_first_response_at)'), 'queue metrics use live priority and first-response data');
@@ -176,7 +176,13 @@ try {
     expect(str_contains($guestInvoiceSource, 'nexus_invoice_pdf.php?invoice_id=') && !str_contains($guestInvoiceSource, 'guest_post.php?export_invoice_pdf='), 'guest invoice download uses the lifecycle-managed Nexus PDF endpoint');
     expect(str_contains($invoicePdfEndpointSource, '!nexusThemeIsEnabled()') && str_contains($invoicePdfEndpointSource, "'export_invoice_pdf' => \$invoice_id") && str_contains($invoicePdfEndpointSource, 'nexusThemeInvoicePdfHtml'), 'paused themes redirect PDF downloads to the original ITFlow renderer');
     expect(str_contains($invoicePdfHelperSource, 'SECURE BILLING PORTAL') && str_contains($invoicePdfHelperSource, 'BILLING DOCUMENT') && str_contains($invoicePdfHelperSource, 'BALANCE DUE'), 'downloadable invoices use the Nexus document hierarchy');
-    expect(str_contains($adminPostSource, "nexus_preset_action") && str_contains($adminPostSource, "nexus_schedule_command") && str_contains($adminPostSource, "nexus_theme_rollback"), 'administration actions support presets, scheduling, and rollback');
+    expect(str_contains($adminPostSource, 'nexusThemeSaveDraftSettings(') && str_contains($adminPostSource, 'nexusThemePublishDraft(') && str_contains($adminPostSource, 'nexusThemeDiscardDraft('), 'administration actions keep draft saving separate from atomic publishing and discard');
+    expect(str_contains($adminPageSource, 'nexus_draft_version') && str_contains($adminPostSource, "['nexus_draft_version']"), 'draft mutations carry optimistic concurrency protection across administrator sessions');
+    expect(str_contains($adminPostSource, "nexus_preset_action") && str_contains($adminPostSource, "nexus_schedule_command") && str_contains($adminPostSource, 'nexusThemeRestoreRevisionToDraft('), 'administration actions support presets, scheduling, and revision restoration');
+    expect(str_contains($adminPageSource, 'Draft comparison') && str_contains($adminPageSource, 'Revision history') && str_contains($adminPageSource, 'Restore to draft'), 'Theme Studio exposes comparison and durable revision history controls');
+    foreach ([$loginSource, $agentHeaderSource, $clientHeaderSource, $guestHeaderSource] as $runtimeSurfaceSource) {
+        expect(str_contains($runtimeSurfaceSource, 'nexusThemePresentationModel('), 'live Nexus surfaces share the preview presentation model');
+    }
 
     $fixture = $testRoot . DIRECTORY_SEPARATOR . 'fixture';
     $stateRoot = $testRoot . DIRECTORY_SEPARATOR . 'state';
@@ -295,13 +301,64 @@ try {
     $gifLogoTheme = $themeDefaults;
     $gifLogoTheme['branding']['logo_light_path'] = '/uploads/nexus-theme/logo-light.gif';
     expect(nexusThemeValidateSettings($gifLogoTheme)['branding']['logo_light_path'] === '/uploads/nexus-theme/logo-light.gif', 'theme customization preserves validated GIF logo paths');
+    $immutableLogoTheme = $themeDefaults;
+    $immutableLogoTheme['branding']['logo_light_path'] = '/uploads/nexus-theme/logo-light-0123456789abcdef.gif';
+    expect(nexusThemeValidateSettings($immutableLogoTheme)['branding']['logo_light_path'] === '/uploads/nexus-theme/logo-light-0123456789abcdef.gif', 'draft-safe immutable logo asset paths remain valid');
+
+    $activeBeforeDraft = nexusThemeSettings($fixture);
+    $draftTheme = $activeBeforeDraft;
+    $draftTheme['content']['login_heading'] = 'Private draft heading';
+    $draftTheme['colors']['header'] = '#123456';
+    nexusThemeSaveDraftSettings($draftTheme, $fixture);
+    expect(nexusThemeHasDraft($fixture) && nexusThemeSettings($fixture) === $activeBeforeDraft, 'saving a draft never mutates the published design');
+    expect(is_file(nexusThemeStateLockPath($fixture)), 'draft mutations serialize version checks and writes through a filesystem lock');
+    expect(nexusThemeDraftSettings($fixture)['content']['login_heading'] === 'Private draft heading', 'draft settings persist independently');
+    $draftChanges = nexusThemeSettingsDiff($activeBeforeDraft, nexusThemeDraftSettings($fixture));
+    expect(count($draftChanges) === 2 && in_array('content.login_heading', array_column($draftChanges, 'path'), true), 'draft comparison reports exact changed fields');
+    $staleDraftVersion = nexusThemeDraftVersion($fixture);
+    $concurrentDraft = nexusThemeDraftSettings($fixture);
+    $concurrentDraft['content']['portal_heading'] = 'Concurrent draft update';
+    nexusThemeSaveDraftSettings($concurrentDraft, $fixture);
+    try {
+        nexusThemeSaveDraftSettings($draftTheme, $fixture, $staleDraftVersion);
+        throw new RuntimeException('stale draft write unexpectedly succeeded');
+    } catch (RuntimeException $error) {
+        expect(str_contains($error->getMessage(), 'another administrator session'), 'stale administrator drafts cannot overwrite newer work');
+    }
+    $assetDirectory = nexusThemeAssetPath($fixture);
+    if (!is_dir($assetDirectory)) {
+        mkdir($assetDirectory, 0777, true);
+    }
+    $draftAssetName = 'logo-light-aaaaaaaaaaaaaaaa.png';
+    $orphanAssetName = 'logo-light-bbbbbbbbbbbbbbbb.png';
+    file_put_contents($assetDirectory . DIRECTORY_SEPARATOR . $draftAssetName, 'draft asset');
+    file_put_contents($assetDirectory . DIRECTORY_SEPARATOR . $orphanAssetName, 'orphan asset');
+    $concurrentDraft['branding']['logo_light_path'] = '/uploads/nexus-theme/' . $draftAssetName;
+    $concurrentDraft['branding']['logo_path'] = $concurrentDraft['branding']['logo_light_path'];
+    nexusThemeSaveDraftSettings($concurrentDraft, $fixture);
+    expect(is_file($assetDirectory . DIRECTORY_SEPARATOR . $draftAssetName) && !is_file($assetDirectory . DIRECTORY_SEPARATOR . $orphanAssetName), 'immutable asset cleanup preserves referenced draft media and removes abandoned uploads');
+    foreach (['auth', 'technician', 'client', 'invoice'] as $previewSurface) {
+        $previewDocument = nexusThemePreviewDocument(nexusThemeDraftSettings($fixture), $previewSurface);
+        expect(str_contains($previewDocument, '/css/nexus-theme.css?v=') && str_contains($previewDocument, '--nexus-header:#123456') && str_contains($previewDocument, 'Private draft heading') === ($previewSurface === 'auth'), $previewSurface . ' preview is generated from shared runtime CSS and draft presentation data');
+    }
+    $publishedDraft = nexusThemePublishDraft('Lifecycle tester', $fixture);
+    expect($publishedDraft['content']['login_heading'] === 'Private draft heading' && nexusThemeSettings($fixture)['colors']['header'] === '#123456', 'publishing atomically promotes the validated draft');
+    expect(!nexusThemeHasDraft($fixture) && !is_file(nexusThemeDraftPath($fixture)), 'publishing clears the private draft');
+    $publishedRevisions = nexusThemeRevisions($fixture);
+    expect(count($publishedRevisions) === 2 && end($publishedRevisions)['hash'] === nexusThemeSettingsHash(nexusThemeSettings($fixture)), 'first publication records both the original and newly published revisions');
+    $revisionToRestore = $publishedRevisions[0];
+    nexusThemeRestoreRevisionToDraft($revisionToRestore['id'], $fixture);
+    expect(nexusThemeHasDraft($fixture) && nexusThemeDraftSettings($fixture)['content']['login_heading'] === $revisionToRestore['settings']['content']['login_heading'], 'any published revision can be restored safely into the draft workspace');
+    nexusThemeDiscardDraft($fixture);
+    expect(!nexusThemeHasDraft($fixture) && nexusThemeSettings($fixture)['content']['login_heading'] === 'Private draft heading', 'discard removes unpublished restoration without changing live settings');
+
     $rollbackTheme = $savedTheme;
     $rollbackTheme['content']['login_heading'] = 'Rollback target';
     nexusThemeSaveSettings($rollbackTheme, $fixture);
     expect(nexusThemeCanRollback($fixture), 'theme customization snapshots the previous design');
     $preRollbackAssetRevision = nexusThemeSettings($fixture)['branding']['asset_revision'];
     nexusThemeRollback($fixture);
-    expect(nexusThemeSettings($fixture)['content']['login_heading'] === 'Support, your way', 'one-click rollback restores the prior design');
+    expect(nexusThemeSettings($fixture)['content']['login_heading'] === 'Private draft heading', 'legacy one-click rollback restores the prior published design');
     expect(nexusThemeSettings($fixture)['branding']['asset_revision'] !== $preRollbackAssetRevision, 'one-click rollback rotates the asset cache revision');
     $presetId = nexusThemeSavePreset('Operations', nexusThemeSettings($fixture), $fixture);
     expect(count(nexusThemeSavedPresets($fixture)) === 1, 'saved presets persist a validated design');

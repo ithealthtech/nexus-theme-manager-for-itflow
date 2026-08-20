@@ -1292,6 +1292,8 @@ body.nexus-client {
 
 /* Nexus administration manager */
 .nexus-manager-page {
+    overflow-x: hidden;
+    overflow-x: clip;
     padding-bottom: 2rem;
 }
 
@@ -1887,28 +1889,6 @@ body.nexus-client {
 .nexus-preview-windowbar i:nth-child(2) { background: #ffd166; }
 .nexus-preview-windowbar i:nth-child(3) { background: #4fd1a1; }
 
-.nexus-preview-canvas {
-    background-color: var(--preview-auth);
-    background-image: linear-gradient(rgba(0,0,0,var(--preview-overlay,0)),rgba(0,0,0,var(--preview-overlay,0))), var(--preview-bg-image, radial-gradient(circle at 10% 10%, rgba(120, 136, 255, 0.2), transparent 50%));
-    background-position: center, var(--preview-bg-position, center);
-    background-size: cover;
-    min-height: 31rem;
-    padding: 2.25rem 2rem 1.25rem;
-    text-align: center;
-}
-
-.nexus-preview-brand {
-    align-items: center;
-    color: #ffffff;
-    display: flex;
-    font-size: 1.05rem;
-    gap: 0.6rem;
-    justify-content: center;
-    margin-bottom: 1.25rem;
-}
-
-.nexus-preview-brand img { height: 2.5rem; max-width: 10rem; object-fit: contain; }
-
 .nexus-preview-symbol {
     align-items: center;
     background: linear-gradient(135deg, var(--preview-secondary), var(--preview-primary));
@@ -1919,88 +1899,69 @@ body.nexus-client {
     justify-content: center;
     width: 2.3rem;
 }
-
-.nexus-preview-login-card {
-    background: var(--preview-surface);
-    border: 1px solid var(--preview-primary);
-    border-radius: var(--nexus-radius-lg);
-    box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.3);
-    margin: 0 auto 1.15rem;
-    max-width: 20rem;
-    padding: 1.5rem;
-    text-align: left;
-}
-
-.nexus-preview-eyebrow { color: var(--preview-primary); font-size: 0.6rem; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; }
-.nexus-preview-login-card h3 { color: var(--preview-text); font-size: 1.35rem; margin: 0.45rem 0; }
-.nexus-preview-login-card p { color: #6f7288; font-size: 0.72rem; line-height: 1.5; }
-.nexus-preview-label { color: var(--preview-text); display: block; font-size: 0.65rem; font-weight: 700; margin: 0.65rem 0 0.25rem; }
-.nexus-preview-field { background: #f5f6fa; border: 1px solid #d7d9e7; border-radius: var(--nexus-radius); height: 2rem; }
-
-.nexus-preview-login-card button {
-    background: linear-gradient(110deg, var(--preview-secondary), var(--preview-primary));
-    border: 0;
-    border-radius: var(--nexus-radius);
-    color: #0b0a17;
-    font-size: 0.7rem;
-    font-weight: 800;
-    margin-top: 0.85rem;
-    padding: 0.65rem;
-    width: 100%;
-}
-
-.nexus-preview-canvas > small { color: rgba(255, 255, 255, 0.62); }
-.nexus-preview-shell {
-    --preview-sidebar-width: 36%;
-    background: var(--preview-page, #f3f4fa);
-    display: flex;
-    height: 31rem;
-    overflow: hidden;
-}
-.nexus-preview-sidebar { background: var(--preview-sidebar); color: #fff; flex: 0 0 var(--preview-sidebar-width); padding: 0.8rem 0.55rem; transition: flex-basis 180ms ease; }
-.nexus-preview-shell-brand { align-items: center; display: flex; gap: 0.45rem; height: 3rem; justify-content: flex-start; margin-bottom: 0.7rem; overflow: hidden; padding: 0 0.35rem; }
-.nexus-preview-shell-brand img { max-height: 2.35rem; max-width: 100%; object-fit: contain; }
-.nexus-preview-shell-brand > i { align-items: center; background: linear-gradient(135deg,var(--preview-secondary),var(--preview-primary)); border-radius: 0.35rem; color: #111; display: flex; height: 1.7rem; justify-content: center; min-width: 1.7rem; }
-.nexus-preview-shell-brand strong { font-size: 0.7rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.nexus-preview-sidebar > small { color: rgba(255,255,255,.58); display: block; font-size: .48rem; font-weight: 800; letter-spacing: .11em; padding: .65rem .45rem .25rem; text-transform: uppercase; }
-.nexus-preview-sidebar > a { align-items: center; border-radius: .35rem; color: rgba(255,255,255,.82); display: flex; font-size: .62rem; gap: .45rem; margin: .14rem 0; padding: .48rem .5rem; }
-.nexus-preview-shell[data-menu-density="compact"] .nexus-preview-sidebar > a { font-size: .54rem; line-height: 1; margin: 0; padding-bottom: .24rem; padding-top: .24rem; }
-.nexus-preview-shell[data-menu-density="compact"] .nexus-preview-sidebar > small { padding-bottom: .14rem; padding-top: .38rem; }
-.nexus-preview-shell[data-menu-density="spacious"] .nexus-preview-sidebar > a { font-size: .69rem; line-height: 1.35; margin: .28rem 0; padding-bottom: .74rem; padding-top: .74rem; }
-.nexus-preview-shell[data-menu-density="spacious"] .nexus-preview-sidebar > small { padding-bottom: .36rem; padding-top: .88rem; }
-.nexus-preview-shell.is-compact { --preview-sidebar-width: 30% !important; }
-.nexus-preview-shell.is-compact .nexus-preview-sidebar { padding-left: .3rem; padding-right: .3rem; }
-.nexus-preview-shell.is-compact .nexus-preview-sidebar > small { font-size: .4rem; letter-spacing: .07em; padding: .28rem .28rem .1rem; }
-.nexus-preview-shell.is-compact .nexus-preview-sidebar > a { font-size: .52rem; gap: .28rem; line-height: 1; margin: 0; padding: .26rem .32rem; }
-.nexus-preview-shell.is-compact .nexus-preview-sidebar > a i { font-size: .54rem; width: .62rem; }
-.nexus-preview-sidebar > a.active { background: linear-gradient(110deg,var(--preview-secondary),var(--preview-primary)); color: #0b0a17; font-weight: 800; }
-.nexus-preview-shell[data-navigation-style="rail"] .nexus-preview-sidebar > a.active { background: color-mix(in srgb,var(--preview-primary) 14%,transparent); border-left: 4px solid var(--preview-primary); border-radius: 0 .35rem .35rem 0; box-shadow: inset .8rem 0 1rem -.8rem var(--preview-primary); color: #fff; }
-.nexus-preview-shell[data-navigation-style="outline"] .nexus-preview-sidebar > a.active { background: transparent; border: 2px solid var(--preview-primary); color: #fff; }
-.nexus-preview-main { flex: 1 1 auto; min-width: 0; }
-.nexus-preview-main header { align-items: center; background: var(--preview-header); color: var(--preview-header-text); display: flex; gap: .7rem; height: 3.15rem; padding: 0 .8rem; }
-.nexus-preview-shell[data-header-style="gradient"] .nexus-preview-main header { background: linear-gradient(110deg,var(--preview-header) 0%,var(--preview-secondary) 58%,var(--preview-primary) 145%); }
-.nexus-preview-shell[data-header-style="glass"] .nexus-preview-main header { background: linear-gradient(105deg,color-mix(in srgb,var(--preview-header) 70%,transparent),color-mix(in srgb,var(--preview-primary) 22%,transparent)); backdrop-filter: blur(14px) saturate(145%); border-bottom: 1px solid color-mix(in srgb,var(--preview-primary) 45%,transparent); box-shadow: 0 .4rem 1.1rem rgba(0,0,0,.2); }
-.nexus-preview-main header span { flex: 1; }
-.nexus-preview-main header strong { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.22); border-radius: 999px; font-size: .46rem; letter-spacing: .08em; padding: .2rem .38rem; text-transform: uppercase; }
-.nexus-preview-main main { padding: 1.1rem; }
-.nexus-preview-page-heading { background: var(--preview-text); border-radius: .2rem; height: .65rem; opacity: .78; width: 42%; }
-.nexus-preview-stat-grid { display: grid; gap: .55rem; grid-template-columns: repeat(3,1fr); margin: 1rem 0; }
-.nexus-preview-stat-grid i { background: var(--preview-surface); border: 1px solid color-mix(in srgb,var(--preview-text) 15%,transparent); border-radius: .5rem; display: block; height: 4.25rem; }
-.nexus-preview-stat-grid i:first-child { border-top: 3px solid var(--preview-primary); }
-.nexus-preview-stat-grid i:nth-child(2) { border-top: 3px solid var(--preview-secondary); }
-.nexus-preview-content-block { background: var(--preview-surface); border-radius: .55rem; height: 15rem; }
-.nexus-preview-shell[data-content-density="compact"] .nexus-preview-main main { padding: .55rem; }
-.nexus-preview-shell[data-content-density="compact"] .nexus-preview-stat-grid { gap: .3rem; margin: .48rem 0; }
-.nexus-preview-shell[data-content-density="compact"] .nexus-preview-stat-grid i { border-radius: .3rem; height: 2.8rem; }
-.nexus-preview-shell[data-content-density="compact"] .nexus-preview-content-block { border-radius: .35rem; height: 19.2rem; }
-.nexus-preview-shell[data-content-density="spacious"] .nexus-preview-main main { padding: 1.6rem; }
-.nexus-preview-shell[data-content-density="spacious"] .nexus-preview-stat-grid { gap: .85rem; margin: 1.45rem 0; }
-.nexus-preview-shell[data-content-density="spacious"] .nexus-preview-stat-grid i { border-radius: .7rem; height: 5.4rem; }
-.nexus-preview-shell[data-content-density="spacious"] .nexus-preview-content-block { border-radius: .8rem; height: 11.4rem; }
 .nexus-saved-preset-list { border: 1px solid var(--nexus-border); border-radius: var(--nexus-radius); overflow: hidden; }
 .nexus-saved-preset-list > div { align-items: center; display: flex; justify-content: space-between; padding: .45rem .7rem; }
 .nexus-saved-preset-list > div + div { border-top: 1px solid var(--nexus-border); }
 .nexus-json-editor { font-family: var(--nexus-font-data); font-size: 0.82rem; }
+
+.nexus-draft-bar { border-left: 4px solid var(--nexus-success) !important; }
+.nexus-draft-bar-pending { border-left-color: var(--nexus-warning) !important; }
+.nexus-draft-bar .card-body,
+.nexus-draft-state,
+.nexus-draft-actions { align-items: center; display: flex; }
+.nexus-draft-bar .card-body { gap: 1rem; justify-content: space-between; }
+.nexus-draft-state { gap: 0.85rem; min-width: 0; }
+.nexus-draft-state > div { display: flex; flex-direction: column; min-width: 0; }
+.nexus-draft-state strong { color: var(--nexus-text); font-size: 1rem; }
+.nexus-draft-state small { color: var(--nexus-muted); }
+.nexus-draft-state-icon {
+    align-items: center;
+    background: color-mix(in srgb, var(--nexus-warning) 15%, var(--nexus-surface));
+    border-radius: 0.75rem;
+    color: var(--nexus-warning);
+    display: inline-flex;
+    flex: 0 0 2.75rem;
+    height: 2.75rem;
+    justify-content: center;
+}
+.nexus-draft-bar-clean .nexus-draft-state-icon { background: color-mix(in srgb, var(--nexus-success) 14%, var(--nexus-surface)); color: var(--nexus-success); }
+.nexus-draft-actions { gap: 0.55rem; }
+.nexus-draft-actions .form-control { min-width: 13rem; width: 16rem; }
+
+.nexus-preview-surface-tabs { display: grid; gap: 0.35rem; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.nexus-preview-surface-tabs .btn { border-radius: 0.45rem !important; font-size: 0.72rem; padding-left: 0.35rem; padding-right: 0.35rem; }
+.nexus-runtime-preview { background: #202234; }
+.nexus-runtime-preview-panel { background: #202234; }
+.nexus-preview-windowbar span { color: #b9bdd0; font-size: 0.64rem; margin-left: 0.25rem; }
+.nexus-runtime-preview-viewport { background: #e8eaf1; height: 25rem; overflow: hidden; position: relative; }
+.nexus-runtime-preview-frame {
+    background: var(--nexus-page);
+    border: 0;
+    height: 50rem;
+    transform: scale(0.5);
+    transform-origin: left top;
+    width: 200%;
+}
+
+.nexus-draft-comparison,
+.nexus-revision-history { background: var(--nexus-surface-2); border: 1px solid var(--nexus-border); border-radius: var(--nexus-radius-lg); padding: 1rem; }
+.nexus-diff-table { color: var(--nexus-copy); font-size: 0.72rem; }
+.nexus-diff-table th { color: var(--nexus-text); font-weight: 750; text-transform: capitalize; }
+.nexus-diff-table td { max-width: 10rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nexus-revision-list { display: grid; gap: 0.55rem; }
+.nexus-revision-list article { align-items: center; background: var(--nexus-surface); border: 1px solid var(--nexus-border); border-radius: var(--nexus-radius); display: flex; gap: 0.75rem; justify-content: space-between; padding: 0.7rem; }
+.nexus-revision-list article > div { display: flex; flex-direction: column; min-width: 0; }
+.nexus-revision-list strong { color: var(--nexus-text); font-size: 0.78rem; }
+.nexus-revision-list small { color: var(--nexus-muted); font-size: 0.67rem; }
+.nexus-revision-list code { color: var(--nexus-cyan); font-size: 0.62rem; }
+.nexus-revision-diff { margin-top: 0.35rem; }
+.nexus-revision-diff summary { color: var(--nexus-cyan); cursor: pointer; font-size: 0.68rem; font-weight: 750; }
+.nexus-revision-diff ul { border-left: 2px solid var(--nexus-border); list-style: none; margin: 0.45rem 0 0.15rem; max-height: 13rem; overflow: auto; padding-left: 0.65rem; }
+.nexus-revision-diff li { display: grid; font-size: 0.64rem; gap: 0.15rem; grid-template-columns: minmax(7rem, 0.8fr) minmax(10rem, 1.2fr); padding: 0.2rem 0; }
+.nexus-revision-diff li strong { font-size: inherit; overflow-wrap: anywhere; }
+.nexus-revision-diff li span { color: var(--nexus-muted); overflow-wrap: anywhere; }
+.nexus-empty-state { align-items: center; color: var(--nexus-muted); display: flex; font-size: 0.78rem; gap: 0.55rem; padding: 0.65rem 0; }
+.nexus-empty-state i { color: var(--nexus-cyan); }
 
 .nexus-update-card {
     border-top: 3px solid var(--nexus-cyan) !important;
@@ -2061,6 +2022,8 @@ body.nexus-client {
     .nexus-workspace-navigation-note { display: none; }
     .nexus-workspace-heading .card-body { padding-bottom: 1rem; padding-top: 1rem; }
     .nexus-studio-workspace[data-active-section="system"] .nexus-preview-sticky { grid-template-columns: 1fr; }
+    .nexus-runtime-preview-frame { height: 60rem; transform: scale(0.4); width: 250%; }
+    .nexus-runtime-preview-viewport { height: 24rem; }
     .nexus-agent .nexus-ticket-queue-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
@@ -2078,6 +2041,17 @@ body.nexus-client {
     .nexus-manager-metrics .card-body { min-height: 6rem; padding: 0.85rem; }
     .nexus-manager-metrics .h4 { font-size: 1.05rem; overflow-wrap: anywhere; }
     .nexus-manager-metric-icon { height: 2.25rem; width: 2.25rem; }
+
+    .nexus-draft-bar .card-body,
+    .nexus-draft-actions { align-items: stretch; flex-direction: column; }
+    .nexus-draft-actions { width: 100%; }
+    .nexus-draft-actions .btn,
+    .nexus-draft-actions .form-control { min-width: 0; width: 100%; }
+    .nexus-preview-surface-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .nexus-runtime-preview-frame { height: 52rem; transform: scale(0.35); width: 285.714%; }
+    .nexus-runtime-preview-viewport { height: 18.2rem; }
+    .nexus-revision-list article { align-items: stretch; flex-direction: column; }
+    .nexus-revision-list article .btn { width: 100%; }
 
     .nexus-manager-control-row {
         align-items: flex-start;
@@ -2127,12 +2101,6 @@ body.nexus-client {
     .nexus-preview-card .card-header { align-items: flex-start !important; flex-wrap: wrap; gap: 0.75rem; }
     .nexus-preview-card .btn-group { display: flex; width: 100%; }
     .nexus-preview-card .btn-group .btn { flex: 1 1 50%; }
-    .nexus-preview-canvas { min-height: 28rem; padding: 1.35rem 0.8rem 1rem; }
-    .nexus-preview-login-card { max-width: 100%; padding: 1.15rem; }
-    .nexus-preview-shell { height: 26rem; }
-    .nexus-preview-main header { gap: 0.42rem; padding: 0 0.55rem; }
-    .nexus-preview-main main { padding: 0.7rem; }
-
     .nexus-update-card .card-header { align-items: flex-start !important; flex-wrap: wrap; gap: 0.65rem; }
     .nexus-update-versions { grid-template-columns: 1fr; }
     .nexus-update-versions > i { transform: rotate(90deg); }
@@ -2156,12 +2124,6 @@ body.nexus-client {
     .nexus-manager-metrics .text-uppercase { font-size: 0.62rem; }
     .nexus-studio-tabs .nav-link { min-width: 7.15rem; }
     .nexus-workspace-heading .card-body { padding-left: 0.85rem; padding-right: 0.85rem; }
-    .nexus-preview-brand { flex-wrap: wrap; }
-    .nexus-preview-shell { height: 23rem; }
-    .nexus-preview-sidebar { padding-left: 0.3rem; padding-right: 0.3rem; }
-    .nexus-preview-sidebar > a { gap: 0.25rem; padding-left: 0.35rem; padding-right: 0.35rem; }
-    .nexus-preview-main header strong { display: none; }
-
     .nexus-agent .nexus-ticket-queue-heading { align-items: flex-start; flex-direction: column; gap: 0.6rem; }
     .nexus-agent .nexus-ticket-queue-grid { grid-template-columns: 1fr; }
     .nexus-agent .nexus-ticket-queue-live { margin-left: 0; }

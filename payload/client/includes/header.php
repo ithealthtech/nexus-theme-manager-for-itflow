@@ -10,7 +10,8 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
 nexusThemeApplyDueSchedule();
 $nexus_theme_enabled = nexusThemeIsEnabled();
 $nexus_theme_settings = nexusThemeSettings();
-$nexus_brand_name = nexusThemeBrandName($session_company_name, $nexus_theme_settings);
+$nexus_theme_presentation = nexusThemePresentationModel($nexus_theme_settings, $session_company_name);
+$nexus_brand_name = $nexus_theme_presentation['brand'];
 $nexus_logo_url = nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($nexus_theme_settings, $session_company_logo ? '/uploads/settings/' . $session_company_logo : '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['sidebar'])), $nexus_theme_settings);
 $nexus_portal_has_logo = $nexus_theme_enabled && $nexus_theme_settings['branding']['show_portal_logo'] && $nexus_logo_url !== '';
 $nexus_native_favicon = is_file($_SERVER['DOCUMENT_ROOT'] . '/uploads/favicon.ico') ? '/uploads/favicon.ico' : '';
@@ -44,7 +45,7 @@ $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThe
     <?php } ?>
 
 </head>
-<body class="hold-transition <?= $nexus_theme_enabled ? 'nexus-theme nexus-client ' . nexusThemeBodyClasses($nexus_theme_settings) : '' ?>">
+<body class="hold-transition <?= $nexus_theme_enabled ? 'nexus-theme nexus-client ' . $nexus_theme_presentation['body_classes'] : '' ?>">
 <a class="sr-only sr-only-focusable" href="#main-content">Skip to main content</a>
 
 <!-- Navbar -->

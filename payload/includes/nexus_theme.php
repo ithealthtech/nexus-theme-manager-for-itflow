@@ -2,15 +2,19 @@
 
 declare(strict_types=1);
 
-const NEXUS_MANAGER_VERSION = '3.4.1';
-const NEXUS_THEME_VERSION = '26.08.18';
+const NEXUS_MANAGER_VERSION = '3.5.0';
+const NEXUS_THEME_VERSION = '26.08.19';
 const NEXUS_ITFLOW_COMMIT = '89b080b430aaafba5d520c4e52c57b28a9559085';
 const NEXUS_THEME_DISABLED_MARKER = '.nexus-theme-disabled';
 const NEXUS_THEME_SETTINGS_FILE = '.nexus-theme-settings.json';
+const NEXUS_THEME_DRAFT_FILE = '.nexus-theme-draft.json';
 const NEXUS_THEME_PREVIOUS_FILE = '.nexus-theme-settings.previous.json';
+const NEXUS_THEME_REVISIONS_FILE = '.nexus-theme-revisions.json';
+const NEXUS_THEME_STATE_LOCK_FILE = '.nexus-theme-state.lock';
 const NEXUS_THEME_SAVED_PRESETS_FILE = '.nexus-theme-presets.json';
 const NEXUS_THEME_SCHEDULE_FILE = '.nexus-theme-schedule.json';
 const NEXUS_THEME_ASSET_DIRECTORY = 'nexus-theme';
+const NEXUS_THEME_MAX_REVISIONS = 50;
 const NEXUS_THEME_MAX_LOGO_BYTES = 8388608;
 const NEXUS_THEME_MAX_BACKGROUND_BYTES = 8388608;
 const NEXUS_UPDATER_REQUEST_FILE = '.nexus-theme-update-request.json';
@@ -59,6 +63,21 @@ function nexusThemeSettingsPath(?string $root = null): string
 function nexusThemePreviousSettingsPath(?string $root = null): string
 {
     return nexusThemeUploadsPath($root) . DIRECTORY_SEPARATOR . NEXUS_THEME_PREVIOUS_FILE;
+}
+
+function nexusThemeDraftPath(?string $root = null): string
+{
+    return nexusThemeUploadsPath($root) . DIRECTORY_SEPARATOR . NEXUS_THEME_DRAFT_FILE;
+}
+
+function nexusThemeRevisionsPath(?string $root = null): string
+{
+    return nexusThemeUploadsPath($root) . DIRECTORY_SEPARATOR . NEXUS_THEME_REVISIONS_FILE;
+}
+
+function nexusThemeStateLockPath(?string $root = null): string
+{
+    return nexusThemeUploadsPath($root) . DIRECTORY_SEPARATOR . NEXUS_THEME_STATE_LOCK_FILE;
 }
 
 function nexusThemeSavedPresetsPath(?string $root = null): string
@@ -282,7 +301,7 @@ function nexusThemeIsEnabled(?string $root = null): bool
 function nexusThemeControlIsWritable(?string $root = null): bool
 {
     $uploads = nexusThemeUploadsPath($root);
-    $paths = [nexusThemeControlPath($root), nexusThemeSettingsPath($root), nexusThemePreviousSettingsPath($root), nexusThemeSavedPresetsPath($root), nexusThemeSchedulePath($root)];
+    $paths = [nexusThemeControlPath($root), nexusThemeSettingsPath($root), nexusThemeDraftPath($root), nexusThemePreviousSettingsPath($root), nexusThemeRevisionsPath($root), nexusThemeStateLockPath($root), nexusThemeSavedPresetsPath($root), nexusThemeSchedulePath($root)];
     foreach ($paths as $path) {
         if (is_link($path) || (file_exists($path) && !is_writable($path))) {
             return false;
@@ -317,6 +336,31 @@ function nexusThemeAtomicWrite(string $path, string $contents, int $mode = 0640)
         }
     }
     clearstatcache(true, $path);
+}
+
+function nexusThemeWithStateLock(callable $operation, ?string $root = null): mixed
+{
+    $path = nexusThemeStateLockPath($root);
+    if (is_link($path)) {
+        throw new RuntimeException('The Nexus state lock cannot be a symbolic link.');
+    }
+    $handle = @fopen($path, 'c+');
+    if ($handle === false) {
+        throw new RuntimeException('The Nexus state lock could not be opened.');
+    }
+    @chmod($path, 0640);
+    try {
+        if (!flock($handle, LOCK_EX)) {
+            throw new RuntimeException('The Nexus state lock could not be acquired.');
+        }
+        try {
+            return $operation();
+        } finally {
+            flock($handle, LOCK_UN);
+        }
+    } finally {
+        fclose($handle);
+    }
 }
 
 function nexusThemeSetEnabled(bool $enabled, ?string $root = null): void
@@ -385,7 +429,7 @@ function nexusThemeValidateSettings(array $input): array
     foreach (['logo_light_path' => ['logo-light', 'png|jpe?g|webp|gif'], 'logo_dark_path' => ['logo-dark', 'png|jpe?g|webp|gif'], 'favicon_path' => ['favicon', 'png|jpe?g|webp'], 'login_background_path' => ['login-background', 'png|jpe?g|webp']] as $key => [$file, $extensions]) {
         $legacyLogo = $key === 'logo_light_path' ? $result['branding']['logo_path'] : '';
         $result['branding'][$key] = nexusThemeCleanText($input['branding'][$key] ?? $legacyLogo, 180);
-        if ($result['branding'][$key] !== '' && preg_match('#^/uploads/nexus-theme/' . preg_quote($file, '#') . '\\.(?:' . $extensions . ')$#', $result['branding'][$key]) !== 1) {
+        if ($result['branding'][$key] !== '' && preg_match('#^/uploads/nexus-theme/' . preg_quote($file, '#') . '(?:-[a-f0-9]{16})?\\.(?:' . $extensions . ')$#', $result['branding'][$key]) !== 1) {
             $result['branding'][$key] = '';
         }
     }
@@ -438,6 +482,261 @@ function nexusThemeSaveSettings(array $settings, ?string $root = null, bool $sna
     }
     nexusThemeAtomicWrite($settingsPath, $json);
     return $validated;
+}
+
+function nexusThemeDraftSettings(?string $root = null): ?array
+{
+    $path = nexusThemeDraftPath($root);
+    if (!is_file($path) || is_link($path) || filesize($path) > 65536) {
+        return null;
+    }
+    try {
+        $decoded = json_decode((string)file_get_contents($path), true, 32, JSON_THROW_ON_ERROR);
+        return is_array($decoded) ? nexusThemeValidateSettings($decoded) : null;
+    } catch (JsonException) {
+        return null;
+    }
+}
+
+function nexusThemeHasDraft(?string $root = null): bool
+{
+    $draft = nexusThemeDraftSettings($root);
+    return $draft !== null && $draft !== nexusThemeSettings($root);
+}
+
+function nexusThemeDraftVersion(?string $root = null): string
+{
+    $path = nexusThemeDraftPath($root);
+    $hash = is_file($path) && !is_link($path) ? hash_file('sha256', $path) : false;
+    return $hash === false ? 'none' : substr($hash, 0, 16);
+}
+
+function nexusThemeAssertDraftVersion(?string $expectedVersion, ?string $root = null): void
+{
+    if ($expectedVersion !== null && !hash_equals(nexusThemeDraftVersion($root), $expectedVersion)) {
+        throw new RuntimeException('The Nexus draft changed in another administrator session. Reload Theme Studio before continuing.');
+    }
+}
+
+function nexusThemeSaveDraftSettingsUnlocked(array $settings, ?string $root = null, ?string $expectedVersion = null): array
+{
+    nexusThemeAssertDraftVersion($expectedVersion, $root);
+    $validated = nexusThemeValidateSettings($settings);
+    if ($validated === nexusThemeSettings($root)) {
+        nexusThemeDiscardDraftUnlocked($root, $expectedVersion);
+        return $validated;
+    }
+    nexusThemeAtomicWrite(
+        nexusThemeDraftPath($root),
+        json_encode($validated, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n"
+    );
+    nexusThemeCleanupOrphanedAssets($root);
+    return $validated;
+}
+
+function nexusThemeSaveDraftSettings(array $settings, ?string $root = null, ?string $expectedVersion = null): array
+{
+    return nexusThemeWithStateLock(
+        static fn(): array => nexusThemeSaveDraftSettingsUnlocked($settings, $root, $expectedVersion),
+        $root
+    );
+}
+
+function nexusThemeDiscardDraftUnlocked(?string $root = null, ?string $expectedVersion = null): void
+{
+    nexusThemeAssertDraftVersion($expectedVersion, $root);
+    $path = nexusThemeDraftPath($root);
+    if (is_link($path) || (is_file($path) && !@unlink($path))) {
+        throw new RuntimeException('The Nexus draft could not be discarded.');
+    }
+    clearstatcache(true, $path);
+    nexusThemeCleanupOrphanedAssets($root);
+}
+
+function nexusThemeDiscardDraft(?string $root = null, ?string $expectedVersion = null): void
+{
+    nexusThemeWithStateLock(
+        static function () use ($root, $expectedVersion): void {
+            nexusThemeDiscardDraftUnlocked($root, $expectedVersion);
+        },
+        $root
+    );
+}
+
+function nexusThemeSettingsHash(array $settings): string
+{
+    return hash('sha256', json_encode(nexusThemeValidateSettings($settings), JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+}
+
+function nexusThemeFlattenSettings(array $settings, string $prefix = ''): array
+{
+    $flat = [];
+    foreach ($settings as $key => $value) {
+        $path = $prefix === '' ? (string)$key : $prefix . '.' . $key;
+        if (is_array($value)) {
+            $flat += nexusThemeFlattenSettings($value, $path);
+            continue;
+        }
+        if ($path === 'branding.asset_revision' || $path === 'schema') {
+            continue;
+        }
+        $flat[$path] = is_bool($value) ? ($value ? 'Enabled' : 'Disabled') : (string)$value;
+    }
+    ksort($flat);
+    return $flat;
+}
+
+function nexusThemeSettingsDiff(array $from, array $to): array
+{
+    $before = nexusThemeFlattenSettings(nexusThemeValidateSettings($from));
+    $after = nexusThemeFlattenSettings(nexusThemeValidateSettings($to));
+    $changes = [];
+    foreach (array_unique(array_merge(array_keys($before), array_keys($after))) as $path) {
+        $old = $before[$path] ?? '';
+        $new = $after[$path] ?? '';
+        if ($old === $new) {
+            continue;
+        }
+        $changes[] = ['path' => $path, 'before' => $old, 'after' => $new];
+    }
+    return $changes;
+}
+
+function nexusThemeRevisionEntry(array $settings, string $actor, string $action, ?string $createdAt = null): array
+{
+    $validated = nexusThemeValidateSettings($settings);
+    return [
+        'id' => bin2hex(random_bytes(8)),
+        'created_at' => $createdAt ?? gmdate('c'),
+        'actor' => nexusThemeCleanText($actor, 80),
+        'action' => nexusThemeCleanText($action, 120),
+        'hash' => nexusThemeSettingsHash($validated),
+        'settings' => $validated,
+    ];
+}
+
+function nexusThemeRevisions(?string $root = null): array
+{
+    $path = nexusThemeRevisionsPath($root);
+    if (!is_file($path) || is_link($path) || filesize($path) > 2097152) {
+        return [];
+    }
+    try {
+        $decoded = json_decode((string)file_get_contents($path), true, 64, JSON_THROW_ON_ERROR);
+    } catch (JsonException) {
+        return [];
+    }
+    if (($decoded['schema'] ?? null) !== 1 || !is_array($decoded['revisions'] ?? null)) {
+        return [];
+    }
+    $revisions = [];
+    foreach (array_slice($decoded['revisions'], -NEXUS_THEME_MAX_REVISIONS) as $revision) {
+        if (!is_array($revision) || preg_match('/^[a-f0-9]{16}$/', (string)($revision['id'] ?? '')) !== 1 || !is_array($revision['settings'] ?? null)) {
+            continue;
+        }
+        $settings = nexusThemeValidateSettings($revision['settings']);
+        $revisions[] = [
+            'id' => (string)$revision['id'],
+            'created_at' => nexusThemeCleanText($revision['created_at'] ?? '', 40),
+            'actor' => nexusThemeCleanText($revision['actor'] ?? 'Administrator', 80),
+            'action' => nexusThemeCleanText($revision['action'] ?? 'Published design', 120),
+            'hash' => nexusThemeSettingsHash($settings),
+            'settings' => $settings,
+        ];
+    }
+    return $revisions;
+}
+
+function nexusThemeWriteRevisions(array $revisions, ?string $root = null): void
+{
+    nexusThemeAtomicWrite(
+        nexusThemeRevisionsPath($root),
+        json_encode(['schema' => 1, 'revisions' => array_values(array_slice($revisions, -NEXUS_THEME_MAX_REVISIONS))], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n"
+    );
+}
+
+function nexusThemePublishDraft(string $actor = 'Administrator', ?string $root = null, string $summary = 'Published draft', ?string $expectedVersion = null): array
+{
+    return nexusThemeWithStateLock(static function () use ($actor, $root, $summary, $expectedVersion): array {
+        nexusThemeAssertDraftVersion($expectedVersion, $root);
+        $draft = nexusThemeDraftSettings($root);
+        if ($draft === null) {
+            throw new RuntimeException('No unpublished Nexus draft is available.');
+        }
+        $active = nexusThemeSettings($root);
+        if ($draft === $active) {
+            nexusThemeDiscardDraftUnlocked($root, $expectedVersion);
+            throw new RuntimeException('The draft already matches the published design.');
+        }
+
+        $draft['branding']['asset_revision'] = bin2hex(random_bytes(8));
+        $draft = nexusThemeValidateSettings($draft);
+        $revisions = nexusThemeRevisions($root);
+        $activeHash = nexusThemeSettingsHash($active);
+        if (!array_filter($revisions, static fn(array $revision): bool => $revision['hash'] === $activeHash)) {
+            $revisions[] = nexusThemeRevisionEntry($active, $actor, $revisions === [] ? 'Initial published design' : 'Previous published design');
+        }
+        $revisionName = nexusThemeCleanText($summary, 120);
+        $revisions[] = nexusThemeRevisionEntry($draft, $actor, $revisionName !== '' ? $revisionName : 'Published draft');
+
+        // History is prepared first; the live design changes with one atomic settings-file rename.
+        nexusThemeWriteRevisions($revisions, $root);
+        nexusThemeAtomicWrite(nexusThemePreviousSettingsPath($root), json_encode($active, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n");
+        nexusThemeAtomicWrite(nexusThemeSettingsPath($root), json_encode($draft, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n");
+        nexusThemeDiscardDraftUnlocked($root, $expectedVersion);
+        return $draft;
+    }, $root);
+}
+
+function nexusThemeRestoreRevisionToDraft(string $id, ?string $root = null, ?string $expectedVersion = null): array
+{
+    return nexusThemeWithStateLock(static function () use ($id, $root, $expectedVersion): array {
+        nexusThemeAssertDraftVersion($expectedVersion, $root);
+        if (preg_match('/^[a-f0-9]{16}$/', $id) !== 1) {
+            throw new RuntimeException('Invalid Nexus revision identifier.');
+        }
+        foreach (nexusThemeRevisions($root) as $revision) {
+            if ($revision['id'] === $id) {
+                return nexusThemeSaveDraftSettingsUnlocked($revision['settings'], $root, $expectedVersion);
+            }
+        }
+        throw new RuntimeException('The selected Nexus revision no longer exists.');
+    }, $root);
+}
+
+function nexusThemeCleanupOrphanedAssets(?string $root = null): void
+{
+    $directory = nexusThemeAssetPath($root);
+    if (!is_dir($directory) || is_link($directory)) {
+        return;
+    }
+    $referenced = [];
+    $designs = [nexusThemeSettings($root)];
+    $draft = nexusThemeDraftSettings($root);
+    if ($draft !== null) {
+        $designs[] = $draft;
+    }
+    foreach (nexusThemeRevisions($root) as $revision) {
+        $designs[] = $revision['settings'];
+    }
+    foreach ($designs as $design) {
+        foreach (['logo_light_path', 'logo_dark_path', 'favicon_path', 'login_background_path'] as $key) {
+            $path = (string)($design['branding'][$key] ?? '');
+            if (preg_match('#^/uploads/nexus-theme/([^/]+)$#', $path, $matches) === 1) {
+                $referenced[$matches[1]] = true;
+            }
+        }
+    }
+    foreach (new DirectoryIterator($directory) as $item) {
+        if (!$item->isFile() || $item->isLink()) {
+            continue;
+        }
+        $name = $item->getFilename();
+        if (preg_match('/^(?:logo-light|logo-dark|favicon|login-background)-[a-f0-9]{16}\.(?:png|jpe?g|webp|gif)$/', $name) !== 1 || isset($referenced[$name])) {
+            continue;
+        }
+        @unlink($item->getPathname());
+    }
 }
 
 function nexusThemeCanRollback(?string $root = null): bool
@@ -544,7 +843,10 @@ function nexusThemeStoreImage(array $upload, string $slot, ?string $root = null)
         throw new RuntimeException('The Nexus asset directory is not writable.');
     }
 
-    $target = $assetDirectory . DIRECTORY_SEPARATOR . $slot . '.' . $extension;
+    // Immutable filenames keep unpublished uploads isolated from the active design
+    // and allow historical revisions to retain their exact visual assets.
+    $assetId = bin2hex(random_bytes(8));
+    $target = $assetDirectory . DIRECTORY_SEPARATOR . $slot . '-' . $assetId . '.' . $extension;
     if (is_link($target)) {
         throw new RuntimeException('The Nexus image target cannot be a symbolic link.');
     }
@@ -562,13 +864,7 @@ function nexusThemeStoreImage(array $upload, string $slot, ?string $root = null)
             @unlink($staged);
         }
     }
-    foreach (['png', 'jpg', 'jpeg', 'webp', 'gif'] as $oldExtension) {
-        $old = $assetDirectory . DIRECTORY_SEPARATOR . $slot . '.' . $oldExtension;
-        if ($old !== $target && is_file($old) && !is_link($old)) {
-            @unlink($old);
-        }
-    }
-    return '/uploads/' . NEXUS_THEME_ASSET_DIRECTORY . '/' . $slot . '.' . $extension;
+    return '/uploads/' . NEXUS_THEME_ASSET_DIRECTORY . '/' . $slot . '-' . $assetId . '.' . $extension;
 }
 
 function nexusThemeStoreLogo(array $upload, ?string $root = null): string
@@ -618,7 +914,7 @@ function nexusThemeLogoUrl(?array $settings = null, string $fallback = '', strin
 
 function nexusThemeVersionedAssetUrl(string $url, ?array $settings = null): string
 {
-    if ($url === '' || preg_match('#^/uploads/nexus-theme/(?:logo-light|logo-dark|favicon|login-background)\.(?:png|jpe?g|webp|gif)$#', $url) !== 1) {
+    if ($url === '' || preg_match('#^/uploads/nexus-theme/(?:logo-light|logo-dark|favicon|login-background)(?:-[a-f0-9]{16})?\.(?:png|jpe?g|webp|gif)$#', $url) !== 1) {
         return $url;
     }
     $settings ??= nexusThemeSettings();
@@ -703,17 +999,17 @@ function nexusThemeDeletePreset(string $id, ?string $root = null): void
     nexusThemeWriteSavedPresets($presets, $root);
 }
 
-function nexusThemeApplyPreset(string $id, ?string $root = null): array
+function nexusThemeApplyPreset(string $id, ?string $root = null, ?string $expectedVersion = null): array
 {
     foreach (nexusThemeSavedPresets($root) as $preset) {
         if ($preset['id'] !== $id) {
             continue;
         }
-        $current = nexusThemeSettings($root);
+        $current = nexusThemeDraftSettings($root) ?? nexusThemeSettings($root);
         foreach (['logo_path', 'logo_light_path', 'logo_dark_path', 'favicon_path', 'login_background_path', 'asset_revision'] as $asset) {
             $preset['settings']['branding'][$asset] = $current['branding'][$asset];
         }
-        return nexusThemeSaveSettings($preset['settings'], $root);
+        return nexusThemeSaveDraftSettings($preset['settings'], $root, $expectedVersion);
     }
     throw new RuntimeException('The selected preset no longer exists.');
 }
@@ -915,4 +1211,90 @@ function nexusThemeCustomCss(?array $settings = null): string
     }
     $css .= '@media (min-width:992px){.nexus-agent:not(.sidebar-collapse) .main-sidebar{width:var(--nexus-sidebar-width)}.nexus-agent:not(.sidebar-collapse) .content-wrapper,.nexus-agent:not(.sidebar-collapse) .main-header,.nexus-agent:not(.sidebar-collapse) .main-footer{margin-left:var(--nexus-sidebar-width)}}' . "\n";
     return $css;
+}
+
+function nexusThemePresentationModel(array $settings, string $fallbackBrand = 'Nexus MSP'): array
+{
+    $settings = nexusThemeValidateSettings($settings);
+    $brand = nexusThemeBrandName($fallbackBrand, $settings);
+    $authLogo = $settings['branding']['show_login_logo']
+        ? nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($settings, '', nexusThemeLogoVariantForColor($settings['colors']['auth_background'])), $settings)
+        : '';
+    $agentLogo = $settings['branding']['show_agent_logo']
+        ? nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($settings, '', nexusThemeLogoVariantForColor($settings['colors']['header'])), $settings)
+        : '';
+    $portalLogo = $settings['branding']['show_portal_logo']
+        ? nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($settings, '', nexusThemeLogoVariantForColor($settings['colors']['sidebar'])), $settings)
+        : '';
+    return [
+        'settings' => $settings,
+        'brand' => $brand,
+        'tagline' => $settings['branding']['tagline'],
+        'logo_alt' => $settings['branding']['logo_alt'] !== '' ? $settings['branding']['logo_alt'] : $brand . ' logo',
+        'auth_logo' => $authLogo,
+        'agent_logo' => $agentLogo,
+        'portal_logo' => $portalLogo,
+        'body_classes' => nexusThemeBodyClasses($settings),
+        'custom_css' => nexusThemeCustomCss($settings),
+    ];
+}
+
+function nexusThemePreviewDocument(array $settings, string $surface, string $fallbackBrand = 'Nexus MSP'): string
+{
+    if (!in_array($surface, ['auth', 'technician', 'client', 'invoice'], true)) {
+        throw new RuntimeException('Unknown Nexus preview surface.');
+    }
+    $model = nexusThemePresentationModel($settings, $fallbackBrand);
+    $settings = $model['settings'];
+    $e = static fn(mixed $value): string => htmlspecialchars((string)$value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $brand = $e($model['brand']);
+    $tagline = $e($model['tagline']);
+    $classes = $e($model['body_classes']);
+    $logoAlt = $e($model['logo_alt']);
+    $authLogo = $e($model['auth_logo']);
+    $agentLogo = $e($model['agent_logo']);
+    $portalLogo = $e($model['portal_logo']);
+    $customCss = $model['custom_css'];
+    $heading = $e($settings['content']['login_heading']);
+    $eyebrow = $e($settings['content']['login_eyebrow']);
+    $message = nl2br($e($settings['content']['login_message']));
+    $portalHeading = $e($settings['content']['portal_heading']);
+    $portalMessage = nl2br($e($settings['content']['portal_message']));
+
+    $brandImage = static function (string $url, string $alt, string $class = 'img-fluid') use ($e): string {
+        return $url === '' ? '' : '<img class="' . $e($class) . '" src="' . $url . '" alt="' . $alt . '">';
+    };
+
+    if ($surface === 'auth') {
+        $brandMarkup = $authLogo !== ''
+            ? $brandImage($authLogo, $logoAlt)
+            : '<span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i>' . $brand . '</span>';
+        $content = '<body class="hold-transition login-page nexus-theme nexus-auth ' . $classes . '"><div class="login-box">'
+            . '<div class="login-logo ' . ($authLogo !== '' ? 'nexus-auth-brand--logo' : 'nexus-auth-brand--text') . '">' . $brandMarkup . '</div>'
+            . '<div class="card"><div class="card-body login-card-body"><span class="nexus-eyebrow">' . $eyebrow . '</span><h1 class="nexus-auth-title">' . $heading . '</h1><p class="nexus-auth-copy">' . $message . '</p>'
+            . '<label class="nexus-field-label">Email address</label><div class="input-group mb-3"><input class="form-control" value="alex@example.com" readonly><div class="input-group-append"><span class="input-group-text"><i class="fas fa-envelope"></i></span></div></div>'
+            . '<label class="nexus-field-label">Password</label><div class="input-group mb-3"><input class="form-control" value="••••••••" readonly><div class="input-group-append"><span class="input-group-text"><i class="fas fa-lock"></i></span></div></div>'
+            . '<button class="btn btn-primary btn-block">Sign in</button></div></div><p class="nexus-auth-tagline">' . $tagline . '</p></div></body>';
+    } elseif ($surface === 'technician') {
+        $brandMark = $agentLogo !== '' ? '<span class="brand-image"></span>' : '<span class="brand-image"><i class="fas fa-layer-group"></i></span>';
+        $content = '<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed nexus-theme nexus-agent ' . $classes . '"><div class="wrapper text-sm">'
+            . '<aside class="main-sidebar sidebar-dark-primary"><a class="brand-link" href="/agent/dashboard.php">' . $brandMark . '<span class="brand-text font-weight-light">' . $brand . '</span></a><div class="sidebar"><nav class="mt-2"><ul class="nav nav-pills nav-sidebar flex-column">'
+            . '<li class="nav-header">WORKSPACE</li><li class="nav-item"><a class="nav-link active"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a></li><li class="nav-item"><a class="nav-link"><i class="nav-icon fas fa-users"></i><p>Clients</p></a></li><li class="nav-header">SUPPORT</li><li class="nav-item"><a class="nav-link"><i class="nav-icon fas fa-ticket-alt"></i><p>Tickets <span class="right badge badge-info">12</span></p></a></li><li class="nav-item"><a class="nav-link"><i class="nav-icon fas fa-project-diagram"></i><p>Projects</p></a></li></ul></nav></div></aside>'
+            . '<nav class="main-header navbar navbar-expand navbar-dark"><a class="nav-link"><i class="fas fa-bars"></i></a><span class="navbar-text ml-auto">Alex Technician&nbsp; <i class="fas fa-user-circle"></i></span></nav>'
+            . '<div class="content-wrapper"><section class="content-header"><div class="container-fluid"><h1>Ticket queue</h1></div></section><section class="content"><div class="container-fluid"><section class="nexus-ticket-queue-summary"><div class="nexus-ticket-queue-heading"><div><span class="nexus-ticket-queue-kicker">Live operations</span><h2>Ticket queue</h2><p>Current support workload and response health.</p></div><span class="nexus-ticket-queue-live"><i></i> Live</span></div><div class="nexus-ticket-queue-grid">'
+            . '<article class="card nexus-ticket-metric nexus-ticket-metric-open"><div class="card-body"><div><strong>12</strong><span>Open tickets</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-inbox"></i></span></div></article><article class="card nexus-ticket-metric nexus-ticket-metric-waiting"><div class="card-body"><div><strong>3</strong><span>Waiting on client</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-user-clock"></i></span></div></article><article class="card nexus-ticket-metric nexus-ticket-metric-priority"><div class="card-body"><div><strong>2</strong><span>High priority</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-exclamation-triangle"></i></span></div></article><article class="card nexus-ticket-metric nexus-ticket-metric-response"><div class="card-body"><div><strong>18m</strong><span>Median response</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-stopwatch"></i></span></div></article></div></section>'
+            . '<div class="card"><div class="card-header"><strong>Active tickets</strong></div><div class="card-body"><table class="table"><thead><tr><th>Subject</th><th>Client</th><th>Status</th></tr></thead><tbody><tr><td>New employee setup</td><td>Nexus MSP</td><td><span class="badge badge-info">Open</span></td></tr><tr><td>VPN access</td><td>Example Co.</td><td><span class="badge badge-warning">Waiting</span></td></tr></tbody></table></div></div></div></section></div></div></body>';
+    } elseif ($surface === 'client') {
+        $clientBrand = $portalLogo !== '' ? $brandImage($portalLogo, $logoAlt, 'nexus-client-nav-logo') : '<span>' . $brand . '</span>';
+        $content = '<body class="hold-transition nexus-theme nexus-client ' . $classes . '"><nav class="navbar navbar-expand-lg navbar-dark nexus-client-nav"><div class="container"><a class="navbar-brand ' . ($portalLogo !== '' ? 'nexus-client-brand--logo' : 'nexus-client-brand--text') . '">' . $clientBrand . '</a><ul class="navbar-nav mr-auto"><li class="nav-item active"><a class="nav-link">Home</a></li><li class="nav-item"><a class="nav-link">Tickets</a></li><li class="nav-item"><a class="nav-link">Finance</a></li></ul><a class="btn nexus-portal-cta"><i class="fas fa-plus mr-2"></i>Create support request</a></div></nav>'
+            . '<main class="container py-5"><span class="nexus-eyebrow">Client workspace</span><h1>' . $portalHeading . '</h1><p class="lead">' . $portalMessage . '</p><div class="row mt-4"><div class="col-md-4"><div class="card"><div class="card-body"><i class="fas fa-ticket-alt text-info fa-2x mb-3"></i><h2 class="h5">Open tickets</h2><strong class="h2">4</strong></div></div></div><div class="col-md-4"><div class="card"><div class="card-body"><i class="fas fa-file-invoice-dollar text-info fa-2x mb-3"></i><h2 class="h5">Invoices</h2><strong class="h2">2</strong></div></div></div><div class="col-md-4"><div class="card"><div class="card-body"><i class="fas fa-book text-info fa-2x mb-3"></i><h2 class="h5">Documents</h2><strong class="h2">18</strong></div></div></div></div></main></body>';
+    } else {
+        $invoiceBrand = $portalLogo !== '' ? $brandImage($portalLogo, $logoAlt, 'nexus-guest-logo-screen') : '<span class="nexus-preview-symbol"><i class="fas fa-layer-group"></i></span><strong>' . $brand . '</strong>';
+        $content = '<body class="layout-top-nav nexus-theme nexus-guest nexus-guest-invoice ' . $classes . '"><div class="wrapper text-sm"><header class="nexus-guest-masthead"><div class="container nexus-guest-masthead-inner"><span class="nexus-guest-brand">' . $invoiceBrand . '</span><div class="nexus-guest-heading"><span>Secure billing portal</span><strong>Invoice details</strong></div><p class="nexus-guest-tagline">' . $tagline . '</p></div></header><main class="container py-4"><div class="card"><div class="card-header d-flex justify-content-between"><strong>Account balance: $1,240.00</strong><span><button class="btn btn-default btn-sm">Print</button> <button class="btn btn-default btn-sm">Download</button></span></div><div class="card-body"><div class="row"><div class="col-7"><span class="nexus-eyebrow">From</span><h1 class="h3">' . $brand . '</h1><p>Managed technology and support</p></div><div class="col-5 text-right"><span class="nexus-eyebrow">Billing document</span><h2>INVOICE</h2><span class="badge badge-success">Open</span></div></div><hr><table class="table mt-4"><thead><tr><th>Service</th><th>Quantity</th><th class="text-right">Amount</th></tr></thead><tbody><tr><td>Managed services<br><small>Monthly support coverage</small></td><td>1</td><td class="text-right">$1,240.00</td></tr></tbody></table><div class="text-right"><span class="nexus-eyebrow">Balance due</span><div class="h2">$1,240.00</div></div></div></div></main></div></body>';
+    }
+
+    $title = $e(ucfirst($surface) . ' draft preview');
+    return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="/"><title>' . $title . '</title>'
+        . '<link rel="stylesheet" href="/libs/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="/libs/adminlte/css/adminlte.min.css"><link rel="stylesheet" href="/css/nexus-theme.css?v=' . $e(NEXUS_THEME_VERSION) . '">'
+        . '<style>' . $customCss . 'html,body{min-height:100%;overflow:auto}body{margin:0}.nexus-preview-note{display:none}</style></head>' . $content . '</html>';
 }

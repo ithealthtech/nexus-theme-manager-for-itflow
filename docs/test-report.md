@@ -1,8 +1,8 @@
 # Nexus Theme Manager for IT Flow Verification Report
 
 - Date: 2026-08-20
-- Package version: 3.4.1
-- Payload version: 26.08.18
+- Package version: 3.5.0
+- Payload version: 26.08.19
 - Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 - Test runtime: PHP 8.4.24 CLI
 
@@ -17,9 +17,9 @@
 | 22 payload PHP files | Pass |
 | 16 baseline PHP templates | Pass |
 | Three shell entrypoints | Syntax pass |
-| Lifecycle simulation | 206 passed, 0 failed |
+| Lifecycle simulation | 229 passed, 0 failed |
 | GUI updater security suite | 32 passed, 0 failed |
-| Responsive browser checks | Pass at 390px and 768px with no page-level overflow |
+| Responsive browser checks | Pass at 390px and 1280px with no page-level overflow |
 | Manifest payload hashes | 23/23 verified |
 | Manifest baseline hashes | 16/16 verified |
 | Old organization name/domain/internal namespace scan | No matches |
@@ -36,7 +36,9 @@ The automated suite creates isolated ITFlow fixtures and protected state roots, 
 | Exact 23-file install and checksum verification | Pass |
 | Duplicate install refusal | Pass |
 | Administrator web control pause/reactivate | Pass |
-| Customization validation, persistence, CSS generation, presets, and upgrade preservation | Pass |
+| Customization validation, draft isolation, atomic publication, revision history, CSS generation, presets, and upgrade preservation | Pass |
+| Four-surface runtime preview parity and sandbox isolation | Pass |
+| Optimistic concurrency and immutable draft-asset retention | Pass |
 | Raster logo upload acceptance and non-image rejection through isolated HTTP runtime | Pass |
 | Disable restores 16 originals and removes seven theme-owned files | Pass |
 | Enable reapplies the exact payload | Pass |
@@ -82,7 +84,7 @@ The automated package is ready for a staging migration. A production operator mu
 
 1. Back up the ITFlow application and database.
 2. Verify and uninstall version 1.0.0 with its original manager.
-3. Run the Nexus 3.4.1 `doctor` command.
+3. Run the Nexus 3.5.0 `doctor` command.
 4. Install Nexus and reload the PHP/web service gracefully.
-5. Smoke-test login, MFA, password recovery, customer tickets, technician navigation, **Administration → NEXUS → Theme Manager**, customization save/reset, logo upload/removal, pause/reactivate, update check/status, and configured integrations.
+5. Smoke-test login, MFA, password recovery, customer tickets, technician navigation, **Administration → NEXUS → Theme Manager**, Save draft, all four exact previews, Publish, revision comparison/restore/discard, logo upload/removal, pause/reactivate, update check/status, and configured integrations.
 6. Retain the archived 1.0.0 recovery state until acceptance is complete.
