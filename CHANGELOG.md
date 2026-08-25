@@ -2,6 +2,27 @@
 
 All notable changes to this project are documented here.
 
+## [3.7.0] - 2026-08-25
+
+### Added
+
+- Added a server-side design-quality engine that checks contrast, focus visibility, logo alternatives, motion, text scale, touch targets, narrow sidebars, mobile branding, and table behavior.
+- Added direct setting links and conservative one-click corrections that save into the private draft without changing the published design.
+- Expanded exact runtime previews to login, password reset, technician dashboard, ticket queue, client portal, mobile navigation, guest invoice, and printable/PDF invoice surfaces.
+- Added widescreen, laptop, tablet, phone, and draggable custom-width responsive testing with viewport-specific collision and overflow guidance.
+- Added protected known-good revisions, automatic snapshots before publishing, imports, schedules, and updates, plus a sanitized downloadable diagnostic bundle.
+
+### Changed
+
+- Theme Studio now uses eight focused sections, including a dedicated Design Quality workspace.
+- Revision retention preserves pinned known-good designs while trimming ordinary history to the 50-revision limit.
+- Updated the README, compatibility table, installation examples, release screenshot, and release documentation for v3.7.0 / payload 26.08.21.
+
+### Validation
+
+- Expanded lifecycle coverage to 246 assertions, including all eight preview surfaces, quality detection and repair, protected-revision retention, automatic snapshots, and sanitized diagnostics.
+- Re-ran the complete PHP, lifecycle, updater, Linux activation, shell, checksum, responsive-browser, and release-package validation workflows.
+
 ## [3.6.0] - 2026-08-25
 
 ### Added
@@ -395,4 +416,5 @@ All notable changes to this project are documented here.
 [3.0.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.1
 [3.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.0
 [3.5.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.5.0
+[3.7.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.7.0
 [3.6.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.6.0

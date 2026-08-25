@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-const NEXUS_MANAGER_VERSION = '3.6.0';
-const NEXUS_THEME_VERSION = '26.08.20';
+const NEXUS_MANAGER_VERSION = '3.7.0';
+const NEXUS_THEME_VERSION = '26.08.21';
 const NEXUS_ITFLOW_COMMIT = '89b080b430aaafba5d520c4e52c57b28a9559085';
 const NEXUS_THEME_DISABLED_MARKER = '.nexus-theme-disabled';
 const NEXUS_THEME_SETTINGS_FILE = '.nexus-theme-settings.json';
@@ -602,7 +602,7 @@ function nexusThemeSettingsDiff(array $from, array $to): array
     return $changes;
 }
 
-function nexusThemeRevisionEntry(array $settings, string $actor, string $action, ?string $createdAt = null): array
+function nexusThemeRevisionEntry(array $settings, string $actor, string $action, ?string $createdAt = null, bool $pinned = false): array
 {
     $validated = nexusThemeValidateSettings($settings);
     return [
@@ -610,6 +610,7 @@ function nexusThemeRevisionEntry(array $settings, string $actor, string $action,
         'created_at' => $createdAt ?? gmdate('c'),
         'actor' => nexusThemeCleanText($actor, 80),
         'action' => nexusThemeCleanText($action, 120),
+        'pinned' => $pinned,
         'hash' => nexusThemeSettingsHash($validated),
         'settings' => $validated,
     ];
@@ -640,6 +641,7 @@ function nexusThemeRevisions(?string $root = null): array
             'created_at' => nexusThemeCleanText($revision['created_at'] ?? '', 40),
             'actor' => nexusThemeCleanText($revision['actor'] ?? 'Administrator', 80),
             'action' => nexusThemeCleanText($revision['action'] ?? 'Published design', 120),
+            'pinned' => (bool)($revision['pinned'] ?? false),
             'hash' => nexusThemeSettingsHash($settings),
             'settings' => $settings,
         ];
@@ -649,10 +651,51 @@ function nexusThemeRevisions(?string $root = null): array
 
 function nexusThemeWriteRevisions(array $revisions, ?string $root = null): void
 {
+    if (count($revisions) > NEXUS_THEME_MAX_REVISIONS) {
+        $pinned = array_values(array_filter($revisions, static fn(array $revision): bool => (bool)($revision['pinned'] ?? false)));
+        $ordinary = array_values(array_filter($revisions, static fn(array $revision): bool => !(bool)($revision['pinned'] ?? false)));
+        $pinned = array_slice($pinned, -NEXUS_THEME_MAX_REVISIONS);
+        $ordinarySlots = max(0, NEXUS_THEME_MAX_REVISIONS - count($pinned));
+        $revisions = array_merge($pinned, $ordinarySlots > 0 ? array_slice($ordinary, -$ordinarySlots) : []);
+        usort($revisions, static fn(array $left, array $right): int => strcmp((string)$left['created_at'], (string)$right['created_at']));
+    }
     nexusThemeAtomicWrite(
         nexusThemeRevisionsPath($root),
-        json_encode(['schema' => 1, 'revisions' => array_values(array_slice($revisions, -NEXUS_THEME_MAX_REVISIONS))], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n"
+        json_encode(['schema' => 1, 'revisions' => array_values($revisions)], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n"
     );
+}
+
+function nexusThemeSnapshotActive(string $actor, string $action, ?string $root = null, bool $pinned = false): array
+{
+    return nexusThemeWithStateLock(static function () use ($actor, $action, $root, $pinned): array {
+        $revision = nexusThemeRevisionEntry(nexusThemeSettings($root), $actor, $action, null, $pinned);
+        $revisions = nexusThemeRevisions($root);
+        $revisions[] = $revision;
+        nexusThemeWriteRevisions($revisions, $root);
+        return $revision;
+    }, $root);
+}
+
+function nexusThemePinRevision(string $id, bool $pinned, ?string $root = null): array
+{
+    return nexusThemeWithStateLock(static function () use ($id, $pinned, $root): array {
+        if (preg_match('/^[a-f0-9]{16}$/', $id) !== 1) {
+            throw new RuntimeException('Invalid Nexus revision identifier.');
+        }
+        $revisions = nexusThemeRevisions($root);
+        foreach ($revisions as &$revision) {
+            if ($revision['id'] !== $id) {
+                continue;
+            }
+            $revision['pinned'] = $pinned;
+            $updated = $revision;
+            unset($revision);
+            nexusThemeWriteRevisions($revisions, $root);
+            return $updated;
+        }
+        unset($revision);
+        throw new RuntimeException('The selected Nexus revision no longer exists.');
+    }, $root);
 }
 
 function nexusThemePublishDraft(string $actor = 'Administrator', ?string $root = null, string $summary = 'Published draft', ?string $expectedVersion = null): array
@@ -672,11 +715,8 @@ function nexusThemePublishDraft(string $actor = 'Administrator', ?string $root =
         $draft['branding']['asset_revision'] = bin2hex(random_bytes(8));
         $draft = nexusThemeValidateSettings($draft);
         $revisions = nexusThemeRevisions($root);
-        $activeHash = nexusThemeSettingsHash($active);
-        if (!array_filter($revisions, static fn(array $revision): bool => $revision['hash'] === $activeHash)) {
-            $revisions[] = nexusThemeRevisionEntry($active, $actor, $revisions === [] ? 'Initial published design' : 'Previous published design');
-        }
         $revisionName = nexusThemeCleanText($summary, 120);
+        $revisions[] = nexusThemeRevisionEntry($active, $actor, 'Automatic snapshot before publication');
         $revisions[] = nexusThemeRevisionEntry($draft, $actor, $revisionName !== '' ? $revisionName : 'Published draft');
 
         // History is prepared first; the live design changes with one atomic settings-file rename.
@@ -1239,9 +1279,141 @@ function nexusThemePresentationModel(array $settings, string $fallbackBrand = 'N
     ];
 }
 
+function nexusThemeRelativeLuminance(string $hex): float
+{
+    $channels = [];
+    for ($offset = 1; $offset <= 5; $offset += 2) {
+        $channel = hexdec(substr($hex, $offset, 2)) / 255;
+        $channels[] = $channel <= 0.03928 ? $channel / 12.92 : (($channel + 0.055) / 1.055) ** 2.4;
+    }
+    return 0.2126 * $channels[0] + 0.7152 * $channels[1] + 0.0722 * $channels[2];
+}
+
+function nexusThemeContrastRatio(string $first, string $second): float
+{
+    $one = nexusThemeRelativeLuminance(nexusThemeCleanColor($first, '#000000'));
+    $two = nexusThemeRelativeLuminance(nexusThemeCleanColor($second, '#ffffff'));
+    return (max($one, $two) + 0.05) / (min($one, $two) + 0.05);
+}
+
+function nexusThemeAccessibleTextColor(string $background): string
+{
+    return nexusThemeContrastRatio('#ffffff', $background) >= nexusThemeContrastRatio('#0b0a17', $background) ? '#ffffff' : '#0b0a17';
+}
+
+function nexusThemeAccessibleAccent(string $background): string
+{
+    return nexusThemeRelativeLuminance($background) > 0.45 ? '#005fcc' : '#7dd3fc';
+}
+
+function nexusThemeQualityReport(array $settings, int $width = 1440): array
+{
+    $settings = nexusThemeValidateSettings($settings);
+    $width = max(320, min(1920, $width));
+    $colors = $settings['colors'];
+    $findings = [];
+    $add = static function (string $id, string $severity, string $title, string $detail, string $section, string $control, string $surface, ?array $fix = null) use (&$findings): void {
+        $findings[] = compact('id', 'severity', 'title', 'detail', 'section', 'control', 'surface', 'fix');
+    };
+
+    $bodyRatio = nexusThemeContrastRatio($colors['text'], $colors['surface']);
+    if ($bodyRatio < 4.5) {
+        $add('body-contrast', 'error', 'Body text contrast is too low', sprintf('Text and surface contrast is %.2f:1; normal text needs at least 4.5:1.', $bodyRatio), 'colors', 'nexus-color-text', 'all', ['path' => 'colors.text', 'value' => nexusThemeAccessibleTextColor($colors['surface'])]);
+    }
+    $headerRatio = nexusThemeContrastRatio($colors['header_text'], $colors['header']);
+    if ($headerRatio < 4.5) {
+        $add('header-contrast', 'error', 'Header text can disappear', sprintf('Header contrast is %.2f:1.', $headerRatio), 'colors', 'nexus-color-header_text', 'technician', ['path' => 'colors.header_text', 'value' => nexusThemeAccessibleTextColor($colors['header'])]);
+    }
+    $buttonInk = nexusThemeAccessibleTextColor($colors['primary']);
+    $buttonRatio = nexusThemeContrastRatio($colors['primary'], $buttonInk);
+    if ($buttonRatio < 4.5) {
+        $add('active-contrast', 'error', 'Primary and active states need contrast', sprintf('Primary action contrast is %.2f:1.', $buttonRatio), 'colors', 'nexus-color-primary', 'all', ['path' => 'colors.primary', 'value' => nexusThemeAccessibleAccent($colors['surface'])]);
+    }
+    $focusRatio = nexusThemeContrastRatio($colors['primary'], $colors['surface']);
+    if ($focusRatio < 3.0) {
+        $add('focus-contrast', 'warning', 'Focus indicators blend into surfaces', sprintf('The focus color has %.2f:1 contrast; visible component boundaries need 3:1.', $focusRatio), 'colors', 'nexus-color-primary', 'all', ['path' => 'colors.primary', 'value' => nexusThemeAccessibleAccent($colors['surface'])]);
+    }
+    $hasLogo = $settings['branding']['logo_light_path'] !== '' || $settings['branding']['logo_dark_path'] !== '';
+    if ($hasLogo && trim($settings['branding']['logo_alt']) === '') {
+        $alt = trim($settings['branding']['brand_name']) !== '' ? $settings['branding']['brand_name'] : 'Nexus MSP';
+        $add('logo-alt', 'error', 'Uploaded logo is missing alternative text', 'Screen readers need a concise accessible brand name.', 'brand', 'nexus-logo-alt', 'all', ['path' => 'branding.logo_alt', 'value' => $alt]);
+    }
+    if ($settings['appearance']['font_scale'] < 95) {
+        $add('font-scale', 'warning', 'Interface text may be too small', 'The selected interface scale is below the recommended 95% floor.', 'layout', 'nexus-font-scale', 'all', ['path' => 'appearance.font_scale', 'value' => 100]);
+    }
+    if ($settings['appearance']['motion_style'] === 'snappy' && !$settings['appearance']['reduce_motion']) {
+        $add('excess-motion', 'warning', 'High-energy motion has no local reduction', 'Operating-system preferences are respected, but a reduced-motion draft is safer for shared environments.', 'motion', 'nexus-reduce-motion', 'all', ['path' => 'appearance.reduce_motion', 'value' => true]);
+    }
+    if ($settings['appearance']['density'] === 'compact' && $settings['appearance']['font_scale'] < 100) {
+        $add('touch-targets', 'warning', 'Compact controls may miss touch-target guidance', 'Compact density combined with reduced scale can create controls below the recommended touch size.', 'layout', 'nexus-density', 'mobile', ['path' => 'appearance.density', 'value' => 'comfortable']);
+    }
+    if ($width <= 768 && $settings['appearance']['sidebar_width'] > 280 && !$settings['appearance']['sidebar_compact']) {
+        $add('sidebar-collision', 'warning', 'Sidebar can crowd the content area', 'This sidebar width leaves limited room at the selected viewport.', 'layout', 'nexus-sidebar-width', 'technician', ['path' => 'appearance.sidebar_width', 'value' => 250]);
+    }
+    if ($width <= 480 && $hasLogo && $settings['branding']['logo_size'] > 115) {
+        $add('logo-overflow', 'warning', 'Logo may overflow narrow headers', 'The current logo scale is oversized for a phone-width navigation header.', 'brand', 'nexus-logo-size', 'mobile', ['path' => 'branding.logo_size', 'value' => 100]);
+    }
+    if ($width <= 480 && strlen(trim($settings['branding']['brand_name'])) > 24) {
+        $add('brand-truncation', 'info', 'Brand name may truncate on phones', 'Use the mobile preview to confirm the full name remains recognizable.', 'brand', 'nexus-brand-name', 'mobile');
+    }
+    if ($width <= 480) {
+        $add('table-behavior', 'info', 'Wide tables require horizontal access', 'Ticket and invoice tables retain their columns in an independently scrollable region.', 'quality', 'nexus-responsive-width', 'invoice');
+    }
+
+    $counts = ['error' => 0, 'warning' => 0, 'info' => 0];
+    foreach ($findings as $finding) {
+        $counts[$finding['severity']]++;
+    }
+    return ['width' => $width, 'counts' => $counts, 'score' => max(0, 100 - $counts['error'] * 20 - $counts['warning'] * 8), 'findings' => $findings];
+}
+
+function nexusThemeApplyQualityFixes(array $settings, int $width = 390): array
+{
+    $settings = nexusThemeValidateSettings($settings);
+    foreach (nexusThemeQualityReport($settings, $width)['findings'] as $finding) {
+        if (!is_array($finding['fix'] ?? null) || !str_contains((string)$finding['fix']['path'], '.')) {
+            continue;
+        }
+        [$group, $key] = explode('.', (string)$finding['fix']['path'], 2);
+        if (array_key_exists($key, $settings[$group] ?? [])) {
+            $settings[$group][$key] = $finding['fix']['value'];
+        }
+    }
+    return nexusThemeValidateSettings($settings);
+}
+
+function nexusThemeDiagnostics(?string $root = null): array
+{
+    $active = nexusThemeSettings($root);
+    $draft = nexusThemeDraftSettings($root);
+    $assets = [];
+    foreach (['logo_light_path', 'logo_dark_path', 'favicon_path', 'login_background_path'] as $key) {
+        $relative = (string)$active['branding'][$key];
+        $file = $relative !== '' ? nexusThemeDocumentRoot($root) . str_replace('/', DIRECTORY_SEPARATOR, $relative) : '';
+        $assets[$key] = [
+            'configured' => $relative !== '',
+            'extension' => $relative !== '' ? strtolower(pathinfo($relative, PATHINFO_EXTENSION)) : null,
+            'exists' => $file !== '' && is_file($file) && !is_link($file),
+            'bytes' => $file !== '' && is_file($file) ? filesize($file) : null,
+        ];
+    }
+    $revisions = nexusThemeRevisions($root);
+    return [
+        'schema' => 1,
+        'kind' => 'nexus-theme-diagnostics',
+        'generated_at' => gmdate('c'),
+        'versions' => ['manager' => NEXUS_MANAGER_VERSION, 'theme' => NEXUS_THEME_VERSION, 'itflow_commit' => NEXUS_ITFLOW_COMMIT, 'php' => PHP_VERSION],
+        'state' => ['enabled' => nexusThemeIsEnabled($root), 'has_draft' => $draft !== null, 'active_hash' => nexusThemeSettingsHash($active), 'draft_hash' => $draft !== null ? nexusThemeSettingsHash($draft) : null],
+        'quality' => ['desktop' => nexusThemeQualityReport($draft ?? $active, 1440), 'mobile' => nexusThemeQualityReport($draft ?? $active, 390)],
+        'assets' => $assets,
+        'history' => ['revisions' => count($revisions), 'pinned' => count(array_filter($revisions, static fn(array $revision): bool => $revision['pinned']))],
+        'updater' => nexusUpdaterStatus($root),
+    ];
+}
+
 function nexusThemePreviewDocument(array $settings, string $surface, string $fallbackBrand = 'Nexus MSP'): string
 {
-    if (!in_array($surface, ['auth', 'technician', 'client', 'invoice'], true)) {
+    if (!in_array($surface, ['auth', 'reset', 'dashboard', 'technician', 'client', 'mobile', 'invoice', 'print'], true)) {
         throw new RuntimeException('Unknown Nexus preview surface.');
     }
     $model = nexusThemePresentationModel($settings, $fallbackBrand);
@@ -1265,7 +1437,16 @@ function nexusThemePreviewDocument(array $settings, string $surface, string $fal
         return $url === '' ? '' : '<img class="' . $e($class) . '" src="' . $url . '" alt="' . $alt . '">';
     };
 
-    if ($surface === 'auth') {
+    if ($surface === 'reset') {
+        $brandMarkup = $authLogo !== ''
+            ? $brandImage($authLogo, $logoAlt)
+            : '<span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i>' . $brand . '</span>';
+        $content = '<body class="hold-transition login-page nexus-theme nexus-auth ' . $classes . '"><div class="login-box">'
+            . '<div class="login-logo ' . ($authLogo !== '' ? 'nexus-auth-brand--logo' : 'nexus-auth-brand--text') . '">' . $brandMarkup . '</div>'
+            . '<div class="card"><div class="card-body login-card-body"><span class="nexus-eyebrow">Secure account recovery</span><h1 class="nexus-auth-title">Reset your password</h1><p class="nexus-auth-copy">Enter the email address for your portal account and we will send a secure reset link.</p>'
+            . '<label class="nexus-field-label">Email address</label><div class="input-group mb-3"><input class="form-control" value="alex@example.com" readonly><div class="input-group-append"><span class="input-group-text"><i class="fas fa-envelope"></i></span></div></div>'
+            . '<button class="btn btn-primary btn-block">Send reset link</button><p class="text-center mt-3 mb-0"><a>Return to sign in</a></p></div></div><p class="nexus-auth-tagline">' . $tagline . '</p></div></body>';
+    } elseif ($surface === 'auth') {
         $brandMarkup = $authLogo !== ''
             ? $brandImage($authLogo, $logoAlt)
             : '<span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i>' . $brand . '</span>';
@@ -1275,26 +1456,31 @@ function nexusThemePreviewDocument(array $settings, string $surface, string $fal
             . '<label class="nexus-field-label">Email address</label><div class="input-group mb-3"><input class="form-control" value="alex@example.com" readonly><div class="input-group-append"><span class="input-group-text"><i class="fas fa-envelope"></i></span></div></div>'
             . '<label class="nexus-field-label">Password</label><div class="input-group mb-3"><input class="form-control" value="••••••••" readonly><div class="input-group-append"><span class="input-group-text"><i class="fas fa-lock"></i></span></div></div>'
             . '<button class="btn btn-primary btn-block">Sign in</button></div></div><p class="nexus-auth-tagline">' . $tagline . '</p></div></body>';
-    } elseif ($surface === 'technician') {
+    } elseif ($surface === 'dashboard' || $surface === 'technician') {
+        $technicianTitle = $surface === 'dashboard' ? 'Operations dashboard' : 'Ticket queue';
         $brandMark = $agentLogo !== '' ? '<span class="brand-image"></span>' : '<span class="brand-image"><i class="fas fa-layer-group"></i></span>';
         $content = '<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed nexus-theme nexus-agent ' . $classes . '"><div class="wrapper text-sm">'
             . '<aside class="main-sidebar sidebar-dark-primary"><a class="brand-link" href="/agent/dashboard.php">' . $brandMark . '<span class="brand-text font-weight-light">' . $brand . '</span></a><div class="sidebar"><nav class="mt-2"><ul class="nav nav-pills nav-sidebar flex-column">'
             . '<li class="nav-header">WORKSPACE</li><li class="nav-item"><a class="nav-link active"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a></li><li class="nav-item"><a class="nav-link"><i class="nav-icon fas fa-users"></i><p>Clients</p></a></li><li class="nav-header">SUPPORT</li><li class="nav-item"><a class="nav-link"><i class="nav-icon fas fa-ticket-alt"></i><p>Tickets <span class="right badge badge-info">12</span></p></a></li><li class="nav-item"><a class="nav-link"><i class="nav-icon fas fa-project-diagram"></i><p>Projects</p></a></li></ul></nav></div></aside>'
             . '<nav class="main-header navbar navbar-expand navbar-dark"><a class="nav-link"><i class="fas fa-bars"></i></a><span class="navbar-text ml-auto">Alex Technician&nbsp; <i class="fas fa-user-circle"></i></span></nav>'
-            . '<div class="content-wrapper"><section class="content-header"><div class="container-fluid"><h1>Ticket queue</h1></div></section><section class="content"><div class="container-fluid"><section class="nexus-ticket-queue-summary"><div class="nexus-ticket-queue-heading"><div><span class="nexus-ticket-queue-kicker">Live operations</span><h2>Ticket queue</h2><p>Current support workload and response health.</p></div><span class="nexus-ticket-queue-live"><i></i> Live</span></div><div class="nexus-ticket-queue-grid">'
+            . '<div class="content-wrapper"><section class="content-header"><div class="container-fluid"><h1>' . $technicianTitle . '</h1></div></section><section class="content"><div class="container-fluid"><section class="nexus-ticket-queue-summary"><div class="nexus-ticket-queue-heading"><div><span class="nexus-ticket-queue-kicker">Live operations</span><h2>' . $technicianTitle . '</h2><p>Current support workload and response health.</p></div><span class="nexus-ticket-queue-live"><i></i> Live</span></div><div class="nexus-ticket-queue-grid">'
             . '<article class="card nexus-ticket-metric nexus-ticket-metric-open"><div class="card-body"><div><strong>12</strong><span>Open tickets</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-inbox"></i></span></div></article><article class="card nexus-ticket-metric nexus-ticket-metric-waiting"><div class="card-body"><div><strong>3</strong><span>Waiting on client</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-user-clock"></i></span></div></article><article class="card nexus-ticket-metric nexus-ticket-metric-priority"><div class="card-body"><div><strong>2</strong><span>High priority</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-exclamation-triangle"></i></span></div></article><article class="card nexus-ticket-metric nexus-ticket-metric-response"><div class="card-body"><div><strong>18m</strong><span>Median response</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-stopwatch"></i></span></div></article></div></section>'
             . '<div class="card"><div class="card-header"><strong>Active tickets</strong></div><div class="card-body"><table class="table"><thead><tr><th>Subject</th><th>Client</th><th>Status</th></tr></thead><tbody><tr><td>New employee setup</td><td>Nexus MSP</td><td><span class="badge badge-info">Open</span></td></tr><tr><td>VPN access</td><td>Example Co.</td><td><span class="badge badge-warning">Waiting</span></td></tr></tbody></table></div></div></div></section></div></div></body>';
+    } elseif ($surface === 'mobile') {
+        $clientBrand = $portalLogo !== '' ? $brandImage($portalLogo, $logoAlt, 'nexus-client-nav-logo') : '<span>' . $brand . '</span>';
+        $content = '<body class="hold-transition nexus-theme nexus-client nexus-preview-mobile ' . $classes . '"><nav class="navbar navbar-dark nexus-client-nav"><div class="container"><a class="navbar-brand">' . $clientBrand . '</a><button class="navbar-toggler"><i class="fas fa-bars"></i></button></div></nav><aside class="nexus-preview-mobile-menu"><span class="nexus-manager-kicker">Navigation</span><a class="active"><i class="fas fa-home"></i> Home</a><a><i class="fas fa-ticket-alt"></i> Tickets</a><a><i class="fas fa-file-invoice-dollar"></i> Finance</a><a><i class="fas fa-book"></i> Documents</a><button class="btn btn-primary btn-block">Create support request</button></aside><main class="container py-4"><span class="nexus-eyebrow">Phone workspace</span><h1>' . $portalHeading . '</h1><p>' . $portalMessage . '</p></main></body>';
     } elseif ($surface === 'client') {
         $clientBrand = $portalLogo !== '' ? $brandImage($portalLogo, $logoAlt, 'nexus-client-nav-logo') : '<span>' . $brand . '</span>';
         $content = '<body class="hold-transition nexus-theme nexus-client ' . $classes . '"><nav class="navbar navbar-expand-lg navbar-dark nexus-client-nav"><div class="container"><a class="navbar-brand ' . ($portalLogo !== '' ? 'nexus-client-brand--logo' : 'nexus-client-brand--text') . '">' . $clientBrand . '</a><ul class="navbar-nav mr-auto"><li class="nav-item active"><a class="nav-link">Home</a></li><li class="nav-item"><a class="nav-link">Tickets</a></li><li class="nav-item"><a class="nav-link">Finance</a></li></ul><a class="btn nexus-portal-cta"><i class="fas fa-plus mr-2"></i>Create support request</a></div></nav>'
             . '<main class="container py-5"><span class="nexus-eyebrow">Client workspace</span><h1>' . $portalHeading . '</h1><p class="lead">' . $portalMessage . '</p><div class="row mt-4"><div class="col-md-4"><div class="card"><div class="card-body"><i class="fas fa-ticket-alt text-info fa-2x mb-3"></i><h2 class="h5">Open tickets</h2><strong class="h2">4</strong></div></div></div><div class="col-md-4"><div class="card"><div class="card-body"><i class="fas fa-file-invoice-dollar text-info fa-2x mb-3"></i><h2 class="h5">Invoices</h2><strong class="h2">2</strong></div></div></div><div class="col-md-4"><div class="card"><div class="card-body"><i class="fas fa-book text-info fa-2x mb-3"></i><h2 class="h5">Documents</h2><strong class="h2">18</strong></div></div></div></div></main></body>';
     } else {
+        $printPreview = $surface === 'print';
         $invoiceBrand = $portalLogo !== '' ? $brandImage($portalLogo, $logoAlt, 'nexus-guest-logo-screen') : '<span class="nexus-preview-symbol"><i class="fas fa-layer-group"></i></span><strong>' . $brand . '</strong>';
-        $content = '<body class="layout-top-nav nexus-theme nexus-guest nexus-guest-invoice ' . $classes . '"><div class="wrapper text-sm"><header class="nexus-guest-masthead"><div class="container nexus-guest-masthead-inner"><span class="nexus-guest-brand">' . $invoiceBrand . '</span><div class="nexus-guest-heading"><span>Secure billing portal</span><strong>Invoice details</strong></div><p class="nexus-guest-tagline">' . $tagline . '</p></div></header><main class="container py-4"><div class="card"><div class="card-header d-flex justify-content-between"><strong>Account balance: $1,240.00</strong><span><button class="btn btn-default btn-sm">Print</button> <button class="btn btn-default btn-sm">Download</button></span></div><div class="card-body"><div class="row"><div class="col-7"><span class="nexus-eyebrow">From</span><h1 class="h3">' . $brand . '</h1><p>Managed technology and support</p></div><div class="col-5 text-right"><span class="nexus-eyebrow">Billing document</span><h2>INVOICE</h2><span class="badge badge-success">Open</span></div></div><hr><table class="table mt-4"><thead><tr><th>Service</th><th>Quantity</th><th class="text-right">Amount</th></tr></thead><tbody><tr><td>Managed services<br><small>Monthly support coverage</small></td><td>1</td><td class="text-right">$1,240.00</td></tr></tbody></table><div class="text-right"><span class="nexus-eyebrow">Balance due</span><div class="h2">$1,240.00</div></div></div></div></main></div></body>';
+        $content = '<body class="layout-top-nav nexus-theme nexus-guest nexus-guest-invoice ' . ($printPreview ? 'nexus-print-preview ' : '') . $classes . '"><div class="wrapper text-sm"><header class="nexus-guest-masthead"><div class="container nexus-guest-masthead-inner"><span class="nexus-guest-brand">' . $invoiceBrand . '</span><div class="nexus-guest-heading"><span>' . ($printPreview ? 'Printable billing document' : 'Secure billing portal') . '</span><strong>Invoice details</strong></div><p class="nexus-guest-tagline">' . $tagline . '</p></div></header><main class="container py-4"><div class="card"><div class="card-header d-flex justify-content-between"><strong>Account balance: $1,240.00</strong>' . ($printPreview ? '<span class="badge badge-light">Print/PDF preview</span>' : '<span><button class="btn btn-default btn-sm">Print</button> <button class="btn btn-default btn-sm">Download</button></span>') . '</div><div class="card-body"><div class="row"><div class="col-7"><span class="nexus-eyebrow">From</span><h1 class="h3">' . $brand . '</h1><p>Managed technology and support</p></div><div class="col-5 text-right"><span class="nexus-eyebrow">Billing document</span><h2>INVOICE</h2><span class="badge badge-success">Open</span></div></div><hr><table class="table mt-4"><thead><tr><th>Service</th><th>Quantity</th><th class="text-right">Amount</th></tr></thead><tbody><tr><td>Managed services<br><small>Monthly support coverage</small></td><td>1</td><td class="text-right">$1,240.00</td></tr></tbody></table><div class="text-right"><span class="nexus-eyebrow">Balance due</span><div class="h2">$1,240.00</div></div></div></div></main></div></body>';
     }
 
     $title = $e(ucfirst($surface) . ' draft preview');
     return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="/"><title>' . $title . '</title>'
         . '<link rel="stylesheet" href="/libs/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="/libs/adminlte/css/adminlte.min.css"><link rel="stylesheet" href="/css/nexus-theme.css?v=' . $e(NEXUS_THEME_VERSION) . '">'
-        . '<style>' . $customCss . 'html,body{min-height:100%;overflow:auto}body{margin:0}.nexus-preview-note{display:none}</style></head>' . $content . '</html>';
+        . '<style>' . $customCss . 'html,body{min-height:100%;overflow:auto}body{margin:0}.nexus-preview-note{display:none}.nexus-preview-mobile-menu{background:var(--nexus-surface);box-shadow:0 1rem 2.5rem rgba(11,10,23,.18);display:grid;gap:.35rem;margin:1rem;padding:1rem}.nexus-preview-mobile-menu a{border-radius:var(--nexus-radius);color:var(--nexus-text);display:flex;gap:.75rem;padding:.75rem}.nexus-preview-mobile-menu a.active{background:var(--nexus-gradient);color:var(--nexus-primary-contrast)}.nexus-print-preview{background:#fff!important}.nexus-print-preview .card{box-shadow:none}</style></head>' . $content . '</html>';
 }
