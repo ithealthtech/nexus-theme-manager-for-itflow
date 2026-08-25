@@ -1,8 +1,8 @@
 # Lifecycle test report
 
-- Date: 2026-08-20
-- Manager version: 3.5.0
-- Payload version: 26.08.19
+- Date: 2026-08-25
+- Manager version: 3.6.0
+- Payload version: 26.08.20
 - PHP runtime: 8.4.24 CLI
 
 ## Syntax validation
@@ -18,7 +18,7 @@
 
 ## Automated lifecycle simulation
 
-Result: **229 assertions passed, 0 failed**
+Result: **232 assertions passed, 0 failed**
 
 The test creates isolated initialized ITFlow fixtures and state roots, then runs the manager as external CLI processes.
 

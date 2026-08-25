@@ -1833,6 +1833,72 @@ body.nexus-client {
 .nexus-contrast-report.nexus-contrast-warning { border-left-color: var(--nexus-warning); }
 .nexus-contrast-icon { color: var(--nexus-cyan); font-size: 1.2rem; }
 
+.nexus-accessibility-inspector {
+    background: var(--nexus-surface-2);
+    border: 1px solid var(--nexus-border);
+    border-radius: var(--nexus-radius-lg);
+    padding: 1rem;
+}
+
+.nexus-accessibility-grid {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.nexus-accessibility-grid div {
+    background: var(--nexus-surface);
+    border: 1px solid var(--nexus-border);
+    border-radius: var(--nexus-radius);
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: 0.75rem 0.85rem;
+}
+
+.nexus-accessibility-grid span {
+    color: var(--nexus-muted);
+    font-size: 0.64rem;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.nexus-accessibility-grid strong {
+    color: var(--nexus-text);
+    font-size: 1rem;
+}
+
+.nexus-accessibility-grid small,
+.nexus-accessibility-checklist span {
+    color: var(--nexus-muted);
+    font-size: 0.72rem;
+}
+
+.nexus-accessibility-checklist {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.nexus-accessibility-checklist div {
+    align-items: flex-start;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.nexus-accessibility-checklist i { color: var(--nexus-success); margin-top: 0.15rem; }
+
+.nexus-responsive-tester {
+    background: var(--nexus-surface-2);
+    border-top: 1px solid var(--nexus-border);
+    padding: 0.95rem 1rem 0.25rem;
+}
+
+.nexus-responsive-presets .btn {
+    border-radius: 0.35rem !important;
+    flex: 1 1 33.33%;
+}
+
 .nexus-choice-grid {
     display: grid;
     gap: 0.75rem;
@@ -1889,6 +1955,16 @@ body.nexus-client {
 .nexus-preview-windowbar i:nth-child(2) { background: #ffd166; }
 .nexus-preview-windowbar i:nth-child(3) { background: #4fd1a1; }
 
+.nexus-runtime-preview-viewport {
+    background: #e8eaf1;
+    height: 25rem;
+    overflow: hidden;
+    position: relative;
+}
+
+.nexus-runtime-preview-viewport[data-responsive-mode="tablet"] { background: #e4e7ef; }
+.nexus-runtime-preview-viewport[data-responsive-mode="mobile"] { background: #dde1ec; }
+
 .nexus-preview-symbol {
     align-items: center;
     background: linear-gradient(135deg, var(--preview-secondary), var(--preview-primary));
@@ -1938,9 +2014,11 @@ body.nexus-client {
     background: var(--nexus-page);
     border: 0;
     height: 50rem;
-    transform: scale(0.5);
-    transform-origin: left top;
-    width: 200%;
+    left: 50%;
+    position: absolute;
+    transform: translateX(-50%) scale(var(--nexus-preview-scale, 0.5));
+    transform-origin: top center;
+    width: var(--nexus-preview-width, 1440px);
 }
 
 .nexus-draft-comparison,
@@ -2022,8 +2100,8 @@ body.nexus-client {
     .nexus-workspace-navigation-note { display: none; }
     .nexus-workspace-heading .card-body { padding-bottom: 1rem; padding-top: 1rem; }
     .nexus-studio-workspace[data-active-section="system"] .nexus-preview-sticky { grid-template-columns: 1fr; }
-    .nexus-runtime-preview-frame { height: 60rem; transform: scale(0.4); width: 250%; }
     .nexus-runtime-preview-viewport { height: 24rem; }
+    .nexus-accessibility-grid { grid-template-columns: 1fr; }
     .nexus-agent .nexus-ticket-queue-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
@@ -2048,8 +2126,8 @@ body.nexus-client {
     .nexus-draft-actions .btn,
     .nexus-draft-actions .form-control { min-width: 0; width: 100%; }
     .nexus-preview-surface-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .nexus-runtime-preview-frame { height: 52rem; transform: scale(0.35); width: 285.714%; }
     .nexus-runtime-preview-viewport { height: 18.2rem; }
+    .nexus-responsive-tester { padding-left: 0.85rem; padding-right: 0.85rem; }
     .nexus-revision-list article { align-items: stretch; flex-direction: column; }
     .nexus-revision-list article .btn { width: 100%; }
 
@@ -2107,6 +2185,8 @@ body.nexus-client {
     .nexus-update-versions div:last-child { text-align: left; }
     .nexus-manager-command { max-width: 100%; overflow-wrap: anywhere; }
     .nexus-saved-preset-list > div { align-items: flex-start; flex-wrap: wrap; gap: 0.4rem; }
+    .nexus-responsive-presets { flex-direction: column; }
+    .nexus-responsive-presets .btn { flex-basis: auto; width: 100%; }
     .nexus-design-operations .form-row > [class*="col-"] { flex: 0 0 100%; margin-bottom: 0.65rem; max-width: 100%; }
     .nexus-design-operations .d-flex.align-items-center.justify-content-between { align-items: flex-start !important; flex-direction: column; gap: 0.65rem; }
     .nexus-workspace-panel .btn-group.w-100 { display: grid; grid-template-columns: 1fr; }

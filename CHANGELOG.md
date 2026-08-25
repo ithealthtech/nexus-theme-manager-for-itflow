@@ -2,6 +2,24 @@
 
 All notable changes to this project are documented here.
 
+## [3.6.0] - 2026-08-25
+
+### Added
+
+- Added a live accessibility inspector for body and primary-action contrast, reduced-motion state, branding alternatives, login copy, and compact-navigation label hygiene.
+- Added desktop, tablet, mobile, and custom-width responsive testing directly around the exact runtime preview.
+- Added an adjustable viewport-width control with active preset feedback so administrators can inspect each supported surface without leaving Theme Studio.
+
+### Changed
+
+- Runtime preview frames now use shared width and scale variables, keeping all four preview surfaces consistent while the responsive tester changes viewport size.
+- Updated the README, compatibility table, installation examples, release screenshot, and release documentation for v3.6.0 / payload 26.08.20.
+
+### Validation
+
+- Added lifecycle assertions for the accessibility inspector, responsive presets, custom-width control, and shared preview sizing variables.
+- Re-ran the complete PHP, lifecycle, updater, Linux activation, shell, checksum, and release-package validation workflows.
+
 ## [3.5.0] - 2026-08-20
 
 ### Added
@@ -377,3 +395,4 @@ All notable changes to this project are documented here.
 [3.0.1]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.1
 [3.0.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.0.0
 [3.5.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.5.0
+[3.6.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.6.0
