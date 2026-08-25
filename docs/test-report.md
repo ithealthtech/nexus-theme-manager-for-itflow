@@ -1,8 +1,8 @@
 # Nexus Theme Manager for IT Flow Verification Report
 
 - Date: 2026-08-25
-- Package version: 3.9.0
-- Payload version: 26.08.23
+- Package version: 3.9.1
+- Payload version: 26.08.24
 - Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 - Test runtime: PHP 8.3.33 CLI
 
@@ -12,13 +12,18 @@
 |---|---|
 | `manager.php` syntax | Pass |
 | `updater.php` syntax | Pass |
+| `upgrade.php` syntax | Pass |
 | Lifecycle test syntax | Pass |
 | Updater security test syntax | Pass |
+| Command-line upgrade test syntax | Pass |
 | 22 payload PHP files | Pass |
 | 16 baseline PHP templates | Pass |
-| Three shell entrypoints | Syntax pass |
+| 45 unique PHP files | Pass |
+| Four shell entrypoints/tests | Syntax pass |
 | Lifecycle simulation | 272 passed, 0 failed |
-| GUI updater security suite | 35 passed, 0 failed |
+| GUI updater security suite | 38 passed, 0 failed |
+| Command-line package upgrade suite | 8 passed, 0 failed |
+| Full `install-latest.sh` Linux wrapper | Added to required GitHub CI; result pending branch run |
 | Responsive browser checks | Side-by-side desktop/390px preview passed; 1280px shell measured 1265px with no page-level overflow |
 | Manifest payload hashes | 23/23 verified |
 | Manifest baseline hashes | 16/16 verified |
@@ -65,6 +70,8 @@ The automated suite creates isolated ITFlow fixtures and protected state roots, 
 | Emergency disable, native presentation fallback, and managed-file/CSS health gating | Pass |
 | Release version, checksum, archive, manifest, CLI, and no-shell invariants | Pass |
 | systemd filesystem hardening and automatic rollback path | Pass |
+| Verified manager-to-manager command-line upgrade and previous-mode preservation | Pass |
+| Deliberately failed replacement with verified automatic rollback | Pass |
 
 ## Identity and customization verification
 
@@ -94,8 +101,8 @@ The rebrand preserves the previously designed color values and layout behavior w
 The automated package is ready for a staging migration. A production operator must still:
 
 1. Back up the ITFlow application and database.
-2. Verify the v3.9.0 archive and companion SHA-256 file.
-3. Run the Nexus 3.9.0 `doctor` command.
-4. Install through the supported lifecycle or GUI updater and reload the PHP/web service gracefully.
+2. Verify the v3.9.1 archive and companion SHA-256 file.
+3. Run the Nexus 3.9.1 `doctor` command.
+4. Install or update through `install-latest.sh`, the supported lifecycle, or the GUI updater and reload the PHP/web service gracefully.
 5. Smoke-test login, MFA, password recovery, customer tickets, technician navigation, **Administration → NEXUS → Theme Manager**, surface profiles, desktop/mobile navigation ordering and roles, user/system/scheduled dark mode, side-by-side previews, asset crop/resize and GIF/WebP reporting, Save draft, Publish, known-good recovery, emergency disable/reactivate, diagnostics, updater progress/retry/rollback, and configured integrations.
 6. Retain the previous release recovery state until acceptance is complete.

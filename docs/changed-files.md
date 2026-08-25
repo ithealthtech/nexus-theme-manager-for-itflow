@@ -10,6 +10,9 @@ Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 |---|---|---|
 | `updater.php` | Installs/removes the per-instance systemd bridge and executes fixed-policy, checksum-verified Nexus updates with staged progress, health checks, and explicit rollback outcomes | CLI/root only; rejects web execution and arbitrary arguments |
 | `tests/updater.php` | Exercises updater request, progress context, recovery outcome, version, archive, checksum, manifest, argument, and hardening invariants | Test-only |
+| `upgrade.php` | Performs a checksum-preceded manager-to-manager command-line upgrade, preserves active mode, and verifies automatic rollback | CLI only; accepts resolved package/root paths and invokes managers without a shell |
+| `install-latest.sh` | Resolves and verifies the latest release, then installs fresh or invokes the transactional package upgrader for an existing managed installation | Root-only bootstrap; strict semantic versions, fixed repository, downgrade refusal |
+| `tests/upgrade.php` | Exercises successful upgrade, mode preservation, deliberately failed activation, rollback, and post-operation verification | Test-only |
 
 ### Managed ITFlow payload
 

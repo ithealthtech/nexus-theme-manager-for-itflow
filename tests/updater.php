@@ -162,6 +162,9 @@ try {
     updaterExpect(str_contains($source, "'--max-filesize'") && str_contains($source, 'validateExtractedTree'), 'release downloads and extracted trees have protected limits');
     updaterExpect(str_contains($source, 'createUpdateWorkspace($packageRoot)') && !str_contains($source, "rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'nexus-update-'"), 'package activation never relies on a cross-filesystem temporary rename');
     updaterExpect(str_contains($source, "if (\$command === 'repair-service')") && str_contains($installerSource, '--repair-gui-updater'), 'verified bootstrap can repair an existing updater without replacing the active theme');
+    updaterExpect(str_contains($installerSource, 'upgrade_mode="yes"') && str_contains($installerSource, 'upgrade.php') && str_contains($installerSource, 'current-package'), 'verified bootstrap detects and executes a managed command-line upgrade');
+    updaterExpect(str_contains($installerSource, 'version_compare($argv[1], $argv[2])') && str_contains($installerSource, 'downgrade refused'), 'command-line installer refuses same-version replacement and package downgrades');
+    updaterExpect(str_contains($installerSource, '$archive_name.sha256.txt') && str_contains($installerSource, '$archive_name.sha256'), 'bootstrap accepts the established checksum suffix and the v3.9.0 compatibility suffix');
     updaterExpect(str_contains($source, "PHP_SAPI !== 'cli'"), 'privileged updater entrypoint rejects web execution');
     updaterExpect(str_contains($source, 'The previous Nexus version was restored automatically.'), 'failed activation includes an automatic rollback path');
     updaterExpect(str_contains($source, "'phase' => 'download'") && str_contains($source, "'phase' => 'verify'") && str_contains($source, "'phase' => 'health_check'") && str_contains($source, "'phase' => 'finalize'"), 'updater reports download, verification, health-check, and finalization stages');

@@ -9,7 +9,7 @@ usage() {
 Usage: sudo ./install-latest.sh --root PATH [--state-root PATH] [--no-gui-updater] [--repair-gui-updater]
 
 Downloads the latest published Nexus Theme Manager release from GitHub,
-verifies its SHA-256 checksum, extracts it under /opt, and installs it.
+verifies its SHA-256 checksum, and installs or upgrades it under /opt.
 
 Options:
   --root PATH        ITFlow application root (required)
@@ -28,6 +28,23 @@ fail() {
 
 require_command() {
     command -v "$1" >/dev/null 2>&1 || fail "Required command not found: $1"
+}
+
+read_json_string() {
+    json_file=$1
+    json_key=$2
+    php -r '
+        try {
+            $data = json_decode((string) file_get_contents($argv[1]), true, 512, JSON_THROW_ON_ERROR);
+            $value = $data[$argv[2]] ?? null;
+            if (!is_string($value) || $value === "") {
+                exit(3);
+            }
+            fwrite(STDOUT, $value);
+        } catch (Throwable $error) {
+            exit(4);
+        }
+    ' "$json_file" "$json_key"
 }
 
 itflow_root=""
@@ -85,9 +102,7 @@ instance_id=$(printf '%s' "$resolved_itflow_root" | sha256sum | cut -c1-16)
 effective_state_root=${state_root:-/var/lib/nexus-itflow-theme}
 existing_state="$effective_state_root/$instance_id/state.json"
 
-if [ "$repair_gui_updater" = "no" ]; then
-    [ ! -f "$existing_state" ] || fail "An existing managed Nexus installation was detected. Use manager.php from the currently installed Nexus version to verify and uninstall it, then rerun this installer."
-elif [ "$gui_updater" = "no" ]; then
+if [ "$repair_gui_updater" = "yes" ] && [ "$gui_updater" = "no" ]; then
     fail "--repair-gui-updater cannot be combined with --no-gui-updater"
 fi
 
@@ -105,21 +120,23 @@ case "$release_tag" in
 esac
 
 release_version=${release_tag#v}
+php -r 'exit(preg_match("/^\\d+\\.\\d+\\.\\d+$/", $argv[1]) === 1 ? 0 : 1);' "$release_version" ||
+    fail "Latest release tag is not a strict semantic version: $release_tag"
 asset_name="Nexus-Theme-Manager-for-ITFlow-$release_version"
 archive_name="$asset_name.zip"
 checksum_name="$archive_name.sha256.txt"
 download_url="$RELEASES_URL/download/$release_tag"
 install_directory="/opt/$asset_name"
 
-if [ "$repair_gui_updater" = "no" ]; then
-    [ ! -e "$install_directory" ] || fail "Destination already exists: $install_directory"
-fi
-
 printf 'Downloading Nexus Theme Manager %s...\n' "$release_version"
 curl --fail --silent --show-error --location \
     --output "$temporary_directory/$archive_name" "$download_url/$archive_name"
-curl --fail --silent --show-error --location \
-    --output "$temporary_directory/$checksum_name" "$download_url/$checksum_name"
+if ! curl --fail --silent --show-error --location \
+    --output "$temporary_directory/$checksum_name" "$download_url/$checksum_name"; then
+    checksum_name="$archive_name.sha256"
+    curl --fail --silent --show-error --location \
+        --output "$temporary_directory/$checksum_name" "$download_url/$checksum_name"
+fi
 
 printf 'Verifying the release checksum...\n'
 (
@@ -146,6 +163,48 @@ if [ "$repair_gui_updater" = "yes" ]; then
     exit 0
 fi
 
+upgrade_mode="no"
+current_package=""
+current_version=""
+current_mode=""
+if [ -f "$existing_state" ]; then
+    current_version=$(read_json_string "$existing_state" package_version) ||
+        fail "Existing Nexus state does not contain a valid package version: $existing_state"
+    current_mode=$(read_json_string "$existing_state" mode) ||
+        fail "Existing Nexus state does not contain a valid active/disabled mode: $existing_state"
+    case "$current_mode" in
+        enabled|disabled) ;;
+        *) fail "Existing Nexus state contains an unsupported mode: $current_mode" ;;
+    esac
+
+    version_relation=$(php -r 'fwrite(STDOUT, (string) version_compare($argv[1], $argv[2]));' "$release_version" "$current_version")
+    case "$version_relation" in
+        1) upgrade_mode="yes" ;;
+        0)
+            printf 'Nexus Theme Manager %s is already installed. No update is required.\n' "$current_version"
+            exit 0
+            ;;
+        -1) fail "Installed Nexus $current_version is newer than latest published release $release_version; downgrade refused" ;;
+        *) fail "Could not compare installed and published Nexus versions" ;;
+    esac
+
+    updater_config="/etc/nexus-theme-manager/$instance_id.json"
+    if [ -f "$updater_config" ]; then
+        current_package=$(read_json_string "$updater_config" package_directory) ||
+            fail "Existing GUI updater configuration does not contain a valid package directory: $updater_config"
+    else
+        current_package="/opt/Nexus-Theme-Manager-for-ITFlow-$current_version"
+    fi
+    [ -f "$current_package/manager.php" ] ||
+        fail "The installed Nexus $current_version package was not found at $current_package"
+    recorded_package_version=$(read_json_string "$current_package/manifest.json" package_version) ||
+        fail "The current Nexus package manifest is invalid: $current_package/manifest.json"
+    [ "$recorded_package_version" = "$current_version" ] ||
+        fail "Existing state reports Nexus $current_version but $current_package contains $recorded_package_version"
+fi
+
+[ ! -e "$install_directory" ] || fail "Destination already exists: $install_directory"
+
 mv "$temporary_directory/extracted/$asset_name" "$install_directory"
 
 run_manager() {
@@ -160,15 +219,34 @@ run_manager() {
     fi
 }
 
-printf 'Running compatibility preflight...\n'
-run_manager doctor
+if [ "$upgrade_mode" = "yes" ]; then
+    printf 'Upgrading Nexus Theme Manager %s to %s...\n' "$current_version" "$release_version"
+    if [ -n "$state_root" ]; then
+        if ! php "$install_directory/upgrade.php" --root "$itflow_root" --current-package "$current_package" --state-root "$state_root" --yes; then
+            case "$install_directory" in
+                /opt/Nexus-Theme-Manager-for-ITFlow-[0-9]*.[0-9]*.[0-9]*) rm -rf -- "$install_directory" ;;
+                *) fail "Upgrade failed and the verified replacement package requires manual review: $install_directory" ;;
+            esac
+            fail "Upgrade failed; review the verified rollback result above"
+        fi
+    elif ! php "$install_directory/upgrade.php" --root "$itflow_root" --current-package "$current_package" --yes; then
+        case "$install_directory" in
+            /opt/Nexus-Theme-Manager-for-ITFlow-[0-9]*.[0-9]*.[0-9]*) rm -rf -- "$install_directory" ;;
+            *) fail "Upgrade failed and the verified replacement package requires manual review: $install_directory" ;;
+        esac
+        fail "Upgrade failed; review the verified rollback result above"
+    fi
+else
+    printf 'Running compatibility preflight...\n'
+    run_manager doctor
 
-printf 'Installing Nexus Theme Manager %s...\n' "$release_version"
-run_manager install --yes
+    printf 'Installing Nexus Theme Manager %s...\n' "$release_version"
+    run_manager install --yes
 
-printf 'Verifying the installation...\n'
-run_manager verify
-run_manager status
+    printf 'Verifying the installation...\n'
+    run_manager verify
+    run_manager status
+fi
 
 if [ "$gui_updater" = "yes" ]; then
     printf 'Installing the protected GUI updater service...\n'
@@ -181,5 +259,9 @@ if [ "$gui_updater" = "yes" ]; then
     fi
 fi
 
-printf '\nInstalled Nexus Theme Manager %s from %s.\n' "$release_version" "$install_directory"
+if [ "$upgrade_mode" = "yes" ]; then
+    printf '\nUpdated Nexus Theme Manager from %s to %s using %s.\n' "$current_version" "$release_version" "$install_directory"
+else
+    printf '\nInstalled Nexus Theme Manager %s from %s.\n' "$release_version" "$install_directory"
+fi
 printf 'Reload the web/PHP service gracefully, then smoke-test the ITFlow interfaces.\n'
