@@ -1888,6 +1888,49 @@ body.nexus-client {
 
 .nexus-accessibility-checklist i { color: var(--nexus-success); margin-top: 0.15rem; }
 
+.nexus-quality-score {
+    align-items: center;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--nexus-cyan) 10%, var(--nexus-surface)), var(--nexus-surface));
+    border: 1px solid var(--nexus-border);
+    border-radius: var(--nexus-radius-lg);
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+}
+
+.nexus-quality-score > div:first-child { display: grid; }
+.nexus-quality-score > div:first-child > strong { color: var(--nexus-text); font-size: 2rem; line-height: 1; }
+.nexus-quality-score > div:first-child > small { color: var(--nexus-muted); margin-top: 0.35rem; }
+.nexus-quality-counts { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: flex-end; }
+.nexus-quality-findings { display: grid; gap: 0.65rem; }
+
+.nexus-quality-finding {
+    align-items: center;
+    background: var(--nexus-surface-2);
+    border: 1px solid var(--nexus-border);
+    border-left: 4px solid var(--nexus-info);
+    border-radius: var(--nexus-radius);
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    padding: 0.8rem;
+}
+
+.nexus-quality-finding-error { border-left-color: var(--nexus-danger); }
+.nexus-quality-finding-warning { border-left-color: var(--nexus-warning); }
+.nexus-quality-finding-icon { color: var(--nexus-info); font-size: 1rem; }
+.nexus-quality-finding-error .nexus-quality-finding-icon { color: var(--nexus-danger); }
+.nexus-quality-finding-warning .nexus-quality-finding-icon { color: var(--nexus-warning); }
+.nexus-quality-finding strong { color: var(--nexus-text); display: block; }
+.nexus-quality-finding p { color: var(--nexus-copy); font-size: 0.78rem; line-height: 1.45; margin: 0.2rem 0; }
+.nexus-quality-finding small { color: var(--nexus-muted); text-transform: capitalize; }
+.nexus-quality-actions { align-items: center; background: var(--nexus-night); border-radius: var(--nexus-radius-lg); color: #fff; display: flex; gap: 1rem; justify-content: space-between; padding: 1rem; }
+.nexus-quality-actions small { color: var(--nexus-muted-dark); display: block; margin-top: 0.2rem; }
+.nexus-quality-control-highlight { box-shadow: var(--nexus-focus) !important; transition: box-shadow 160ms ease; }
+.nexus-revision-actions { display: flex; flex: 0 0 auto; gap: 0.35rem; }
+.nexus-system-tool-grid { display: grid; gap: 0.45rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.nexus-responsive-alerts { min-height: 1.5rem; }
+
 .nexus-responsive-tester {
     background: var(--nexus-surface-2);
     border-top: 1px solid var(--nexus-border);
@@ -1964,6 +2007,8 @@ body.nexus-client {
 
 .nexus-runtime-preview-viewport[data-responsive-mode="tablet"] { background: #e4e7ef; }
 .nexus-runtime-preview-viewport[data-responsive-mode="mobile"] { background: #dde1ec; }
+.nexus-runtime-preview-viewport[data-responsive-mode="phone"] { background: #dde1ec; }
+.nexus-runtime-preview-viewport[data-responsive-mode="widescreen"] { background: #eef0f6; }
 
 .nexus-preview-symbol {
     align-items: center;
@@ -2005,6 +2050,7 @@ body.nexus-client {
 .nexus-draft-actions .form-control { min-width: 13rem; width: 16rem; }
 
 .nexus-preview-surface-tabs { display: grid; gap: 0.35rem; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.nexus-preview-surface-tabs-expanded { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .nexus-preview-surface-tabs .btn { border-radius: 0.45rem !important; font-size: 0.72rem; padding-left: 0.35rem; padding-right: 0.35rem; }
 .nexus-runtime-preview { background: #202234; }
 .nexus-runtime-preview-panel { background: #202234; }
@@ -2128,6 +2174,14 @@ body.nexus-client {
     .nexus-preview-surface-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .nexus-runtime-preview-viewport { height: 18.2rem; }
     .nexus-responsive-tester { padding-left: 0.85rem; padding-right: 0.85rem; }
+    .nexus-quality-score,
+    .nexus-quality-actions { align-items: stretch; flex-direction: column; }
+    .nexus-quality-counts { justify-content: flex-start; }
+    .nexus-quality-finding { align-items: start; grid-template-columns: auto minmax(0, 1fr); }
+    .nexus-quality-finding .btn { grid-column: 1 / -1; width: 100%; }
+    .nexus-revision-actions { width: 100%; }
+    .nexus-revision-actions .btn { flex: 1 1 0; }
+    .nexus-system-tool-grid { grid-template-columns: 1fr; }
     .nexus-revision-list article { align-items: stretch; flex-direction: column; }
     .nexus-revision-list article .btn { width: 100%; }
 

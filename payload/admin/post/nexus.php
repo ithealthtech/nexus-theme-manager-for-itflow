@@ -7,6 +7,49 @@ $nexusRedirect = static function (): never {
     exit;
 };
 
+if (isset($_POST['nexus_diagnostics_download'])) {
+    validateCSRFToken();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
+    $diagnostics = nexusThemeDiagnostics();
+    header('Content-Type: application/json; charset=utf-8');
+    header('Content-Disposition: attachment; filename="nexus-theme-diagnostics-' . gmdate('Ymd-His') . '.json"');
+    header('Cache-Control: no-store');
+    echo json_encode($diagnostics, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . "\n";
+    exit;
+}
+
+if (isset($_POST['nexus_quality_fix'])) {
+    validateCSRFToken();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
+    try {
+        $width = max(320, min(1920, (int)($_POST['nexus_quality_width'] ?? 390)));
+        $current = nexusThemeDraftSettings() ?? nexusThemeSettings();
+        $fixed = nexusThemeApplyQualityFixes($current, $width);
+        nexusThemeSaveDraftSettings($fixed, null, (string)($_POST['nexus_draft_version'] ?? 'none'));
+        logAudit('Nexus Theme Manager', 'Edit', "$session_name applied safe Nexus quality corrections to the draft");
+        flashAlert('Safe accessibility and responsive corrections saved to the private draft. Review every preview before publishing.');
+    } catch (Throwable $error) {
+        logApp('Nexus Theme Manager', 'error', $error->getMessage());
+        flashAlert('Nexus could not apply quality corrections: ' . escapeHtml($error->getMessage()), 'error');
+    }
+    $nexusRedirect();
+}
+
+if (isset($_POST['nexus_revision_pin'])) {
+    validateCSRFToken();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
+    try {
+        $pinned = (string)$_POST['nexus_revision_pin'] === '1';
+        nexusThemePinRevision((string)($_POST['nexus_revision_id'] ?? ''), $pinned);
+        logAudit('Nexus Theme Manager', 'Edit', "$session_name " . ($pinned ? 'pinned' : 'unpinned') . ' a Nexus known-good revision');
+        flashAlert($pinned ? 'Revision protected as a known-good design.' : 'Known-good protection removed from the revision.');
+    } catch (Throwable $error) {
+        logApp('Nexus Theme Manager', 'error', $error->getMessage());
+        flashAlert('Nexus could not update revision protection: ' . escapeHtml($error->getMessage()), 'error');
+    }
+    $nexusRedirect();
+}
+
 if (isset($_POST['nexus_theme_state'])) {
     validateCSRFToken();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
@@ -133,6 +176,7 @@ if (isset($_POST['nexus_preset_action'])) {
             nexusThemeDeletePreset($id);
             $message = 'Theme preset deleted.';
         } elseif ($action === 'import') {
+            nexusThemeSnapshotActive((string)$session_name, 'Automatic snapshot before preset import');
             $count = nexusThemeImportPresets((string)($_POST['nexus_presets_json'] ?? ''));
             $message = $count . ' theme preset' . ($count === 1 ? '' : 's') . ' imported.';
         } else {
@@ -156,6 +200,7 @@ if (isset($_POST['nexus_schedule_command'])) {
             nexusThemeCancelSchedule();
             $message = 'Scheduled theme action cancelled.';
         } elseif ($command === 'set') {
+            nexusThemeSnapshotActive((string)$session_name, 'Automatic snapshot before scheduled activation');
             $schedule = nexusThemeSetSchedule((string)($_POST['nexus_schedule_action'] ?? ''), (string)($_POST['nexus_schedule_at'] ?? ''));
             $message = 'Theme ' . ($schedule['action'] === 'enable' ? 'activation' : 'pause') . ' scheduled for ' . $schedule['activate_at'] . '.';
         } else {
@@ -191,6 +236,9 @@ if (isset($_POST['nexus_update_action'])) {
 
     try {
         $action = (string)$_POST['nexus_update_action'];
+        if ($action === 'update') {
+            nexusThemeSnapshotActive((string)$session_name, 'Automatic snapshot before Nexus update', null, true);
+        }
         nexusUpdaterQueue($action);
         $label = $action === 'update' ? 'installation' : 'update check';
         logAudit('Nexus Theme Manager', 'Edit', "$session_name queued a protected Nexus $label");
@@ -216,6 +264,7 @@ if (isset($_POST['nexus_theme_import'])) {
         foreach (['logo_path', 'logo_light_path', 'logo_dark_path', 'favicon_path', 'login_background_path', 'asset_revision'] as $asset) {
             $decoded['branding'][$asset] = $current['branding'][$asset];
         }
+        nexusThemeSnapshotActive((string)$session_name, 'Automatic snapshot before configuration import');
         nexusThemeSaveDraftSettings($decoded, null, (string)($_POST['nexus_draft_version'] ?? 'none'));
         logAudit('Nexus Theme Manager', 'Edit', "$session_name imported a Nexus theme draft");
         flashAlert('Nexus configuration imported as a draft. Review and publish when ready.');
