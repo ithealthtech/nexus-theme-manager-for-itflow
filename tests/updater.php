@@ -164,6 +164,9 @@ try {
     updaterExpect(str_contains($source, "if (\$command === 'repair-service')") && str_contains($installerSource, '--repair-gui-updater'), 'verified bootstrap can repair an existing updater without replacing the active theme');
     updaterExpect(str_contains($source, "PHP_SAPI !== 'cli'"), 'privileged updater entrypoint rejects web execution');
     updaterExpect(str_contains($source, 'The previous Nexus version was restored automatically.'), 'failed activation includes an automatic rollback path');
+    updaterExpect(str_contains($source, "'phase' => 'download'") && str_contains($source, "'phase' => 'verify'") && str_contains($source, "'phase' => 'health_check'") && str_contains($source, "'phase' => 'finalize'"), 'updater reports download, verification, health-check, and finalization stages');
+    updaterExpect(str_contains($source, "'rollback_state' => 'restored'") && str_contains($source, "'rollback_state' => 'failed'") && str_contains($source, "'can_retry' => false"), 'updater distinguishes successful recovery from rollback failures');
+    updaterExpect(str_contains($source, '], $this->activeRequest, $extra)') && str_contains($source, '$this->lastProgress'), 'updater preserves request context and bounded progress across status writes');
     updaterExpect(!str_contains($source, 'shell_exec(') && !preg_match('/\bexec\s*\(/', $source), 'updater does not invoke a command shell');
 
     fwrite(STDOUT, "\nUpdater test result: $passes assertions passed, 0 failed.\n");

@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "package_id": "org.nexus-theme-manager.itflow",
-  "package_version": "3.8.0",
-  "theme_version": "26.08.22",
+  "package_version": "3.9.0",
+  "theme_version": "26.08.23",
   "name": "Nexus Theme Manager for IT Flow",
   "vendor": "Nexus Theme Manager contributors",
   "compatible_itflow": {
@@ -12,7 +12,7 @@
   "files": [
     {
       "path": "includes/nexus_theme.php",
-      "payload_sha256": "2a0a13f5f86e6cff42b04a4471fe1838551f5aa51be74bdad19ae058e81696e6",
+      "payload_sha256": "33d3b083e70f506c45faa41d7a4baa10886e89440bf405692216af3be80e12ed",
       "baseline_sha256": null,
       "php": true
     },
@@ -24,7 +24,7 @@
     },
     {
       "path": "css/nexus-theme.css",
-      "payload_sha256": "cb465483a713e1764af9a8f0803fca15098a00bdb62cd647edfc6bd66beaef1c",
+      "payload_sha256": "08d6c27563a67792f9f35cd15bfcb3ffd9efd8b27847795ee1597251586be4df",
       "baseline_sha256": null,
       "php": false
     },
@@ -36,13 +36,13 @@
     },
     {
       "path": "admin/nexus.php",
-      "payload_sha256": "195fd71282f68aa90c6455e23e6ae2f1a32233186418775f27f74d0cafb6b9dd",
+      "payload_sha256": "2eff4cf3edb5d99fa338fff12ca768205b7b79a651046ccf13c74daa68d6aec5",
       "baseline_sha256": null,
       "php": true
     },
     {
       "path": "admin/post/nexus.php",
-      "payload_sha256": "b9e65e87c9469b6ff276dc434b57baba2ac56a5e43f06474b867b318a7f10ead",
+      "payload_sha256": "8412b0ab9857ea604e005d3dc4a9ef3d10cd07b80127275ac931199d3d34a559",
       "baseline_sha256": null,
       "php": true
     },

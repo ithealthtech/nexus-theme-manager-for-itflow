@@ -8,8 +8,8 @@ Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 
 | File | Purpose | Privilege boundary |
 |---|---|---|
-| `updater.php` | Installs/removes the per-instance systemd bridge and executes fixed-policy, checksum-verified Nexus updates with rollback | CLI/root only; rejects web execution and arbitrary arguments |
-| `tests/updater.php` | Exercises updater request, version, archive, checksum, manifest, argument, and hardening invariants | Test-only |
+| `updater.php` | Installs/removes the per-instance systemd bridge and executes fixed-policy, checksum-verified Nexus updates with staged progress, health checks, and explicit rollback outcomes | CLI/root only; rejects web execution and arbitrary arguments |
+| `tests/updater.php` | Exercises updater request, progress context, recovery outcome, version, archive, checksum, manifest, argument, and hardening invariants | Test-only |
 
 ### Managed ITFlow payload
 
@@ -19,8 +19,8 @@ Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 | `css/nexus-theme-custom.php` | CSP-compatible same-origin stylesheet generated exclusively from validated settings | Low |
 | `includes/nexus_theme.php` | Presentation state, allow-listed customization, atomic drafts/publishing, protected revisions and snapshots, accessibility/responsive quality checks, sanitized diagnostics, eight preview documents, palette derivation, inspected raster-asset storage, and fixed update request/status helpers | Low |
 | `includes/nexus_invoice_pdf.php` | Pure escaped Nexus invoice-document HTML builder for ITFlow's bundled TCPDF runtime | Low |
-| `admin/nexus.php` | Administrator-only Theme Studio with focused sub-navigation, exact eight-surface previews, responsive testing, design-quality findings and remediation links, responsive branding, protected revisions, presets, scheduling, diagnostics, import/export, reset, and update actions | Low |
-| `admin/post/nexus.php` | CSRF-protected state, settings, assets, quality fixes, revision pinning, automatic snapshots, diagnostics, presets, schedule, rollback, import/reset, and allow-listed update queue actions with audit/application logging | Low |
+| `admin/nexus.php` | Administrator-only Theme Studio with focused sub-navigation, exact eight-surface previews, responsive testing, design-quality findings, responsive branding, protected revisions, presets, scheduling, diagnostics, and a live staged updater with recovery controls | Low |
+| `admin/post/nexus.php` | CSRF-protected state, settings, assets, quality fixes, revision pinning, automatic snapshots, diagnostics, presets, schedule, rollback, import/reset, and allow-listed update/retry queue actions with audit/application logging | Low |
 | `guest/nexus_invoice_pdf.php` | URL-key-validated themed invoice download endpoint; redirects to ITFlow's original renderer whenever Nexus presentation is paused | Medium |
 
 ## Edited

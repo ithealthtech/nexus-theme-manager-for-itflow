@@ -2,6 +2,26 @@
 
 All notable changes to this project are documented here.
 
+## [3.9.0] - 2026-08-25
+
+### Added
+
+- Added a six-stage updater timeline covering release discovery, download, checksum verification, current-version protection, installation, and application health checks.
+- Added live updater status polling so progress changes in place without reloading Theme Studio or losing the active workspace.
+- Added bounded progress percentages, clear phase labels, recovery guidance, release-note links, and a safe retry action that repeats only the previous allow-listed operation.
+- Added explicit rollback reporting that distinguishes a verified automatic restore from a rollback requiring manual attention.
+
+### Changed
+
+- The protected updater now preserves request context across status writes and reports staging, transition, health-check, finalization, and updater-registration failures separately.
+- Update actions return to a temporary watch view in Updates & System and stop polling after the new terminal result arrives.
+- Updater controls and progress stages collapse into a touch-friendly single-column layout on phones.
+
+### Validation
+
+- Expanded lifecycle coverage to 257 assertions and updater security coverage to 35 assertions.
+- Verified running, completed, recovery, and retry layouts at desktop and 390px phone widths with no horizontal overflow.
+
 ## [3.8.0] - 2026-08-25
 
 ### Added
@@ -440,4 +460,5 @@ All notable changes to this project are documented here.
 [3.5.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.5.0
 [3.7.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.7.0
 [3.8.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.8.0
+[3.9.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.9.0
 [3.6.0]: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v3.6.0

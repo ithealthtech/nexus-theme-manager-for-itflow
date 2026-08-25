@@ -6,7 +6,8 @@ $nexusRedirect = static function (): never {
     $allowedSections = ['brand', 'colors', 'layout', 'quality', 'motion', 'content', 'operations', 'system'];
     $returnSection = (string)($_POST['nexus_return_section'] ?? '');
     $fragment = in_array($returnSection, $allowedSections, true) ? '#nexus-' . $returnSection : '';
-    header('Location: /admin/nexus.php' . $fragment);
+    $query = isset($_POST['nexus_update_action']) ? '?updater=watch' : '';
+    header('Location: /admin/nexus.php' . $query . $fragment);
     exit;
 };
 

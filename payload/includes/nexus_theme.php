@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-const NEXUS_MANAGER_VERSION = '3.8.0';
-const NEXUS_THEME_VERSION = '26.08.22';
+const NEXUS_MANAGER_VERSION = '3.9.0';
+const NEXUS_THEME_VERSION = '26.08.23';
 const NEXUS_ITFLOW_COMMIT = '89b080b430aaafba5d520c4e52c57b28a9559085';
 const NEXUS_THEME_DISABLED_MARKER = '.nexus-theme-disabled';
 const NEXUS_THEME_SETTINGS_FILE = '.nexus-theme-settings.json';
@@ -136,6 +136,12 @@ function nexusUpdaterStatus(?string $root = null): array
         'updated_at' => null,
         'release_url' => null,
         'phase' => null,
+        'phase_label' => nexusUpdaterReady($root) ? 'Ready' : 'Setup required',
+        'progress' => 0,
+        'action' => null,
+        'can_retry' => false,
+        'recovery' => null,
+        'rollback_state' => null,
     ];
     $saved = nexusUpdaterReadJson(NEXUS_UPDATER_STATUS_FILE, $root);
     if ($saved === null) {
@@ -146,9 +152,11 @@ function nexusUpdaterStatus(?string $root = null): array
     $updatedAt = nexusThemeCleanText($saved['updated_at'] ?? '', 40);
     $updatedTimestamp = $updatedAt !== '' ? strtotime($updatedAt) : false;
     $message = nexusThemeCleanText($saved['message'] ?? $fallback['message'], 280);
+    $stale = false;
     if (in_array($state, ['checking', 'running'], true)
         && ($updatedTimestamp === false || $updatedTimestamp < time() - 1200)) {
         $state = 'failed';
+        $stale = true;
         $message = 'The updater stopped reporting progress. Check the systemd service log, then retry.';
     }
     $version = static function (mixed $value): ?string {
@@ -159,6 +167,36 @@ function nexusUpdaterStatus(?string $root = null): array
     if (!str_starts_with($releaseUrl, 'https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v')) {
         $releaseUrl = '';
     }
+    $phaseLabels = [
+        'checking' => 'Checking release',
+        'check_complete' => 'Check complete',
+        'download' => 'Downloading package',
+        'verify' => 'Verifying release',
+        'stage' => 'Staging package',
+        'backup' => 'Protecting current version',
+        'transition' => 'Preparing transition',
+        'install' => 'Installing Nexus',
+        'health_check' => 'Running health checks',
+        'finalize' => 'Finalizing update',
+        'complete' => 'Update complete',
+        'rollback' => 'Restoring previous version',
+        'rollback_complete' => 'Previous version restored',
+        'rollback_failed' => 'Rollback needs attention',
+        'registration_failed' => 'Updater repair required',
+        'failed' => 'Update stopped',
+    ];
+    $phase = (string)($saved['phase'] ?? '');
+    if (!array_key_exists($phase, $phaseLabels)) {
+        $phase = '';
+    }
+    $defaultProgress = in_array($state, ['update_available', 'up_to_date', 'completed'], true) ? 100 : 0;
+    $progress = is_int($saved['progress'] ?? null) ? max(0, min(100, $saved['progress'])) : $defaultProgress;
+    $action = in_array($saved['action'] ?? '', ['check', 'update'], true) ? $saved['action'] : null;
+    $rollbackState = in_array($saved['rollback_state'] ?? '', ['restored', 'failed'], true) ? $saved['rollback_state'] : null;
+    $recovery = nexusThemeCleanText($saved['recovery'] ?? '', 320);
+    if ($stale && $recovery === '') {
+        $recovery = 'The protected updater stopped reporting. Confirm the service is available, then retry the previous action.';
+    }
     return [
         'state' => $state,
         'message' => $message,
@@ -166,7 +204,13 @@ function nexusUpdaterStatus(?string $root = null): array
         'latest_version' => $version($saved['latest_version'] ?? ''),
         'updated_at' => $updatedAt,
         'release_url' => $releaseUrl !== '' ? $releaseUrl : null,
-        'phase' => nexusThemeCleanText($saved['phase'] ?? '', 32),
+        'phase' => $phase !== '' ? $phase : null,
+        'phase_label' => $phase !== '' ? $phaseLabels[$phase] : ucfirst(str_replace('_', ' ', $state)),
+        'progress' => $progress,
+        'action' => $action,
+        'can_retry' => $stale || ($saved['can_retry'] ?? false) === true,
+        'recovery' => $recovery !== '' ? $recovery : null,
+        'rollback_state' => $rollbackState,
     ];
 }
 

@@ -1,8 +1,8 @@
 # Lifecycle test report
 
 - Date: 2026-08-25
-- Manager version: 3.8.0
-- Payload version: 26.08.22
+- Manager version: 3.9.0
+- Payload version: 26.08.23
 - PHP runtime: 8.3.33 CLI
 
 ## Syntax validation
@@ -18,7 +18,7 @@
 
 ## Automated lifecycle simulation
 
-Result: **254 assertions passed, 0 failed**
+Result: **257 assertions passed, 0 failed**
 
 The test creates isolated initialized ITFlow fixtures and state roots, then runs the manager as external CLI processes.
 
@@ -45,6 +45,7 @@ The test creates isolated initialized ITFlow fixtures and state roots, then runs
 | Immutable draft branding assets and orphan cleanup | Pass |
 | Customization survives CLI disable | Pass |
 | GUI updater setup requirement, allow-listed request queue, status sanitization, and busy-state refusal | Pass |
+| Live updater status, bounded stage progress, recovery metadata, and retry routing | Pass |
 | Stale updater progress becomes a recoverable failure state | Pass |
 | CLI disable clears the web presentation-state marker | Pass |
 | Disable restores 16 originals | Pass |

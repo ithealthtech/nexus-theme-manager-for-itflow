@@ -20,6 +20,10 @@ final class NexusUpdater
     private string $curl;
     private string $unzip;
     private string $systemctl;
+    private array $activeRequest = [];
+    private array $failureContext = [];
+    private int $lastProgress = 0;
+    private ?string $lastPhase = null;
 
     public function __construct(string $configPath)
     {
@@ -54,12 +58,16 @@ final class NexusUpdater
                 return;
             }
             $request = self::validateRequest(self::readJsonFile($requestPath, 4096));
+            $this->activeRequest = [
+                'request_id' => $request['request_id'],
+                'action' => $request['action'],
+            ];
             if (!@unlink($requestPath)) {
                 throw new NexusUpdaterException('The queued update request could not be claimed.');
             }
             $this->writeStatus('checking', 'Checking GitHub for the latest verified Nexus release.', [
-                'request_id' => $request['request_id'],
-                'action' => $request['action'],
+                'phase' => 'checking',
+                'progress' => 10,
             ]);
 
             $release = $this->resolveLatestRelease();
@@ -73,6 +81,8 @@ final class NexusUpdater
                     'current_version' => $current,
                     'latest_version' => $release['version'],
                     'release_url' => $release['release_url'],
+                    'phase' => 'check_complete',
+                    'progress' => 100,
                 ]);
                 return;
             }
@@ -83,6 +93,8 @@ final class NexusUpdater
                     'current_version' => $current,
                     'latest_version' => $release['version'],
                     'release_url' => $release['release_url'],
+                    'phase' => 'check_complete',
+                    'progress' => 100,
                 ]);
                 return;
             }
@@ -92,12 +104,17 @@ final class NexusUpdater
                 'current_version' => $current,
                 'latest_version' => $release['version'],
                 'phase' => 'download',
+                'progress' => 15,
             ]);
             $this->performUpdate($release, $request['request_id']);
         } catch (Throwable $error) {
-            $this->writeStatus('failed', 'Update failed: ' . $error->getMessage(), [
+            $this->writeStatus('failed', 'Update failed: ' . $error->getMessage(), array_merge([
                 'current_version' => $this->config['package_version'] ?? null,
-            ]);
+                'phase' => $this->lastPhase ?? 'failed',
+                'progress' => $this->lastProgress,
+                'can_retry' => true,
+                'recovery' => 'Review the failure detail and updater service log, then retry the same action.',
+            ], $this->failureContext));
             throw $error;
         } finally {
             flock($lock, LOCK_UN);
@@ -125,10 +142,22 @@ final class NexusUpdater
             $checksum = $temporaryRoot . DIRECTORY_SEPARATOR . $release['checksum_name'];
             $this->download($release['download_base'] . '/' . $release['archive_name'], $archive, 67108864);
             $this->download($release['download_base'] . '/' . $release['checksum_name'], $checksum, 4096);
+            $this->writeStatus('running', 'Download complete. Verifying the signed release checksum and archive layout.', [
+                'current_version' => $this->config['package_version'],
+                'latest_version' => $release['version'],
+                'phase' => 'verify',
+                'progress' => 30,
+            ]);
             self::verifyReleaseChecksum($checksum, $archive, $release['archive_name']);
 
             $entries = preg_split('/\r?\n/', trim($this->runProcess([$this->unzip, '-Z1', $archive]))) ?: [];
             self::validateArchiveEntries($entries, $release['asset_name']);
+            $this->writeStatus('running', 'Release verified. Staging the protected package under /opt.', [
+                'current_version' => $this->config['package_version'],
+                'latest_version' => $release['version'],
+                'phase' => 'stage',
+                'progress' => 42,
+            ]);
             $extractRoot = $temporaryRoot . DIRECTORY_SEPARATOR . 'extracted';
             if (!mkdir($extractRoot, 0700, true)) {
                 throw new NexusUpdaterException('The release extraction directory could not be created.');
@@ -154,8 +183,15 @@ final class NexusUpdater
                 'current_version' => $this->config['package_version'],
                 'latest_version' => $release['version'],
                 'phase' => 'backup',
+                'progress' => 55,
             ]);
             $this->runManager($oldManager, 'verify');
+            $this->writeStatus('running', 'Current installation verified. Preparing the clean version transition.', [
+                'current_version' => $this->config['package_version'],
+                'latest_version' => $release['version'],
+                'phase' => 'transition',
+                'progress' => 65,
+            ]);
             $this->runManager($oldManager, 'uninstall', ['--yes']);
             $uninstalled = true;
 
@@ -164,14 +200,27 @@ final class NexusUpdater
                 'current_version' => $this->config['package_version'],
                 'latest_version' => $release['version'],
                 'phase' => 'install',
+                'progress' => 75,
             ]);
             $newManager = $newPackage . DIRECTORY_SEPARATOR . 'manager.php';
             $this->runManager($newManager, 'doctor');
             $newActivationAttempted = true;
             $this->runManager($newManager, 'install', ['--yes']);
+            $this->writeStatus('running', 'Nexus is installed. Running managed-file and application health checks.', [
+                'current_version' => $this->config['package_version'],
+                'latest_version' => $release['version'],
+                'phase' => 'health_check',
+                'progress' => 88,
+            ]);
             $this->runManager($newManager, 'verify');
             $newInstalled = true;
 
+            $this->writeStatus('running', 'Health checks passed. Finalizing updater registration.', [
+                'current_version' => $release['version'],
+                'latest_version' => $release['version'],
+                'phase' => 'finalize',
+                'progress' => 96,
+            ]);
             $this->config['package_directory'] = $newPackage;
             $this->config['package_version'] = $release['version'];
             $this->config['updated_at'] = gmdate('c');
@@ -184,13 +233,29 @@ final class NexusUpdater
                 'latest_version' => $release['version'],
                 'release_url' => $release['release_url'],
                 'phase' => 'complete',
+                'progress' => 100,
+                'can_retry' => false,
             ]);
         } catch (Throwable $error) {
             if ($newInstalled) {
+                $this->failureContext = [
+                    'current_version' => $release['version'],
+                    'latest_version' => $release['version'],
+                    'phase' => 'registration_failed',
+                    'progress' => 100,
+                    'can_retry' => false,
+                    'recovery' => 'The new Nexus version is active. Repair the protected GUI updater registration before attempting another update.',
+                ];
                 throw new NexusUpdaterException('Nexus ' . $release['version'] . ' is installed and verified, but GUI updater registration failed: ' . $error->getMessage());
             }
             if ($uninstalled && !$newInstalled) {
                 try {
+                    $this->writeStatus('running', 'Installation did not complete. Restoring the previous verified Nexus version.', [
+                        'current_version' => $this->config['package_version'],
+                        'latest_version' => $release['version'],
+                        'phase' => 'rollback',
+                        'progress' => 90,
+                    ]);
                     if ($newActivationAttempted && is_string($newPackage)) {
                         try {
                             $this->runManager($newPackage . DIRECTORY_SEPARATOR . 'manager.php', 'uninstall', ['--yes']);
@@ -204,11 +269,25 @@ final class NexusUpdater
                     if (is_string($newPackage) && is_dir($newPackage)) {
                         self::removeTree($newPackage, $packageRoot);
                     }
+                    $this->failureContext = [
+                        'phase' => 'rollback_complete',
+                        'progress' => 100,
+                        'rollback_state' => 'restored',
+                        'can_retry' => true,
+                        'recovery' => 'The previous Nexus version was restored and verified. Review the failure detail, then retry when ready.',
+                    ];
                     throw new NexusUpdaterException($error->getMessage() . ' The previous Nexus version was restored automatically.');
                 } catch (NexusUpdaterException $rollbackError) {
                     if (str_contains($rollbackError->getMessage(), 'restored automatically')) {
                         throw $rollbackError;
                     }
+                    $this->failureContext = [
+                        'phase' => 'rollback_failed',
+                        'progress' => 100,
+                        'rollback_state' => 'failed',
+                        'can_retry' => false,
+                        'recovery' => 'Automatic rollback failed. Restore or verify the previous package from SSH before queuing another GUI update.',
+                    ];
                     throw new NexusUpdaterException($error->getMessage() . ' Automatic rollback also failed: ' . $rollbackError->getMessage());
                 }
             }
@@ -312,12 +391,19 @@ final class NexusUpdater
 
     private function writeStatus(string $state, string $message, array $extra = []): void
     {
+        if (isset($extra['progress']) && is_numeric($extra['progress'])) {
+            $this->lastProgress = max(0, min(100, (int)$extra['progress']));
+            $extra['progress'] = $this->lastProgress;
+        }
+        if (isset($extra['phase']) && is_string($extra['phase'])) {
+            $this->lastPhase = $extra['phase'];
+        }
         self::atomicJsonWrite($this->statusPath(), array_merge([
             'schema' => NEXUS_UPDATER_SCHEMA,
             'state' => $state,
             'message' => $message,
             'updated_at' => gmdate('c'),
-        ], $extra), 0644);
+        ], $this->activeRequest, $extra), 0644);
     }
 
     private function writeReadyMarker(): void

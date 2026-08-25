@@ -128,7 +128,9 @@ try {
     expect(str_contains($adminPostSource, 'validateCSRFToken()'), 'administration action validates the ITFlow CSRF token');
     expect(!preg_match('/\\b(?:exec|shell_exec|system|passthru|proc_open)\\s*\\(/', $adminPostSource), 'administration action cannot launch lifecycle shell commands');
     expect(str_contains($adminPostSource, "['brand', 'colors', 'layout', 'quality', 'motion', 'content', 'operations', 'system']") && str_contains($adminPostSource, "'#nexus-' . \$returnSection"), 'administration actions can return only to an allow-listed Theme Studio section');
-    expect(substr_count($adminPageSource, 'name="nexus_return_section" value="system"') === 2, 'both updater forms return to the System and Updates section');
+    expect(substr_count($adminPageSource, 'name="nexus_return_section" value="system"') === 3 && str_contains($adminPostSource, "'?updater=watch'"), 'check, install, and retry actions return to the live System and Updates workspace');
+    expect(str_contains($adminPageSource, "isset(\$_GET['nexus_update_status'])") && str_contains($adminPageSource, "fetch('/admin/nexus.php?nexus_update_status=1'") && !str_contains($adminPageSource, 'window.location.reload()'), 'Theme Studio polls protected updater status without disruptive page reloads');
+    expect(str_contains($adminPageSource, 'id="nexus-update-timeline"') && str_contains($adminPageSource, 'id="nexus-update-retry-button"') && str_contains($themeCssSource, '.nexus-update-timeline li.is-active'), 'updater UI exposes stage progress, recovery guidance, and safe retry controls');
     expect(str_contains($adminNavSource, '/admin/nexus.php'), 'administration navigation exposes the Nexus Theme Manager');
     expect(str_contains($adminNavSource, 'brand-link nexus-admin-back') && str_contains($themeCssSource, '.nexus-agent .main-sidebar .nexus-admin-back'), 'administration return navigation uses the compact Nexus treatment');
     expect(str_contains($adminNavSource, 'NEXUS_MANAGER_VERSION'), 'administration navigation reports the installed manager version');
@@ -448,10 +450,16 @@ try {
         'current_version' => '2.5.1',
         'latest_version' => '3.0.0',
         'release_url' => 'https://evil.invalid/release',
+        'phase' => 'install',
+        'progress' => 140,
+        'action' => 'update',
+        'can_retry' => true,
+        'recovery' => '<b>Retry safely</b>',
         'updated_at' => gmdate('c'),
     ], JSON_THROW_ON_ERROR));
     $runningUpdate = nexusUpdaterStatus($fixture);
     expect($runningUpdate['message'] === 'Installing' && $runningUpdate['release_url'] === null, 'GUI updater sanitizes privileged-service status before display');
+    expect($runningUpdate['phase'] === 'install' && $runningUpdate['phase_label'] === 'Installing Nexus' && $runningUpdate['progress'] === 100 && $runningUpdate['action'] === 'update' && $runningUpdate['can_retry'] && $runningUpdate['recovery'] === 'Retry safely', 'GUI updater normalizes stage progress and recovery metadata');
     try {
         nexusUpdaterQueue('update', $fixture);
         throw new RuntimeException('busy queue unexpectedly accepted');
@@ -464,7 +472,8 @@ try {
         'message' => 'Installing',
         'updated_at' => gmdate('c', time() - 1800),
     ], JSON_THROW_ON_ERROR));
-    expect(nexusUpdaterStatus($fixture)['state'] === 'failed', 'GUI updater turns stale progress into a recoverable failure state');
+    $staleUpdate = nexusUpdaterStatus($fixture);
+    expect($staleUpdate['state'] === 'failed' && $staleUpdate['can_retry'] && $staleUpdate['recovery'] !== null, 'GUI updater turns stale progress into a recoverable retry state');
 
     runManager($manager, array_merge(['verify'], $common), 0);
     [$statusJson] = runManager($manager, array_merge(['status'], $common, ['--json']), 0);
