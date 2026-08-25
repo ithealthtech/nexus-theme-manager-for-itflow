@@ -48,6 +48,27 @@
     -webkit-font-smoothing: antialiased;
 }
 
+/* Theme Studio v3.9 design-system controls */
+.nexus-asset-health-grid { display:grid; gap:.75rem; grid-template-columns:repeat(2,minmax(0,1fr)); margin-top:1rem; }
+.nexus-asset-health-grid > div { background:var(--nexus-surface-2); border:1px solid var(--nexus-border); border-radius:var(--nexus-radius); display:flex; flex-direction:column; padding:.8rem; }
+.nexus-favicon-preview { align-items:center; background:var(--nexus-surface-2); border:1px solid var(--nexus-border); border-radius:.55rem; display:inline-flex; gap:.7rem; padding:.55rem .8rem; }
+.nexus-favicon-preview img { height:24px; object-fit:contain; width:24px; }
+.nexus-profile-card { border:1px solid var(--nexus-border)!important; box-shadow:none!important; margin-bottom:.65rem; }
+.nexus-profile-card .card-header { background:var(--nexus-surface-2); padding:.8rem 1rem; }
+.nexus-profile-color { min-height:2.6rem!important; padding:.25rem!important; }
+.nexus-navigation-builder { display:grid; gap:.5rem; margin-top:.65rem; }
+.nexus-navigation-row { align-items:center; background:var(--nexus-surface-2); border:1px solid var(--nexus-border); border-radius:var(--nexus-radius); display:grid; gap:.45rem; grid-template-columns:auto auto minmax(8rem,1fr) minmax(7rem,.7fr) auto auto auto; padding:.55rem; }
+.nexus-navigation-row label { align-items:center; display:flex; font-size:.74rem; gap:.25rem; margin:0; white-space:nowrap; }
+.nexus-preview-comparison { display:grid; gap:.65rem; grid-template-columns:minmax(0,1fr) minmax(130px,.34fr); padding:.65rem; }
+.nexus-preview-comparison > div > small { display:block; font-weight:700; margin:0 0 .35rem; text-transform:uppercase; }
+.nexus-preview-phone .nexus-runtime-preview-viewport { border:2px solid var(--nexus-night); border-radius:1rem; }
+.nexus-recovery-card { border-left:4px solid var(--nexus-warning); }
+@media (max-width:767.98px) {
+    .nexus-asset-health-grid,.nexus-preview-comparison { grid-template-columns:1fr; }
+    .nexus-navigation-row { grid-template-columns:auto auto 1fr; }
+    .nexus-navigation-row .form-control,.nexus-navigation-row .custom-select { grid-column:1/-1; }
+}
+
 .nexus-theme.dark-mode,
 .nexus-theme.nexus-auth,
 .nexus-theme.nexus-client {
@@ -2099,6 +2120,51 @@ body.nexus-client {
     border-top: 3px solid var(--nexus-cyan) !important;
 }
 
+.nexus-update-status-copy > strong { color: var(--nexus-text); display: block; font-size: 0.78rem; margin-bottom: 0.2rem; }
+.nexus-update-status-copy > p { color: var(--nexus-copy); }
+.nexus-update-progress .progress { background: var(--nexus-surface-2); border: 1px solid var(--nexus-border); height: 0.65rem; overflow: hidden; }
+.nexus-update-progress .progress-bar { background: var(--nexus-gradient); transition: width 280ms ease; }
+
+.nexus-update-timeline {
+    display: grid;
+    gap: 0.55rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.nexus-update-timeline li {
+    align-items: center;
+    background: var(--nexus-surface-2);
+    border: 1px solid var(--nexus-border);
+    border-radius: var(--nexus-radius);
+    display: flex;
+    gap: 0.55rem;
+    min-width: 0;
+    padding: 0.65rem;
+}
+
+.nexus-update-timeline li > span {
+    align-items: center;
+    background: var(--nexus-surface);
+    border: 1px solid var(--nexus-border);
+    border-radius: 50%;
+    color: var(--nexus-muted);
+    display: flex;
+    flex: 0 0 1.8rem;
+    height: 1.8rem;
+    justify-content: center;
+}
+
+.nexus-update-timeline li > div { display: flex; flex-direction: column; min-width: 0; }
+.nexus-update-timeline strong { color: var(--nexus-text); font-size: 0.7rem; }
+.nexus-update-timeline small { color: var(--nexus-muted); font-size: 0.61rem; line-height: 1.35; }
+.nexus-update-timeline li.is-active { border-color: var(--nexus-cyan); box-shadow: 0 0 0 3px color-mix(in srgb, var(--nexus-cyan) 13%, transparent); }
+.nexus-update-timeline li.is-active > span { background: var(--nexus-cyan); border-color: var(--nexus-cyan); color: var(--nexus-night); }
+.nexus-update-timeline li.is-complete > span { background: var(--nexus-success); border-color: var(--nexus-success); color: #fff; }
+.nexus-update-recovery { font-size: 0.76rem; line-height: 1.45; }
+
 .nexus-update-versions {
     align-items: center;
     background: var(--nexus-surface-2);
@@ -2157,6 +2223,7 @@ body.nexus-client {
     .nexus-runtime-preview-viewport { height: 24rem; }
     .nexus-accessibility-grid { grid-template-columns: 1fr; }
     .nexus-agent .nexus-ticket-queue-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .nexus-update-timeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 991.98px) {
@@ -2258,6 +2325,8 @@ body.nexus-client {
     .nexus-update-versions { grid-template-columns: 1fr; }
     .nexus-update-versions > i { transform: rotate(90deg); }
     .nexus-update-versions div:last-child { text-align: left; }
+    .nexus-update-timeline { grid-template-columns: 1fr; }
+    .nexus-update-actions .btn { margin-right: 0 !important; width: 100%; }
     .nexus-manager-command { max-width: 100%; overflow-wrap: anywhere; }
     .nexus-saved-preset-list > div { align-items: flex-start; flex-wrap: wrap; gap: 0.4rem; }
     .nexus-responsive-presets { display: grid !important; gap: 0.4rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }

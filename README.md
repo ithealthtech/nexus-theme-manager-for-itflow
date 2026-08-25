@@ -4,7 +4,7 @@
 [![Latest release](https://img.shields.io/github/v/release/ithealthtech/nexus-theme-manager-for-itflow)](https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/latest)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
-Nexus gives ITFlow a polished, customizable interface without changing its database or business logic. It adds an administrator-only Theme Studio, exact page previews, safe draft publishing, revision history, and verified updates.
+Nexus gives ITFlow a polished, customizable interface without changing its database or business logic. Version 3.9 adds surface-specific design profiles, configurable navigation, automatic dark mode, an advanced asset workflow, recovery controls, side-by-side responsive previews, and an observable protected updater.
 
 ![Nexus Theme Studio](docs/images/nexus-theme-studio-v3-8.jpg)
 
@@ -16,15 +16,20 @@ Nexus gives ITFlow a polished, customizable interface without changing its datab
 - Header treatments, active-navigation styles, corners, and interface motion
 - Login, password reset, technician, client portal, guest invoice, print, and PDF surfaces
 - Saved presets, scheduled activation, import/export, and protected revisions
+- Independent technician, client, authentication, guest, and print profiles with global fallbacks
+- Desktop and mobile navigation order, labels, approved icons, visibility, and administrator/technician access
+- System, scheduled, forced, or user-selectable dark mode with an independent dark palette and logo
 
 Theme Studio also includes:
 
-- Eight previews built from the same presentation model and stylesheet as the live pages
+- Eight previews built from the same presentation model, CSS variables, and shared live components
+- Side-by-side desktop and 390px phone comparison for every preview surface
 - Phone, tablet, laptop, widescreen, and custom-width responsive testing
 - Accessibility and layout checks with direct links to affected settings
 - Safe automatic corrections that remain unpublished until you approve them
-- Automatic recovery snapshots and downloadable sanitized diagnostics
-- A protected GUI updater with checksum verification and rollback
+- Asset crop/resize controls, image dimensions, size warnings, favicon preview, 24fps GIF inspection, and automatic WebP companions
+- One-click emergency disable, known-good recovery, managed-file/CSS health checks, automatic snapshots, and sanitized diagnostics
+- Live updater stages, failure details, retry, post-update health checks, checksum verification, and visible rollback status
 
 After installation, open **Administration → NEXUS → Theme Manager**.
 
@@ -32,8 +37,8 @@ After installation, open **Administration → NEXUS → Theme Manager**.
 
 | Component | Supported version |
 |---|---|
-| Nexus manager | 3.8.0 |
-| Nexus theme | 26.08.22 |
+| Nexus manager | 3.9.0 |
+| Nexus theme | 26.08.23 |
 | ITFlow | 26.08 |
 | ITFlow commit | `89b080b430aaafba5d520c4e52c57b28a9559085` |
 | PHP | 8.1 or newer |
@@ -62,9 +67,9 @@ Open Theme Studio after installation and confirm that the theme is active and th
 Use the versioned ZIP and `.sha256.txt` file from the [latest release](https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/latest). Do not use GitHub's automatically generated source archive as the installation package.
 
 ```bash
-sha256sum --check Nexus-Theme-Manager-for-ITFlow-3.8.0.zip.sha256.txt
-sudo unzip Nexus-Theme-Manager-for-ITFlow-3.8.0.zip -d /opt
-cd /opt/Nexus-Theme-Manager-for-ITFlow-3.8.0
+sha256sum --check Nexus-Theme-Manager-for-ITFlow-3.9.0.zip.sha256.txt
+sudo unzip Nexus-Theme-Manager-for-ITFlow-3.9.0.zip -d /opt
+cd /opt/Nexus-Theme-Manager-for-ITFlow-3.9.0
 
 sudo php manager.php doctor --root /var/www/itflow.example.com
 sudo php manager.php install --root /var/www/itflow.example.com --yes
@@ -76,13 +81,13 @@ sudo php manager.php verify --root /var/www/itflow.example.com
 
 Open **Theme Studio → Updates & System**, select **Check for updates**, then install the available release.
 
-The web application only queues an allow-listed request. A root-owned systemd service downloads the fixed GitHub release, verifies the checksum and manifest, checks compatibility, installs it, runs health checks, and restores the previous release if activation fails.
+The web application only queues an allow-listed request. A root-owned systemd service downloads the fixed GitHub release, reports each stage, verifies the checksum and manifest, checks compatibility, installs it, runs post-update health checks, and restores the previous release if activation fails. A failed operation shows bounded details and a Retry action for the same approved operation.
 
 Older releases that cannot update safely should be uninstalled with their original manager before running `install-latest.sh`.
 
 ## Pause or remove Nexus
 
-The Theme Studio **Pause theme** button removes all Nexus presentation customizations immediately while keeping settings available for reactivation.
+The Theme Studio **Pause theme** button removes all Nexus presentation customizations immediately while keeping settings available for reactivation. **Updates & System → Recovery mode** also provides an emergency disable, a managed-file/CSS health check, and restoration of the newest pinned known-good revision.
 
 To restore the original ITFlow templates from the command line:
 
@@ -112,7 +117,7 @@ ITFlow currently has no native theme or plugin hook system, so Nexus manages a b
 
 ## Documentation
 
-- [v3.8.0 release notes](docs/release-v3.8.0.md)
+- [v3.9.0 release notes](docs/release-v3.9.0.md)
 - [Architecture and privilege boundaries](docs/architecture.md)
 - [Managed file list](docs/changed-files.md)
 - [Validation report](docs/test-report.md)

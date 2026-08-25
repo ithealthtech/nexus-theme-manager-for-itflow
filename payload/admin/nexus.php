@@ -3,6 +3,19 @@
 require_once 'includes/inc_all_admin.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
 
+if (isset($_GET['nexus_update_status'])) {
+    $nexusStatusResponse = nexusUpdaterStatus();
+    $nexusStatusResponse['ready'] = nexusUpdaterReady();
+    $nexusStatusResponse['busy'] = in_array($nexusStatusResponse['state'], ['checking', 'running'], true);
+    $nexusStatusResponse['update_available'] = $nexusStatusResponse['state'] === 'update_available'
+        && $nexusStatusResponse['latest_version'] !== null
+        && version_compare($nexusStatusResponse['latest_version'], NEXUS_MANAGER_VERSION, '>');
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-store, max-age=0');
+    echo json_encode($nexusStatusResponse, JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+    exit;
+}
+
 $nexusDocumentRoot = nexusThemeDocumentRoot();
 $nexusThemeEnabled = nexusThemeIsEnabled();
 $nexusControlWritable = nexusThemeControlIsWritable();
@@ -15,6 +28,11 @@ $nexusDefaults = nexusThemeDefaults();
 $nexusPresets = nexusThemePresets();
 $nexusLogoUrl = nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($nexusSettings, '', 'light'), $nexusSettings);
 $nexusDarkLogoUrl = nexusThemeVersionedAssetUrl($nexusSettings['branding']['logo_dark_path'], $nexusSettings);
+$nexusLightLogoMeta = nexusThemeAssetMetadata($nexusSettings['branding']['logo_light_path']);
+$nexusDarkLogoMeta = nexusThemeAssetMetadata($nexusSettings['branding']['logo_dark_path']);
+$nexusFaviconMeta = nexusThemeAssetMetadata($nexusSettings['branding']['favicon_path']);
+$nexusBackgroundMeta = nexusThemeAssetMetadata($nexusSettings['branding']['login_background_path']);
+$nexusHealth = nexusThemeHealthReport();
 $nexusSavedPresets = nexusThemeSavedPresets();
 $nexusSavedPresetsJson = nexusThemeExportPresets();
 $nexusSchedule = nexusThemeSchedule();
@@ -48,6 +66,7 @@ $nexusExportJson = json_encode($nexusSettings, JSON_PRETTY_PRINT | JSON_UNESCAPE
 $nexusUpdaterIsReady = nexusUpdaterReady();
 $nexusUpdateStatus = nexusUpdaterStatus();
 $nexusUpdateBusy = in_array($nexusUpdateStatus['state'], ['checking', 'running'], true);
+$nexusUpdatePollRequested = ($_GET['updater'] ?? '') === 'watch';
 $nexusUpdateAvailable = $nexusUpdateStatus['state'] === 'update_available'
     && $nexusUpdateStatus['latest_version'] !== null
     && version_compare($nexusUpdateStatus['latest_version'], NEXUS_MANAGER_VERSION, '>');
@@ -61,6 +80,24 @@ $nexusUpdatePresentation = [
     'completed' => ['success', 'check-circle', 'Updated'],
     'failed' => ['danger', 'exclamation-circle', 'Attention needed'],
 ][$nexusUpdateStatus['state']];
+$nexusUpdateSteps = [
+    'checking' => ['Release check', 'Find the latest verified version'],
+    'download' => ['Download', 'Retrieve the fixed GitHub assets'],
+    'verify' => ['Verification', 'Validate SHA-256 and package boundaries'],
+    'backup' => ['Protection', 'Verify and preserve the current version'],
+    'install' => ['Installation', 'Activate the managed payload'],
+    'health_check' => ['Health check', 'Verify files and updater registration'],
+];
+$nexusUpdatePhaseSteps = [
+    'checking' => 0, 'check_complete' => 0,
+    'download' => 1,
+    'verify' => 2, 'stage' => 2,
+    'backup' => 3, 'transition' => 3, 'rollback' => 3, 'rollback_complete' => 3, 'rollback_failed' => 3,
+    'install' => 4,
+    'health_check' => 5, 'finalize' => 5, 'complete' => 5, 'registration_failed' => 5,
+];
+$nexusUpdateActiveStep = $nexusUpdatePhaseSteps[$nexusUpdateStatus['phase'] ?? ''] ?? -1;
+$nexusUpdateFinished = in_array($nexusUpdateStatus['state'], ['update_available', 'up_to_date', 'completed'], true);
 $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NEXUS_MANAGER_VERSION
     . '/updater.php install-service --root ' . $nexusDocumentRoot;
 
@@ -180,6 +217,13 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
                                     <div class="col-md-4"><div class="custom-control custom-switch"><input type="hidden" name="nexus[branding][show_agent_logo]" value="0"><input type="checkbox" class="custom-control-input" id="nexus-show-agent-logo" name="nexus[branding][show_agent_logo]" value="1" <?= $nexusSettings['branding']['show_agent_logo'] ? 'checked' : '' ?>><label class="custom-control-label" for="nexus-show-agent-logo">Technician navigation</label></div></div>
                                     <div class="col-md-4"><div class="custom-control custom-switch"><input type="checkbox" class="custom-control-input" id="nexus-show-portal-logo" name="nexus[branding][show_portal_logo]" value="1" <?= $nexusSettings['branding']['show_portal_logo'] ? 'checked' : '' ?>><label class="custom-control-label" for="nexus-show-portal-logo">Client portal</label></div></div>
                                 </div>
+                                <hr><div class="nexus-section-heading"><span class="nexus-section-icon"><i class="fas fa-crop-alt"></i></span><div><h3 class="h6 mb-1">Advanced asset processing</h3><p class="text-muted mb-0">Optional pixel crop, proportional resize, animation inspection, and automatic WebP companions.</p></div></div>
+                                <div class="form-row mt-3"><div class="form-group col-md-3"><label for="nexus-crop-x">Crop X</label><input class="form-control" type="number" min="0" id="nexus-crop-x" name="nexus_asset[logo][crop][x]" value="0"></div><div class="form-group col-md-3"><label for="nexus-crop-y">Crop Y</label><input class="form-control" type="number" min="0" id="nexus-crop-y" name="nexus_asset[logo][crop][y]" value="0"></div><div class="form-group col-md-3"><label for="nexus-crop-width">Crop width</label><input class="form-control" type="number" min="0" id="nexus-crop-width" name="nexus_asset[logo][crop][width]" value="0" placeholder="Full"></div><div class="form-group col-md-3"><label for="nexus-crop-height">Crop height</label><input class="form-control" type="number" min="0" id="nexus-crop-height" name="nexus_asset[logo][crop][height]" value="0" placeholder="Full"></div></div>
+                                <div class="form-row"><div class="form-group col-md-6"><label for="nexus-resize-width">Output width</label><input class="form-control" type="number" min="0" max="4000" id="nexus-resize-width" name="nexus_asset[logo][resize_width]" value="0" placeholder="Keep original"></div><div class="form-group col-md-6"><label for="nexus-resize-height">Output height</label><input class="form-control" type="number" min="0" max="4000" id="nexus-resize-height" name="nexus_asset[logo][resize_height]" value="0" placeholder="Auto"></div></div>
+                                <div class="nexus-asset-health-grid">
+                                    <?php foreach (['Light logo' => $nexusLightLogoMeta, 'Dark logo' => $nexusDarkLogoMeta, 'Favicon' => $nexusFaviconMeta, 'Login background' => $nexusBackgroundMeta] as $nexusAssetLabel => $nexusAssetMeta) { ?><div><strong><?= escapeHtml($nexusAssetLabel) ?></strong><?php if (!$nexusAssetMeta['configured']) { ?><small>Not configured</small><?php } elseif (!$nexusAssetMeta['exists']) { ?><small class="text-danger">Missing</small><?php } else { ?><small><?= (int)$nexusAssetMeta['width'] ?>×<?= (int)$nexusAssetMeta['height'] ?> · <?= number_format((int)$nexusAssetMeta['bytes'] / 1024) ?> KB</small><small><?= $nexusAssetMeta['animated'] ? (int)$nexusAssetMeta['frames'] . ' frames · ' . escapeHtml((string)$nexusAssetMeta['fps']) . 'fps' : 'Static' ?> · <?= $nexusAssetMeta['webp'] ? 'WebP ready' : 'Original format' ?></small><?php } ?><?php foreach ($nexusAssetMeta['warnings'] as $nexusAssetWarning) { ?><small class="text-warning"><i class="fas fa-exclamation-triangle mr-1"></i><?= escapeHtml($nexusAssetWarning) ?></small><?php } ?></div><?php } ?>
+                                </div>
+                                <?php if ($nexusSettings['branding']['favicon_path'] !== '') { ?><div class="mt-3"><strong class="d-block mb-2">Favicon preview</strong><span class="nexus-favicon-preview"><img src="<?= escapeHtml(nexusThemeVersionedAssetUrl($nexusSettings['branding']['favicon_path'], $nexusSettings)) ?>" alt="Favicon preview"><span><?= escapeHtml($nexusSettings['branding']['browser_title'] ?: $nexusBrandPlaceholder) ?></span></span></div><?php } ?>
                             </div>
 
                             <div class="tab-pane fade" id="nexus-colors" role="tabpanel">
@@ -211,6 +255,12 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
                                 <div class="form-row"><div class="form-group col-md-6"><label for="nexus-header-style">Header treatment</label><select class="custom-select nexus-navigation-control" id="nexus-header-style" name="nexus[appearance][header_style]"><?php foreach (['solid' => 'Solid', 'gradient' => 'Gradient', 'glass' => 'Glass'] as $value => $label) { ?><option value="<?= $value ?>" <?= $nexusSettings['appearance']['header_style'] === $value ? 'selected' : '' ?>><?= $label ?></option><?php } ?></select></div><div class="form-group col-md-6"><label for="nexus-navigation-style">Active navigation</label><select class="custom-select nexus-navigation-control" id="nexus-navigation-style" name="nexus[appearance][navigation_style]"><?php foreach (['pill' => 'Gradient pill', 'rail' => 'Accent rail', 'outline' => 'Outline'] as $value => $label) { ?><option value="<?= $value ?>" <?= $nexusSettings['appearance']['navigation_style'] === $value ? 'selected' : '' ?>><?= $label ?></option><?php } ?></select></div></div>
                                 <div class="custom-control custom-switch mb-3"><input type="checkbox" class="custom-control-input nexus-navigation-control" id="nexus-sidebar-compact" name="nexus[appearance][sidebar_compact]" value="1" <?= $nexusSettings['appearance']['sidebar_compact'] ? 'checked' : '' ?>><label class="custom-control-label" for="nexus-sidebar-compact">Compact sidebar labels and section spacing</label></div>
                                 <div class="form-group"><div class="d-flex justify-content-between"><label for="nexus-font-scale">Interface scale</label><output id="nexus-font-scale-output"><?= (int)$nexusSettings['appearance']['font_scale'] ?>%</output></div><input type="range" class="custom-range" id="nexus-font-scale" name="nexus[appearance][font_scale]" min="90" max="110" step="1" value="<?= (int)$nexusSettings['appearance']['font_scale'] ?>"></div>
+                                <hr><div class="nexus-section-heading"><span class="nexus-section-icon"><i class="fas fa-object-group"></i></span><div><h3 class="h6 mb-1">Per-surface design profiles</h3><p class="text-muted mb-0">Global settings remain the default. Enable only the surfaces that need independent colors or density.</p></div></div>
+                                <div class="accordion mt-3" id="nexus-profile-accordion"><?php foreach (['technician' => 'Technician', 'client' => 'Client portal', 'auth' => 'Login & reset', 'guest' => 'Guest invoice', 'print' => 'Print / PDF'] as $nexusSurface => $nexusSurfaceLabel) { $nexusProfile = $nexusSettings['profiles'][$nexusSurface]; ?><div class="card nexus-profile-card"><div class="card-header"><div class="custom-control custom-switch"><input type="checkbox" class="custom-control-input" id="nexus-profile-<?= $nexusSurface ?>" name="nexus[profiles][<?= $nexusSurface ?>][enabled]" value="1" <?= $nexusProfile['enabled'] ? 'checked' : '' ?>><label class="custom-control-label" for="nexus-profile-<?= $nexusSurface ?>"><strong><?= escapeHtml($nexusSurfaceLabel) ?></strong> overrides</label></div></div><div class="card-body"><div class="form-row"><?php foreach (['primary' => 'Accent', 'header' => 'Header', 'page' => 'Page', 'surface' => 'Cards', 'text' => 'Text'] as $nexusProfileColor => $nexusProfileColorLabel) { ?><div class="form-group col-6 col-md"><label><?= escapeHtml($nexusProfileColorLabel) ?></label><input type="color" class="form-control nexus-profile-color" name="nexus[profiles][<?= $nexusSurface ?>][colors][<?= $nexusProfileColor ?>]" value="<?= escapeHtml($nexusProfile['colors'][$nexusProfileColor] ?? $nexusSettings['colors'][$nexusProfileColor]) ?>"></div><?php } ?></div><div class="form-group mb-0"><label>Content density</label><select class="custom-select" name="nexus[profiles][<?= $nexusSurface ?>][appearance][density]"><option value="">Use global</option><?php foreach (['compact', 'comfortable', 'spacious'] as $nexusProfileDensity) { ?><option value="<?= $nexusProfileDensity ?>" <?= ($nexusProfile['appearance']['density'] ?? '') === $nexusProfileDensity ? 'selected' : '' ?>><?= ucfirst($nexusProfileDensity) ?></option><?php } ?></select></div></div></div><?php } ?></div>
+                                <hr><div class="nexus-section-heading"><span class="nexus-section-icon"><i class="fas fa-sitemap"></i></span><div><h3 class="h6 mb-1">Navigation builder</h3><p class="text-muted mb-0">Drag with the arrow buttons, relabel, choose approved icons, and set role visibility separately for desktop and mobile.</p></div></div>
+                                <?php foreach (['desktop' => 'Desktop sidebar', 'mobile' => 'Mobile navigation'] as $nexusViewport => $nexusViewportLabel) { ?><div class="mt-3"><strong><?= escapeHtml($nexusViewportLabel) ?></strong><div class="nexus-navigation-builder" data-navigation-viewport="<?= $nexusViewport ?>"><?php foreach ($nexusSettings['navigation'][$nexusViewport] as $nexusNavIndex => $nexusNavItem) { ?><div class="nexus-navigation-row" data-navigation-item><input type="hidden" data-nav-field="id" name="nexus[navigation][<?= $nexusViewport ?>][<?= $nexusNavIndex ?>][id]" value="<?= escapeHtml($nexusNavItem['id']) ?>"><button type="button" class="btn btn-sm btn-default" data-nav-move="up" aria-label="Move up"><i class="fas fa-chevron-up"></i></button><button type="button" class="btn btn-sm btn-default" data-nav-move="down" aria-label="Move down"><i class="fas fa-chevron-down"></i></button><input class="form-control" data-nav-field="label" name="nexus[navigation][<?= $nexusViewport ?>][<?= $nexusNavIndex ?>][label]" maxlength="32" value="<?= escapeHtml($nexusNavItem['label']) ?>" aria-label="Navigation label"><select class="custom-select" data-nav-field="icon" name="nexus[navigation][<?= $nexusViewport ?>][<?= $nexusNavIndex ?>][icon]" aria-label="Icon"><?php foreach (['fas fa-tachometer-alt' => 'Dashboard', 'fas fa-users' => 'Users', 'fas fa-ticket-alt' => 'Ticket', 'fas fa-project-diagram' => 'Project', 'fas fa-file-invoice' => 'Invoice', 'fas fa-chart-line' => 'Chart', 'fas fa-home' => 'Home'] as $nexusIcon => $nexusIconLabel) { ?><option value="<?= $nexusIcon ?>" <?= $nexusNavItem['icon'] === $nexusIcon ? 'selected' : '' ?>><?= escapeHtml($nexusIconLabel) ?></option><?php } ?></select><label><input type="checkbox" data-nav-field="roles][]" name="nexus[navigation][<?= $nexusViewport ?>][<?= $nexusNavIndex ?>][roles][]" value="admin" <?= in_array('admin', $nexusNavItem['roles'], true) ? 'checked' : '' ?>> Admin</label><label><input type="checkbox" data-nav-field="roles][]" name="nexus[navigation][<?= $nexusViewport ?>][<?= $nexusNavIndex ?>][roles][]" value="tech" <?= in_array('tech', $nexusNavItem['roles'], true) ? 'checked' : '' ?>> Tech</label><label><input type="checkbox" data-nav-field="visible" name="nexus[navigation][<?= $nexusViewport ?>][<?= $nexusNavIndex ?>][visible]" value="1" <?= $nexusNavItem['visible'] ? 'checked' : '' ?>> Show</label></div><?php } ?></div></div><?php } ?>
+                                <hr><div class="nexus-section-heading"><span class="nexus-section-icon"><i class="fas fa-moon"></i></span><div><h3 class="h6 mb-1">Automatic dark mode</h3><p class="text-muted mb-0">Follow the operating system, force a mode, or switch on a daily schedule.</p></div></div>
+                                <div class="form-row mt-3"><div class="form-group col-md-6"><label for="nexus-dark-mode">Default mode</label><select class="custom-select" id="nexus-dark-mode" name="nexus[dark_mode][mode]"><?php foreach (['system' => 'System preference', 'light' => 'Always light', 'dark' => 'Always dark', 'scheduled' => 'Scheduled'] as $nexusDarkMode => $nexusDarkLabel) { ?><option value="<?= $nexusDarkMode ?>" <?= $nexusSettings['dark_mode']['mode'] === $nexusDarkMode ? 'selected' : '' ?>><?= escapeHtml($nexusDarkLabel) ?></option><?php } ?></select></div><div class="form-group col-md-3"><label>Dark from</label><input class="form-control" type="time" name="nexus[dark_mode][schedule_start]" value="<?= escapeHtml($nexusSettings['dark_mode']['schedule_start']) ?>"></div><div class="form-group col-md-3"><label>Light from</label><input class="form-control" type="time" name="nexus[dark_mode][schedule_end]" value="<?= escapeHtml($nexusSettings['dark_mode']['schedule_end']) ?>"></div></div><div class="custom-control custom-switch mb-3"><input type="checkbox" class="custom-control-input" id="nexus-dark-user" name="nexus[dark_mode][user_selectable]" value="1" <?= $nexusSettings['dark_mode']['user_selectable'] ? 'checked' : '' ?>><label class="custom-control-label" for="nexus-dark-user">Allow each user to select light, dark, or system mode</label></div><div class="form-row"><?php foreach (['primary' => 'Accent', 'sidebar' => 'Sidebar', 'header' => 'Header', 'page' => 'Page', 'surface' => 'Cards', 'text' => 'Text'] as $nexusDarkColor => $nexusDarkColorLabel) { ?><div class="form-group col-6 col-md-4"><label><?= escapeHtml($nexusDarkColorLabel) ?></label><input type="color" class="form-control" name="nexus[dark_mode][colors][<?= $nexusDarkColor ?>]" value="<?= escapeHtml($nexusSettings['dark_mode']['colors'][$nexusDarkColor]) ?>"></div><?php } ?></div>
                                 <div class="nexus-accessibility-inspector mt-4" id="nexus-accessibility-inspector" aria-live="polite">
                                     <div class="d-flex align-items-start justify-content-between flex-wrap mb-3">
                                         <div>
@@ -275,7 +325,7 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
                         <div class="card-header border-0"><div class="d-flex align-items-start justify-content-between flex-wrap"><div><span class="nexus-manager-kicker">Exact runtime preview</span><h2 class="h5 mb-1" id="nexus-preview-title">Authentication</h2><small class="text-muted">Uses the same validated settings model, generated CSS, AdminLTE markup, and Nexus stylesheet as live pages.</small></div><span class="badge badge-<?= $nexusHasDraft ? 'warning' : 'success' ?> mt-1"><?= $nexusHasDraft ? 'Saved draft' : 'Published' ?></span></div><label class="sr-only" for="nexus-preview-surface-select">Choose a preview surface</label><select class="custom-select nexus-preview-surface-select mt-3" id="nexus-preview-surface-select" aria-label="Choose a preview surface"><option value="auth">Login</option><option value="reset">Password reset</option><option value="dashboard">Technician dashboard</option><option value="technician">Ticket queue</option><option value="client">Client portal</option><option value="mobile">Mobile navigation</option><option value="invoice">Guest invoice</option><option value="print">Print / PDF invoice</option></select><div class="nexus-preview-surface-tabs nexus-preview-surface-tabs-expanded mt-3" role="group" aria-label="Preview surface"><button type="button" class="btn btn-info nexus-preview-mode active" data-mode="auth">Login</button><button type="button" class="btn btn-outline-info nexus-preview-mode" data-mode="reset">Reset</button><button type="button" class="btn btn-outline-info nexus-preview-mode" data-mode="dashboard">Dashboard</button><button type="button" class="btn btn-outline-info nexus-preview-mode" data-mode="technician">Tickets</button><button type="button" class="btn btn-outline-info nexus-preview-mode" data-mode="client">Client</button><button type="button" class="btn btn-outline-info nexus-preview-mode" data-mode="mobile">Mobile nav</button><button type="button" class="btn btn-outline-info nexus-preview-mode" data-mode="invoice">Invoice</button><button type="button" class="btn btn-outline-info nexus-preview-mode" data-mode="print">Print/PDF</button></div><div class="nexus-responsive-tester mt-3"><div class="d-flex align-items-center justify-content-between flex-wrap mb-2"><div><span class="nexus-manager-kicker">Responsive tester</span><strong>Preview size</strong></div><small class="text-muted" id="nexus-responsive-copy">Laptop 1366px</small></div><div class="btn-group btn-group-sm w-100 nexus-responsive-presets" role="group" aria-label="Responsive preview presets"><button type="button" class="btn btn-outline-info" data-responsive-mode="widescreen" data-responsive-width="1600">Wide</button><button type="button" class="btn btn-outline-info active" data-responsive-mode="laptop" data-responsive-width="1366">Laptop</button><button type="button" class="btn btn-outline-info" data-responsive-mode="tablet" data-responsive-width="768">Tablet</button><button type="button" class="btn btn-outline-info" data-responsive-mode="phone" data-responsive-width="390">Phone</button></div><div class="form-group mt-3 mb-0"><label for="nexus-responsive-width">Custom width</label><input type="range" class="custom-range" id="nexus-responsive-width" min="320" max="1920" step="10" value="1366"><small class="form-text text-muted">Drag to inspect narrow breakpoints without leaving Theme Studio.</small></div><div class="nexus-responsive-alerts mt-2" id="nexus-responsive-alerts" aria-live="polite"><span class="badge badge-success"><i class="fas fa-check mr-1"></i>No predicted collisions at 1366px</span></div></div></div>
                         <div class="card-body p-0"><div class="nexus-runtime-preview" id="nexus-live-preview">
                             <?php foreach ($nexusPreviewDocuments as $nexusPreviewSurface => $nexusPreviewDocument) { ?>
-                                <div class="nexus-runtime-preview-panel <?= $nexusPreviewSurface === 'auth' ? '' : 'd-none' ?>" data-preview-panel="<?= escapeHtml($nexusPreviewSurface) ?>"><div class="nexus-preview-windowbar"><i></i><i></i><i></i><span><?= ucfirst(escapeHtml($nexusPreviewSurface)) ?> · <?= $nexusHasDraft ? 'Draft' : 'Published' ?></span></div><div class="nexus-runtime-preview-viewport"><iframe class="nexus-runtime-preview-frame" sandbox="" loading="lazy" title="<?= ucfirst(escapeHtml($nexusPreviewSurface)) ?> Nexus preview" srcdoc="<?= escapeHtml($nexusPreviewDocument) ?>"></iframe></div></div>
+                                <div class="nexus-runtime-preview-panel <?= $nexusPreviewSurface === 'auth' ? '' : 'd-none' ?>" data-preview-panel="<?= escapeHtml($nexusPreviewSurface) ?>"><div class="nexus-preview-windowbar"><i></i><i></i><i></i><span><?= ucfirst(escapeHtml($nexusPreviewSurface)) ?> · <?= $nexusHasDraft ? 'Draft' : 'Published' ?></span></div><div class="nexus-preview-comparison"><div><small>Desktop / custom width</small><div class="nexus-runtime-preview-viewport"><iframe class="nexus-runtime-preview-frame" sandbox="" loading="lazy" title="<?= ucfirst(escapeHtml($nexusPreviewSurface)) ?> desktop Nexus preview" srcdoc="<?= escapeHtml($nexusPreviewDocument) ?>"></iframe></div></div><div class="nexus-preview-phone"><small>Phone · 390px</small><div class="nexus-runtime-preview-viewport" data-responsive-mode="phone" style="--nexus-preview-width:390px"><iframe class="nexus-runtime-preview-frame" sandbox="" loading="lazy" title="<?= ucfirst(escapeHtml($nexusPreviewSurface)) ?> mobile Nexus preview" srcdoc="<?= escapeHtml($nexusPreviewDocument) ?>"></iframe></div></div></div></div>
                             <?php } ?>
                         </div></div>
                         <div class="card-footer bg-transparent nexus-preview-footer"><small class="text-muted" id="nexus-preview-freshness"><i class="fas fa-info-circle mr-1"></i>Editing the form does not alter this trustworthy snapshot. Save draft to regenerate it.</small></div>
@@ -302,35 +352,50 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
                         </div>
                     </section>
 
-                    <section class="card nexus-update-card nexus-workspace-panel" data-workspace-panel="system" id="nexus-system">
+                    <section class="card nexus-update-card nexus-workspace-panel" data-workspace-panel="system" id="nexus-system" data-update-state="<?= escapeHtml($nexusUpdateStatus['state']) ?>">
                         <div class="card-header border-0 d-flex align-items-center justify-content-between">
                             <div><span class="nexus-manager-kicker">Protected lifecycle</span><h2 class="h5 mb-0">Nexus updates</h2></div>
-                            <span class="badge badge-<?= $nexusUpdatePresentation[0] ?> px-3 py-2"><i class="fas fa-<?= $nexusUpdatePresentation[1] ?> mr-1"></i><?= $nexusUpdatePresentation[2] ?></span>
+                            <span class="badge badge-<?= $nexusUpdatePresentation[0] ?> px-3 py-2" id="nexus-update-badge"><i class="fas fa-<?= $nexusUpdatePresentation[1] ?> mr-1"></i><span><?= $nexusUpdatePresentation[2] ?></span></span>
                         </div>
                         <div class="card-body pt-0">
-                            <p class="mb-3"><?= escapeHtml($nexusUpdateStatus['message']) ?></p>
+                            <div class="nexus-update-status-copy" aria-live="polite" aria-atomic="true">
+                                <strong id="nexus-update-phase-label"><?= escapeHtml($nexusUpdateStatus['phase_label']) ?></strong>
+                                <p class="mb-3" id="nexus-update-message"><?= escapeHtml($nexusUpdateStatus['message']) ?></p>
+                            </div>
                             <div class="nexus-update-versions">
-                                <div><span>Installed</span><strong><?= escapeHtml($nexusUpdateStatus['current_version']) ?></strong></div>
+                                <div><span>Installed</span><strong id="nexus-update-current-version"><?= escapeHtml($nexusUpdateStatus['current_version']) ?></strong></div>
                                 <i class="fas fa-long-arrow-alt-right text-muted"></i>
-                                <div><span>Latest</span><strong><?= escapeHtml($nexusUpdateStatus['latest_version'] ?? 'Check now') ?></strong></div>
+                                <div><span>Latest</span><strong id="nexus-update-latest-version"><?= escapeHtml($nexusUpdateStatus['latest_version'] ?? 'Check now') ?></strong></div>
                             </div>
                             <?php if (!$nexusUpdaterIsReady) { ?>
                                 <div class="nexus-manager-command mt-3"><span>One-time updater setup</span><code><?= escapeHtml($nexusUpdaterSetupCommand) ?></code></div>
                                 <small class="form-text">Run once as root. Theme Studio never receives general sudo or shell access.</small>
                             <?php } else { ?>
-                                <?php if ($nexusUpdateStatus['phase'] !== null && $nexusUpdateBusy) { ?>
-                                    <div class="progress mt-3" style="height:0.45rem"><div class="progress-bar progress-bar-striped progress-bar-animated" style="width:<?= $nexusUpdateStatus['phase'] === 'download' ? '25' : ($nexusUpdateStatus['phase'] === 'backup' ? '55' : '80') ?>%"></div></div>
-                                <?php } ?>
-                                <div class="d-flex flex-wrap mt-3">
-                                    <button type="submit" form="nexus-update-check-form" class="btn btn-outline-info mr-2 mb-2" <?= $nexusUpdateBusy ? 'disabled' : '' ?>><i class="fas fa-sync-alt mr-2"></i>Check for updates</button>
-                                    <?php if ($nexusUpdateAvailable) { ?>
-                                        <button type="submit" form="nexus-update-install-form" class="btn btn-primary mb-2" onclick="return confirm('Install Nexus <?= escapeHtml($nexusUpdateStatus['latest_version']) ?> now? The updater will verify the release and roll back automatically if installation fails.')"><i class="fas fa-cloud-download-alt mr-2"></i>Install <?= escapeHtml($nexusUpdateStatus['latest_version']) ?></button>
-                                    <?php } ?>
+                                <div class="nexus-update-progress mt-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2"><span class="small font-weight-bold" id="nexus-update-progress-copy"><?= escapeHtml($nexusUpdateStatus['phase_label']) ?></span><span class="small text-muted" id="nexus-update-progress-value"><?= (int)$nexusUpdateStatus['progress'] ?>%</span></div>
+                                    <div class="progress" role="progressbar" aria-label="Nexus update progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= (int)$nexusUpdateStatus['progress'] ?>"><div class="progress-bar <?= $nexusUpdateBusy ? 'progress-bar-striped progress-bar-animated' : '' ?>" id="nexus-update-progress-bar" style="width:<?= (int)$nexusUpdateStatus['progress'] ?>%"></div></div>
                                 </div>
-                                <?php if ($nexusUpdateStatus['updated_at'] !== null && $nexusUpdateStatus['updated_at'] !== '') { ?><small class="text-muted">Last updater activity: <?= escapeHtml($nexusUpdateStatus['updated_at']) ?> UTC</small><?php } ?>
+                                <ol class="nexus-update-timeline mt-3" id="nexus-update-timeline" aria-label="Update stages">
+                                    <?php $nexusUpdateStepIndex = 0; foreach ($nexusUpdateSteps as $nexusUpdateStep => $nexusUpdateStepContent) { $nexusStepComplete = $nexusUpdateFinished || $nexusUpdateStepIndex < $nexusUpdateActiveStep; $nexusStepActive = !$nexusUpdateFinished && $nexusUpdateStepIndex === $nexusUpdateActiveStep; ?>
+                                        <li data-update-step="<?= escapeHtml($nexusUpdateStep) ?>" class="<?= $nexusStepComplete ? 'is-complete' : '' ?> <?= $nexusStepActive ? 'is-active' : '' ?>"><span><i class="fas fa-<?= $nexusStepComplete ? 'check' : ($nexusStepActive ? 'sync-alt fa-spin' : 'circle') ?>"></i></span><div><strong><?= escapeHtml($nexusUpdateStepContent[0]) ?></strong><small><?= escapeHtml($nexusUpdateStepContent[1]) ?></small></div></li>
+                                    <?php $nexusUpdateStepIndex++; } ?>
+                                </ol>
+                                <div class="alert alert-<?= $nexusUpdateStatus['rollback_state'] === 'restored' ? 'warning' : 'danger' ?> nexus-update-recovery mt-3 <?= $nexusUpdateStatus['recovery'] === null ? 'd-none' : '' ?>" id="nexus-update-recovery" role="status"><i class="fas fa-life-ring mr-2"></i><span><?= escapeHtml($nexusUpdateStatus['recovery'] ?? '') ?></span></div>
+                                <div class="d-flex flex-wrap align-items-center mt-3 nexus-update-actions">
+                                    <button type="submit" form="nexus-update-check-form" id="nexus-update-check-button" class="btn btn-outline-info mr-2 mb-2" <?= $nexusUpdateBusy ? 'disabled' : '' ?>><i class="fas fa-sync-alt mr-2"></i>Check for updates</button>
+                                    <button type="submit" form="nexus-update-install-form" id="nexus-update-install-button" class="btn btn-primary mr-2 mb-2 <?= $nexusUpdateAvailable ? '' : 'd-none' ?>" onclick="return confirm('Install the available Nexus update now? The updater will verify the release and roll back automatically if installation fails.')"><i class="fas fa-cloud-download-alt mr-2"></i><span>Install <?= escapeHtml($nexusUpdateStatus['latest_version'] ?? 'update') ?></span></button>
+                                    <button type="submit" form="nexus-update-retry-form" id="nexus-update-retry-button" class="btn btn-outline-danger mr-2 mb-2 <?= $nexusUpdateStatus['state'] === 'failed' && $nexusUpdateStatus['can_retry'] ? '' : 'd-none' ?>"><i class="fas fa-redo mr-2"></i>Retry</button>
+                                    <a href="<?= escapeHtml($nexusUpdateStatus['release_url'] ?? '#') ?>" id="nexus-update-release-link" class="btn btn-link mb-2 <?= $nexusUpdateStatus['release_url'] === null ? 'd-none' : '' ?>" target="_blank" rel="noopener"><i class="fab fa-github mr-1"></i>Release notes</a>
+                                </div>
+                                <small class="text-muted" id="nexus-update-updated-at"><?php if ($nexusUpdateStatus['updated_at'] !== null && $nexusUpdateStatus['updated_at'] !== '') { ?>Last updater activity: <?= escapeHtml($nexusUpdateStatus['updated_at']) ?> UTC<?php } ?></small>
                             <?php } ?>
                         </div>
                         <div class="card-footer bg-transparent border-0 pt-0"><span class="small text-muted"><i class="fas fa-lock mr-1 text-success"></i>Fixed repository · SHA-256 verification · rollback protection</span></div>
+                    </section>
+
+                    <section class="card nexus-workspace-panel nexus-recovery-card" data-workspace-panel="system">
+                        <div class="card-header border-0"><div><span class="nexus-manager-kicker">Always-available safety</span><h2 class="h5 mb-0">Recovery mode</h2></div><span class="badge badge-<?= $nexusHealth['healthy'] ? 'success' : 'danger' ?>"><?= $nexusHealth['healthy'] ? 'Healthy' : count($nexusHealth['failed']) . ' failed' ?></span></div>
+                        <div class="card-body pt-0"><p class="text-muted">Checks required managed files, readable settings, and CSS structure. Emergency disable immediately bypasses all Nexus presentation while leaving native administrator access intact.</p><?php if (!$nexusHealth['healthy']) { ?><div class="alert alert-danger"><strong>Detected:</strong> <?= escapeHtml(implode(', ', $nexusHealth['failed'])) ?></div><?php } ?><div class="nexus-system-tool-grid"><button type="submit" form="nexus-recovery-check-form" class="btn btn-outline-info"><i class="fas fa-stethoscope mr-1"></i>Run health check</button><button type="submit" form="nexus-recovery-restore-form" class="btn btn-outline-warning" onclick="return confirm('Restore and activate the newest pinned known-good design?')"><i class="fas fa-history mr-1"></i>Restore known-good</button><button type="submit" form="nexus-recovery-disable-form" class="btn btn-danger" onclick="return confirm('Emergency-disable every Nexus customization now?')"><i class="fas fa-power-off mr-1"></i>Emergency disable</button></div><small class="form-text mt-2">A snapshot is created before restore. Pinned revisions are preferred; otherwise the newest revision is used.</small></div>
                     </section>
 
                     <section class="card nexus-workspace-panel" data-workspace-panel="system">
@@ -357,9 +422,13 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
     <form action="post.php" method="post" id="nexus-discard-draft-form"><input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>"><input type="hidden" name="nexus_theme_draft_action" value="discard"><input type="hidden" name="nexus_draft_version" value="<?= escapeHtml($nexusDraftVersion) ?>"></form>
     <form action="post.php" method="post" id="nexus-quality-fix-form"><input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>"><input type="hidden" name="nexus_quality_fix" value="1"><input type="hidden" name="nexus_quality_width" value="390"><input type="hidden" name="nexus_draft_version" value="<?= escapeHtml($nexusDraftVersion) ?>"></form>
     <form action="post.php" method="post" id="nexus-diagnostics-form"><input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>"><input type="hidden" name="nexus_diagnostics_download" value="1"></form>
+    <form action="post.php" method="post" id="nexus-recovery-check-form"><input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>"><input type="hidden" name="nexus_recovery_action" value="check"><input type="hidden" name="nexus_return_section" value="system"></form>
+    <form action="post.php" method="post" id="nexus-recovery-restore-form"><input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>"><input type="hidden" name="nexus_recovery_action" value="restore"><input type="hidden" name="nexus_return_section" value="system"></form>
+    <form action="post.php" method="post" id="nexus-recovery-disable-form"><input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>"><input type="hidden" name="nexus_recovery_action" value="disable"><input type="hidden" name="nexus_return_section" value="system"></form>
     <?php foreach ($nexusRevisions as $nexusRevision) { ?><form action="post.php" method="post" id="nexus-restore-revision-<?= escapeHtml($nexusRevision['id']) ?>"><input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>"><input type="hidden" name="nexus_theme_draft_action" value="restore"><input type="hidden" name="nexus_draft_version" value="<?= escapeHtml($nexusDraftVersion) ?>"><input type="hidden" name="nexus_revision_id" value="<?= escapeHtml($nexusRevision['id']) ?>"></form><form action="post.php" method="post" id="nexus-pin-revision-<?= escapeHtml($nexusRevision['id']) ?>"><input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>"><input type="hidden" name="nexus_revision_pin" value="<?= $nexusRevision['pinned'] ? '0' : '1' ?>"><input type="hidden" name="nexus_revision_id" value="<?= escapeHtml($nexusRevision['id']) ?>"></form><?php } ?>
     <form action="post.php" method="post" id="nexus-update-check-form"><input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>"><input type="hidden" name="nexus_update_action" value="check"><input type="hidden" name="nexus_return_section" value="system"></form>
     <form action="post.php" method="post" id="nexus-update-install-form"><input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>"><input type="hidden" name="nexus_update_action" value="update"><input type="hidden" name="nexus_return_section" value="system"></form>
+    <form action="post.php" method="post" id="nexus-update-retry-form"><input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>"><input type="hidden" name="nexus_update_action" id="nexus-update-retry-action" value="<?= escapeHtml($nexusUpdateStatus['action'] ?? 'check') ?>"><input type="hidden" name="nexus_return_section" value="system"></form>
 </div>
 
 <div class="modal fade" id="nexus-import-modal" tabindex="-1" role="dialog" aria-labelledby="nexus-import-title" aria-hidden="true"><div class="modal-dialog modal-lg" role="document"><form action="post.php" method="post" class="modal-content"><input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>"><input type="hidden" name="nexus_theme_import" value="1"><input type="hidden" name="nexus_draft_version" value="<?= escapeHtml($nexusDraftVersion) ?>"><div class="modal-header"><h2 class="modal-title h5" id="nexus-import-title">Import Nexus configuration</h2><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button></div><div class="modal-body"><p class="text-muted">Paste a configuration exported from Theme Studio. Uploaded assets stay attached and the imported design remains private until you publish it.</p><textarea class="form-control nexus-json-editor" name="nexus_import_json" rows="16" required spellcheck="false" placeholder='{"schema": 1, ...}'></textarea></div><div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button><button type="submit" class="btn btn-primary" <?= $nexusControlWritable ? '' : 'disabled' ?>><i class="fas fa-upload mr-2"></i>Import to draft</button></div></form></div></div>
@@ -532,7 +601,96 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
     function markDraftDirty() { workspace.classList.add('is-dirty'); var freshness = document.getElementById('nexus-preview-freshness'); if (freshness) freshness.innerHTML = '<i class="fas fa-exclamation-circle mr-1 text-warning"></i>Form edits are newer than this exact snapshot. Save draft to regenerate all eight previews.'; var state = document.getElementById('nexus-draft-save-state'); if (state) state.innerHTML = '<i class="fas fa-circle mr-1 text-warning"></i>Unsaved form changes'; }
     document.getElementById('nexus-customizer-form').addEventListener('input', markDraftDirty);
     document.getElementById('nexus-customizer-form').addEventListener('change', markDraftDirty);
-    <?php if ($nexusUpdateBusy) { ?>setTimeout(function () { window.location.reload(); }, 3500);<?php } ?>
+    var updaterCard = document.getElementById('nexus-system');
+    if (updaterCard && <?= $nexusUpdaterIsReady ? 'true' : 'false' ?>) {
+        var updaterInitialActivity = <?= json_encode($nexusUpdateStatus['updated_at']) ?>;
+        var updaterWatchRequested = <?= $nexusUpdatePollRequested ? 'true' : 'false' ?>;
+        var updaterSawBusy = <?= $nexusUpdateBusy ? 'true' : 'false' ?>;
+        var updaterPollsRemaining = updaterWatchRequested ? 30 : (updaterSawBusy ? 180 : 0);
+        var updaterPresentations = {
+            ready:['info','shield-alt','Ready'], checking:['info','sync-alt fa-spin','Checking'], update_available:['warning','arrow-circle-up','Update available'],
+            up_to_date:['success','check-circle','Up to date'], running:['primary','sync-alt fa-spin','Updating'], completed:['success','check-circle','Updated'], failed:['danger','exclamation-circle','Attention needed']
+        };
+        var updaterPhaseStep = {checking:0,check_complete:0,download:1,verify:2,stage:2,backup:3,transition:3,rollback:3,rollback_complete:3,rollback_failed:3,install:4,health_check:5,finalize:5,complete:5,registration_failed:5};
+        function renderUpdaterStatus(status) {
+            var presentation = updaterPresentations[status.state] || updaterPresentations.ready;
+            updaterCard.dataset.updateState = status.state;
+            var badge = document.getElementById('nexus-update-badge');
+            badge.className = 'badge badge-' + presentation[0] + ' px-3 py-2';
+            badge.querySelector('i').className = 'fas fa-' + presentation[1] + ' mr-1';
+            badge.querySelector('span').textContent = presentation[2];
+            document.getElementById('nexus-update-phase-label').textContent = status.phase_label;
+            document.getElementById('nexus-update-message').textContent = status.message;
+            document.getElementById('nexus-update-current-version').textContent = status.current_version;
+            document.getElementById('nexus-update-latest-version').textContent = status.latest_version || 'Check now';
+            document.getElementById('nexus-update-progress-copy').textContent = status.phase_label;
+            document.getElementById('nexus-update-progress-value').textContent = status.progress + '%';
+            var progress = document.getElementById('nexus-update-progress-bar');
+            progress.style.width = status.progress + '%';
+            progress.parentElement.setAttribute('aria-valuenow', status.progress);
+            progress.classList.toggle('progress-bar-striped', status.busy);
+            progress.classList.toggle('progress-bar-animated', status.busy);
+            var activeStep = Object.prototype.hasOwnProperty.call(updaterPhaseStep, status.phase) ? updaterPhaseStep[status.phase] : -1;
+            var finished = ['update_available','up_to_date','completed'].indexOf(status.state) !== -1;
+            document.querySelectorAll('#nexus-update-timeline [data-update-step]').forEach(function (step, index) {
+                var complete = finished || index < activeStep;
+                var active = !finished && index === activeStep;
+                step.classList.toggle('is-complete', complete);
+                step.classList.toggle('is-active', active);
+                step.querySelector('i').className = 'fas fa-' + (complete ? 'check' : (active ? 'sync-alt fa-spin' : 'circle'));
+            });
+            var recovery = document.getElementById('nexus-update-recovery');
+            recovery.classList.toggle('d-none', !status.recovery);
+            recovery.classList.toggle('alert-warning', status.rollback_state === 'restored');
+            recovery.classList.toggle('alert-danger', status.rollback_state !== 'restored');
+            recovery.querySelector('span').textContent = status.recovery || '';
+            document.getElementById('nexus-update-check-button').disabled = status.busy;
+            var installButton = document.getElementById('nexus-update-install-button');
+            installButton.classList.toggle('d-none', !status.update_available);
+            installButton.disabled = status.busy;
+            installButton.querySelector('span').textContent = 'Install ' + (status.latest_version || 'update');
+            var retryButton = document.getElementById('nexus-update-retry-button');
+            retryButton.classList.toggle('d-none', !(status.state === 'failed' && status.can_retry));
+            retryButton.disabled = status.busy;
+            document.getElementById('nexus-update-retry-action').value = status.action === 'update' ? 'update' : 'check';
+            var releaseLink = document.getElementById('nexus-update-release-link');
+            releaseLink.classList.toggle('d-none', !status.release_url);
+            releaseLink.href = status.release_url || '#';
+            document.getElementById('nexus-update-updated-at').textContent = status.updated_at ? 'Last updater activity: ' + status.updated_at + ' UTC' : '';
+        }
+        function pollUpdaterStatus() {
+            if (updaterPollsRemaining <= 0) return;
+            updaterPollsRemaining--;
+            fetch('/admin/nexus.php?nexus_update_status=1', {credentials:'same-origin', cache:'no-store', headers:{Accept:'application/json'}})
+                .then(function (response) { if (!response.ok) throw new Error('Updater status request failed.'); return response.json(); })
+                .then(function (status) {
+                    renderUpdaterStatus(status);
+                    if (status.busy) { updaterSawBusy = true; updaterPollsRemaining = Math.max(updaterPollsRemaining, 180); }
+                    var newTerminalResult = !status.busy && status.updated_at && status.updated_at !== updaterInitialActivity;
+                    if (!updaterSawBusy && updaterWatchRequested && !newTerminalResult) setTimeout(pollUpdaterStatus, 2000);
+                    else if (status.busy) setTimeout(pollUpdaterStatus, 2000);
+                })
+                .catch(function () { if (updaterPollsRemaining > 0) setTimeout(pollUpdaterStatus, 3500); });
+        }
+        if (updaterPollsRemaining > 0) setTimeout(pollUpdaterStatus, 750);
+    }
+    function reindexNavigation(builder) {
+        builder.querySelectorAll('[data-navigation-item]').forEach(function (row, index) {
+            row.querySelectorAll('[data-nav-field]').forEach(function (field) {
+                var suffix = field.dataset.navField;
+                field.name = 'nexus[navigation][' + builder.dataset.navigationViewport + '][' + index + '][' + suffix + (suffix === 'roles][]' ? '' : ']');
+            });
+        });
+    }
+    studio.querySelectorAll('[data-navigation-viewport]').forEach(function (builder) {
+        builder.addEventListener('click', function (event) {
+            var button = event.target.closest('[data-nav-move]'); if (!button) return;
+            var row = button.closest('[data-navigation-item]');
+            if (button.dataset.navMove === 'up' && row.previousElementSibling) builder.insertBefore(row, row.previousElementSibling);
+            if (button.dataset.navMove === 'down' && row.nextElementSibling) builder.insertBefore(row.nextElementSibling, row);
+            reindexNavigation(builder);
+        });
+    });
 })();
 </script>
 

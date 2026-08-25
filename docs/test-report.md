@@ -1,8 +1,8 @@
 # Nexus Theme Manager for IT Flow Verification Report
 
 - Date: 2026-08-25
-- Package version: 3.8.0
-- Payload version: 26.08.22
+- Package version: 3.9.0
+- Payload version: 26.08.23
 - Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 - Test runtime: PHP 8.3.33 CLI
 
@@ -17,9 +17,9 @@
 | 22 payload PHP files | Pass |
 | 16 baseline PHP templates | Pass |
 | Three shell entrypoints | Syntax pass |
-| Lifecycle simulation | 254 passed, 0 failed |
-| GUI updater security suite | 32 passed, 0 failed |
-| Responsive browser checks | Pass at 390px, 768px, and 1440px with no page-level overflow |
+| Lifecycle simulation | 272 passed, 0 failed |
+| GUI updater security suite | 35 passed, 0 failed |
+| Responsive browser checks | Side-by-side desktop/390px preview passed; 1280px shell measured 1265px with no page-level overflow |
 | Manifest payload hashes | 23/23 verified |
 | Manifest baseline hashes | 16/16 verified |
 | Old organization name/domain/internal namespace scan | No matches |
@@ -56,6 +56,13 @@ The automated suite creates isolated ITFlow fixtures and protected state roots, 
 | Non-exact adoption refusal | Pass |
 | Package tamper detection | Pass |
 | GUI request allow-listing and protected-service setup requirement | Pass |
+| In-place stage polling, health-check progress, rollback outcome, recovery guidance, and retry controls | Pass |
+| Per-surface validation and global-fallback resolution | Pass |
+| Desktop/mobile navigation destination, icon, role, visibility, and order constraints | Pass |
+| System, user, forced, and overnight scheduled dark-mode resolution | Pass |
+| Mode-aware light/dark assets and WebP companion retention | Pass |
+| Shared live/preview ticket component parity | Pass |
+| Emergency disable, native presentation fallback, and managed-file/CSS health gating | Pass |
 | Release version, checksum, archive, manifest, CLI, and no-shell invariants | Pass |
 | systemd filesystem hardening and automatic rollback path | Pass |
 
@@ -87,8 +94,8 @@ The rebrand preserves the previously designed color values and layout behavior w
 The automated package is ready for a staging migration. A production operator must still:
 
 1. Back up the ITFlow application and database.
-2. Verify the v3.8.0 archive and companion SHA-256 file.
-3. Run the Nexus 3.8.0 `doctor` command.
+2. Verify the v3.9.0 archive and companion SHA-256 file.
+3. Run the Nexus 3.9.0 `doctor` command.
 4. Install through the supported lifecycle or GUI updater and reload the PHP/web service gracefully.
-5. Smoke-test login, MFA, password recovery, customer tickets, technician navigation, **Administration → NEXUS → Theme Manager**, responsive section navigation, preview visibility, Save draft, all eight exact previews, Design Quality findings and draft fixes, Publish, revision comparison/pin/restore/discard, diagnostics download, logo upload/removal, pause/reactivate, update check/status, and configured integrations.
+5. Smoke-test login, MFA, password recovery, customer tickets, technician navigation, **Administration → NEXUS → Theme Manager**, surface profiles, desktop/mobile navigation ordering and roles, user/system/scheduled dark mode, side-by-side previews, asset crop/resize and GIF/WebP reporting, Save draft, Publish, known-good recovery, emergency disable/reactivate, diagnostics, updater progress/retry/rollback, and configured integrations.
 6. Retain the previous release recovery state until acceptance is complete.

@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-const NEXUS_MANAGER_VERSION = '3.8.0';
-const NEXUS_THEME_VERSION = '26.08.22';
+const NEXUS_MANAGER_VERSION = '3.9.0';
+const NEXUS_THEME_VERSION = '26.08.23';
 const NEXUS_ITFLOW_COMMIT = '89b080b430aaafba5d520c4e52c57b28a9559085';
 const NEXUS_THEME_DISABLED_MARKER = '.nexus-theme-disabled';
 const NEXUS_THEME_SETTINGS_FILE = '.nexus-theme-settings.json';
@@ -136,6 +136,12 @@ function nexusUpdaterStatus(?string $root = null): array
         'updated_at' => null,
         'release_url' => null,
         'phase' => null,
+        'phase_label' => nexusUpdaterReady($root) ? 'Ready' : 'Setup required',
+        'progress' => 0,
+        'action' => null,
+        'can_retry' => false,
+        'recovery' => null,
+        'rollback_state' => null,
     ];
     $saved = nexusUpdaterReadJson(NEXUS_UPDATER_STATUS_FILE, $root);
     if ($saved === null) {
@@ -146,9 +152,11 @@ function nexusUpdaterStatus(?string $root = null): array
     $updatedAt = nexusThemeCleanText($saved['updated_at'] ?? '', 40);
     $updatedTimestamp = $updatedAt !== '' ? strtotime($updatedAt) : false;
     $message = nexusThemeCleanText($saved['message'] ?? $fallback['message'], 280);
+    $stale = false;
     if (in_array($state, ['checking', 'running'], true)
         && ($updatedTimestamp === false || $updatedTimestamp < time() - 1200)) {
         $state = 'failed';
+        $stale = true;
         $message = 'The updater stopped reporting progress. Check the systemd service log, then retry.';
     }
     $version = static function (mixed $value): ?string {
@@ -159,6 +167,36 @@ function nexusUpdaterStatus(?string $root = null): array
     if (!str_starts_with($releaseUrl, 'https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/tag/v')) {
         $releaseUrl = '';
     }
+    $phaseLabels = [
+        'checking' => 'Checking release',
+        'check_complete' => 'Check complete',
+        'download' => 'Downloading package',
+        'verify' => 'Verifying release',
+        'stage' => 'Staging package',
+        'backup' => 'Protecting current version',
+        'transition' => 'Preparing transition',
+        'install' => 'Installing Nexus',
+        'health_check' => 'Running health checks',
+        'finalize' => 'Finalizing update',
+        'complete' => 'Update complete',
+        'rollback' => 'Restoring previous version',
+        'rollback_complete' => 'Previous version restored',
+        'rollback_failed' => 'Rollback needs attention',
+        'registration_failed' => 'Updater repair required',
+        'failed' => 'Update stopped',
+    ];
+    $phase = (string)($saved['phase'] ?? '');
+    if (!array_key_exists($phase, $phaseLabels)) {
+        $phase = '';
+    }
+    $defaultProgress = in_array($state, ['update_available', 'up_to_date', 'completed'], true) ? 100 : 0;
+    $progress = is_int($saved['progress'] ?? null) ? max(0, min(100, $saved['progress'])) : $defaultProgress;
+    $action = in_array($saved['action'] ?? '', ['check', 'update'], true) ? $saved['action'] : null;
+    $rollbackState = in_array($saved['rollback_state'] ?? '', ['restored', 'failed'], true) ? $saved['rollback_state'] : null;
+    $recovery = nexusThemeCleanText($saved['recovery'] ?? '', 320);
+    if ($stale && $recovery === '') {
+        $recovery = 'The protected updater stopped reporting. Confirm the service is available, then retry the previous action.';
+    }
     return [
         'state' => $state,
         'message' => $message,
@@ -166,7 +204,13 @@ function nexusUpdaterStatus(?string $root = null): array
         'latest_version' => $version($saved['latest_version'] ?? ''),
         'updated_at' => $updatedAt,
         'release_url' => $releaseUrl !== '' ? $releaseUrl : null,
-        'phase' => nexusThemeCleanText($saved['phase'] ?? '', 32),
+        'phase' => $phase !== '' ? $phase : null,
+        'phase_label' => $phase !== '' ? $phaseLabels[$phase] : ucfirst(str_replace('_', ' ', $state)),
+        'progress' => $progress,
+        'action' => $action,
+        'can_retry' => $stale || ($saved['can_retry'] ?? false) === true,
+        'recovery' => $recovery !== '' ? $recovery : null,
+        'rollback_state' => $rollbackState,
     ];
 }
 
@@ -250,6 +294,34 @@ function nexusThemeDefaults(): array
             'font_scale' => 100,
             'motion_style' => 'fluid',
             'reduce_motion' => false,
+        ],
+        'profiles' => array_fill_keys(['technician', 'client', 'auth', 'guest', 'print'], [
+            'enabled' => false,
+            'colors' => [],
+            'appearance' => [],
+        ]),
+        'navigation' => [
+            'desktop' => [
+                ['id' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'fas fa-tachometer-alt', 'href' => '/agent/dashboard.php', 'roles' => ['admin', 'tech'], 'visible' => true],
+                ['id' => 'clients', 'label' => 'Clients', 'icon' => 'fas fa-users', 'href' => '/agent/clients.php', 'roles' => ['admin', 'tech'], 'visible' => true],
+                ['id' => 'tickets', 'label' => 'Tickets', 'icon' => 'fas fa-ticket-alt', 'href' => '/agent/tickets.php', 'roles' => ['admin', 'tech'], 'visible' => true],
+                ['id' => 'projects', 'label' => 'Projects', 'icon' => 'fas fa-project-diagram', 'href' => '/agent/projects.php', 'roles' => ['admin', 'tech'], 'visible' => true],
+                ['id' => 'invoices', 'label' => 'Invoices', 'icon' => 'fas fa-file-invoice', 'href' => '/agent/invoices.php', 'roles' => ['admin'], 'visible' => true],
+                ['id' => 'reports', 'label' => 'Reports', 'icon' => 'fas fa-chart-line', 'href' => '/agent/reports.php', 'roles' => ['admin'], 'visible' => true],
+            ],
+            'mobile' => [
+                ['id' => 'dashboard', 'label' => 'Home', 'icon' => 'fas fa-home', 'href' => '/agent/dashboard.php', 'roles' => ['admin', 'tech'], 'visible' => true],
+                ['id' => 'tickets', 'label' => 'Tickets', 'icon' => 'fas fa-ticket-alt', 'href' => '/agent/tickets.php', 'roles' => ['admin', 'tech'], 'visible' => true],
+                ['id' => 'clients', 'label' => 'Clients', 'icon' => 'fas fa-users', 'href' => '/agent/clients.php', 'roles' => ['admin', 'tech'], 'visible' => true],
+                ['id' => 'projects', 'label' => 'Projects', 'icon' => 'fas fa-project-diagram', 'href' => '/agent/projects.php', 'roles' => ['admin', 'tech'], 'visible' => true],
+            ],
+        ],
+        'dark_mode' => [
+            'mode' => 'system',
+            'user_selectable' => true,
+            'schedule_start' => '19:00',
+            'schedule_end' => '07:00',
+            'colors' => ['primary' => '#69bff5', 'secondary' => '#7888ff', 'sidebar' => '#090817', 'header' => '#070611', 'header_text' => '#ffffff', 'auth_background' => '#070611', 'page' => '#0f1020', 'surface' => '#17182b', 'text' => '#f7f8ff'],
         ],
     ];
 }
@@ -403,7 +475,7 @@ function nexusThemeValidateSettings(array $input): array
 {
     $defaults = nexusThemeDefaults();
     $presets = nexusThemePresets();
-    foreach (['branding', 'content', 'colors', 'appearance'] as $section) {
+    foreach (['branding', 'content', 'colors', 'appearance', 'profiles', 'navigation', 'dark_mode'] as $section) {
         if (!isset($input[$section]) || !is_array($input[$section])) {
             $input[$section] = [];
         }
@@ -466,7 +538,123 @@ function nexusThemeValidateSettings(array $input): array
     $result['appearance']['font_scale'] = max(90, min(110, (int)($input['appearance']['font_scale'] ?? 100)));
     $result['appearance']['motion_style'] = in_array($input['appearance']['motion_style'] ?? '', ['subtle', 'fluid', 'snappy'], true) ? $input['appearance']['motion_style'] : 'fluid';
     $result['appearance']['reduce_motion'] = !empty($input['appearance']['reduce_motion']);
+
+    foreach (array_keys($defaults['profiles']) as $surface) {
+        $profile = is_array($input['profiles'][$surface] ?? null) ? $input['profiles'][$surface] : [];
+        $result['profiles'][$surface]['enabled'] = !empty($profile['enabled']);
+        $result['profiles'][$surface]['colors'] = [];
+        foreach ($defaults['colors'] as $key => $fallback) {
+            if (isset($profile['colors'][$key]) && trim((string)$profile['colors'][$key]) !== '') {
+                $result['profiles'][$surface]['colors'][$key] = nexusThemeCleanColor($profile['colors'][$key], $fallback);
+            }
+        }
+        $result['profiles'][$surface]['appearance'] = [];
+        foreach (['density', 'menu_density', 'header_style', 'navigation_style'] as $key) {
+            if (isset($profile['appearance'][$key]) && trim((string)$profile['appearance'][$key]) !== '') {
+                $allowed = $key === 'header_style' ? ['solid', 'gradient', 'glass'] : ($key === 'navigation_style' ? ['pill', 'rail', 'outline'] : ['compact', 'comfortable', 'spacious']);
+                if (in_array($profile['appearance'][$key], $allowed, true)) {
+                    $result['profiles'][$surface]['appearance'][$key] = $profile['appearance'][$key];
+                }
+            }
+        }
+    }
+
+    $navigationDefaultsById = [];
+    foreach (array_merge($defaults['navigation']['desktop'], $defaults['navigation']['mobile']) as $item) {
+        if (!isset($navigationDefaultsById[$item['id']])) $navigationDefaultsById[$item['id']] = $item;
+    }
+    foreach (['desktop', 'mobile'] as $viewport) {
+        $submittedItems = is_array($input['navigation'][$viewport] ?? null) ? $input['navigation'][$viewport] : [];
+        $result['navigation'][$viewport] = [];
+        $seen = [];
+        foreach (array_slice($submittedItems, 0, 24) as $item) {
+            if (!is_array($item)) continue;
+            $id = strtolower(nexusThemeCleanText($item['id'] ?? '', 32));
+            if (!isset($navigationDefaultsById[$id]) || isset($seen[$id])) continue;
+            $base = $navigationDefaultsById[$id];
+            $roles = array_values(array_intersect(['admin', 'tech'], is_array($item['roles'] ?? null) ? $item['roles'] : []));
+            $result['navigation'][$viewport][] = [
+                'id' => $id,
+                'label' => nexusThemeCleanText($item['label'] ?? $base['label'], 32),
+                'icon' => preg_match('/^(?:fas|far) fa-[a-z0-9-]{2,40}$/', (string)($item['icon'] ?? '')) === 1 ? (string)$item['icon'] : $base['icon'],
+                'href' => $base['href'],
+                'roles' => $roles === [] ? $base['roles'] : $roles,
+                'visible' => !empty($item['visible']),
+            ];
+            $seen[$id] = true;
+        }
+        foreach ($defaults['navigation'][$viewport] as $item) {
+            if (!isset($seen[$item['id']])) $result['navigation'][$viewport][] = $item;
+        }
+    }
+
+    $dark = is_array($input['dark_mode'] ?? null) ? $input['dark_mode'] : [];
+    $result['dark_mode']['mode'] = in_array($dark['mode'] ?? '', ['light', 'dark', 'system', 'scheduled'], true) ? $dark['mode'] : 'system';
+    $result['dark_mode']['user_selectable'] = !empty($dark['user_selectable']);
+    foreach (['schedule_start', 'schedule_end'] as $key) {
+        $candidate = (string)($dark[$key] ?? $defaults['dark_mode'][$key]);
+        $result['dark_mode'][$key] = preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', $candidate) === 1 ? $candidate : $defaults['dark_mode'][$key];
+    }
+    foreach ($defaults['dark_mode']['colors'] as $key => $fallback) {
+        $result['dark_mode']['colors'][$key] = nexusThemeCleanColor($dark['colors'][$key] ?? '', $fallback);
+    }
     return $result;
+}
+
+function nexusThemeSettingsForSurface(array $settings, string $surface): array
+{
+    $settings = nexusThemeValidateSettings($settings);
+    if (!isset($settings['profiles'][$surface]) || !$settings['profiles'][$surface]['enabled']) return $settings;
+    foreach (['colors', 'appearance'] as $section) {
+        foreach ($settings['profiles'][$surface][$section] as $key => $value) $settings[$section][$key] = $value;
+    }
+    return $settings;
+}
+
+function nexusThemeDarkModeState(array $settings, ?string $preference = null, ?int $timestamp = null): string
+{
+    $settings = nexusThemeValidateSettings($settings);
+    if ($settings['dark_mode']['user_selectable'] && in_array($preference, ['light', 'dark', 'system'], true)) return $preference;
+    $mode = $settings['dark_mode']['mode'];
+    if ($mode !== 'scheduled') return $mode;
+    $now = (int)date('Hi', $timestamp ?? time());
+    $start = (int)str_replace(':', '', $settings['dark_mode']['schedule_start']);
+    $end = (int)str_replace(':', '', $settings['dark_mode']['schedule_end']);
+    $dark = $start <= $end ? ($now >= $start && $now < $end) : ($now >= $start || $now < $end);
+    return $dark ? 'dark' : 'light';
+}
+
+function nexusThemeDarkModeClasses(array $settings): string
+{
+    $cookie = isset($_COOKIE['nexus_color_mode']) ? (string)$_COOKIE['nexus_color_mode'] : null;
+    $mode = nexusThemeDarkModeState($settings, $cookie);
+    return 'nexus-color-mode-' . $mode . ($mode === 'dark' ? ' dark-mode' : '');
+}
+
+function nexusThemeNavigationItems(array $settings, string $viewport = 'desktop', string $role = 'tech'): array
+{
+    $settings = nexusThemeValidateSettings($settings);
+    $viewport = $viewport === 'mobile' ? 'mobile' : 'desktop';
+    $role = strtolower($role) === 'admin' ? 'admin' : 'tech';
+    return array_values(array_filter($settings['navigation'][$viewport], static fn(array $item): bool => $item['visible'] && in_array($role, $item['roles'], true)));
+}
+
+function nexusThemeNavigationScript(array $settings, string $role = 'tech'): string
+{
+    $payload = json_encode([
+        'desktop' => nexusThemeNavigationItems($settings, 'desktop', $role),
+        'mobile' => nexusThemeNavigationItems($settings, 'mobile', $role),
+    ], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_THROW_ON_ERROR);
+    return '(function(){"use strict";var c=' . $payload . ';function apply(items){var nav=document.querySelector(".nav-sidebar");if(!nav)return;var links=Array.prototype.slice.call(nav.querySelectorAll("a.nav-link[href]")),byId={};links.forEach(function(a){var h=a.getAttribute("href")||"",hb=h.split(/[?#]/)[0].split("/").pop();items.forEach(function(i){var ib=i.href.split("/").pop();if(h===i.href||hb===ib)byId[i.id]=a.closest("li.nav-item");});});var group=nav.querySelector("[data-nexus-nav-group]");if(!group){group=document.createElement("li");group.className="nav-header";group.dataset.nexusNavGroup="1";group.textContent="CUSTOM NAVIGATION";nav.appendChild(group);}items.forEach(function(i){var li=byId[i.id];if(!li)return;li.hidden=false;var p=li.querySelector("p");if(p&&p.childNodes.length)p.childNodes[0].nodeValue=i.label+" ";var icon=li.querySelector(".nav-icon");if(icon)icon.className="nav-icon "+i.icon;nav.appendChild(li);});Object.keys(byId).forEach(function(id){if(!items.some(function(i){return i.id===id;}))byId[id].hidden=true;});}function run(){apply(matchMedia("(max-width: 991px)").matches?c.mobile:c.desktop);}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",run):run();matchMedia("(max-width: 991px)").addEventListener&&matchMedia("(max-width: 991px)").addEventListener("change",run);})();';
+}
+
+function nexusThemeColorModeScript(array $settings): string
+{
+    $settings = nexusThemeValidateSettings($settings);
+    $lightLogo = nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($settings, '', 'light'), $settings);
+    $darkLogo = nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($settings, '', 'dark'), $settings);
+    $config = json_encode(['mode' => $settings['dark_mode']['mode'], 'selectable' => $settings['dark_mode']['user_selectable'], 'light_logo' => $lightLogo, 'dark_logo' => $darkLogo], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_THROW_ON_ERROR);
+    return '(function(){"use strict";var c=' . $config . ',k="nexus_color_mode",stored=null;try{stored=localStorage.getItem(k);}catch(e){}var v=c.selectable?stored:c.mode;if(!/^(light|dark|system)$/.test(v||""))v=c.mode;document.documentElement.dataset.nexusColorMode=v;try{if(c.selectable)document.cookie=k+"="+v+"; path=/; max-age=31536000; SameSite=Lax";}catch(e){}function applyLogo(){var systemDark=matchMedia("(prefers-color-scheme:dark)").matches,bodyDark=document.body&&document.body.classList.contains("nexus-color-mode-dark"),isDark=v==="dark"||(v==="system"&&systemDark)||(v==="scheduled"&&bodyDark),src=isDark?c.light_logo:c.dark_logo;if(src)document.querySelectorAll("img[data-nexus-color-logo]").forEach(function(img){if(img.getAttribute("src")!==src)img.setAttribute("src",src);});}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",applyLogo):applyLogo();var media=matchMedia("(prefers-color-scheme:dark)");if(media.addEventListener)media.addEventListener("change",applyLogo);if(c.selectable)window.nexusSetColorMode=function(n){if(!/^(light|dark|system)$/.test(n))return;try{localStorage.setItem(k,n);document.cookie=k+"="+n+"; path=/; max-age=31536000; SameSite=Lax";}catch(e){}location.reload();};})();';
 }
 
 function nexusThemeSaveSettings(array $settings, ?string $root = null, bool $snapshot = true): array
@@ -764,6 +952,8 @@ function nexusThemeCleanupOrphanedAssets(?string $root = null): void
             $path = (string)($design['branding'][$key] ?? '');
             if (preg_match('#^/uploads/nexus-theme/([^/]+)$#', $path, $matches) === 1) {
                 $referenced[$matches[1]] = true;
+                $webpCompanion = preg_replace('/\.(?:png|jpe?g)$/i', '.webp', $matches[1]);
+                if ($webpCompanion !== $matches[1]) $referenced[$webpCompanion] = true;
             }
         }
     }
@@ -831,7 +1021,70 @@ function nexusThemeAllowedImageTypes(string $slot): array
     return $types;
 }
 
-function nexusThemeStoreImage(array $upload, string $slot, ?string $root = null): string
+function nexusThemeGifPlaybackReport(string $path): array
+{
+    $contents = is_file($path) && filesize($path) <= NEXUS_THEME_MAX_LOGO_BYTES ? file_get_contents($path) : false;
+    if ($contents === false) return ['animated' => false, 'frames' => 0, 'fps' => null, 'valid_24fps' => false];
+    preg_match_all('/\x21\xF9\x04[\x00-\xFF]\K[\x00-\xFF]{2}/s', $contents, $delays);
+    $values = [];
+    foreach ($delays[0] as $bytes) $values[] = max(1, unpack('v', $bytes)[1]);
+    $average = $values === [] ? null : array_sum($values) / count($values);
+    $fps = $average === null ? null : round(100 / $average, 1);
+    return ['animated' => count($values) > 1, 'frames' => count($values), 'fps' => $fps, 'valid_24fps' => $fps !== null && $fps >= 23 && $fps <= 25];
+}
+
+function nexusThemeImageResource(string $path, int $type): mixed
+{
+    return match ($type) {
+        IMAGETYPE_PNG => function_exists('imagecreatefrompng') ? @imagecreatefrompng($path) : false,
+        IMAGETYPE_JPEG => function_exists('imagecreatefromjpeg') ? @imagecreatefromjpeg($path) : false,
+        IMAGETYPE_WEBP => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($path) : false,
+        default => false,
+    };
+}
+
+function nexusThemeProcessImage(string $path, int $type, array $options): void
+{
+    $resizeWidth = max(0, min(4000, (int)($options['resize_width'] ?? 0)));
+    $resizeHeight = max(0, min(4000, (int)($options['resize_height'] ?? 0)));
+    $crop = is_array($options['crop'] ?? null) ? $options['crop'] : [];
+    $wantsTransform = $resizeWidth > 0 || $resizeHeight > 0 || $crop !== [];
+    if (!$wantsTransform) return;
+    if ($type === IMAGETYPE_GIF) throw new RuntimeException('Animated GIFs preserve every frame and cannot be cropped. Upload a pre-cropped GIF or use a static logo.');
+    if (!extension_loaded('gd')) throw new RuntimeException('Logo crop and resize require the PHP GD extension.');
+    $source = nexusThemeImageResource($path, $type);
+    if ($source === false) throw new RuntimeException('The uploaded image could not be opened for processing.');
+    try {
+        $sourceWidth = imagesx($source); $sourceHeight = imagesy($source);
+        $x = max(0, min($sourceWidth - 1, (int)($crop['x'] ?? 0)));
+        $y = max(0, min($sourceHeight - 1, (int)($crop['y'] ?? 0)));
+        $cropWidth = max(1, min($sourceWidth - $x, (int)($crop['width'] ?? $sourceWidth)));
+        $cropHeight = max(1, min($sourceHeight - $y, (int)($crop['height'] ?? $sourceHeight)));
+        if ($resizeWidth < 1 && $resizeHeight < 1) { $resizeWidth = $cropWidth; $resizeHeight = $cropHeight; }
+        elseif ($resizeWidth < 1) $resizeWidth = max(1, (int)round($resizeHeight * $cropWidth / $cropHeight));
+        elseif ($resizeHeight < 1) $resizeHeight = max(1, (int)round($resizeWidth * $cropHeight / $cropWidth));
+        $target = imagecreatetruecolor($resizeWidth, $resizeHeight);
+        imagealphablending($target, false); imagesavealpha($target, true);
+        imagecopyresampled($target, $source, 0, 0, $x, $y, $resizeWidth, $resizeHeight, $cropWidth, $cropHeight);
+        $written = match ($type) { IMAGETYPE_PNG => imagepng($target, $path, 6), IMAGETYPE_WEBP => imagewebp($target, $path, 88), default => imagejpeg($target, $path, 90) };
+        imagedestroy($target);
+        if (!$written) throw new RuntimeException('The processed image could not be saved.');
+    } finally { imagedestroy($source); }
+}
+
+function nexusThemeCreateWebpCompanion(string $path, int $type): ?string
+{
+    if ($type === IMAGETYPE_WEBP || $type === IMAGETYPE_GIF || !function_exists('imagewebp')) return null;
+    $source = nexusThemeImageResource($path, $type);
+    if ($source === false) return null;
+    $target = preg_replace('/\.[^.]+$/', '.webp', $path);
+    $written = imagewebp($source, $target, 88); imagedestroy($source);
+    if (!$written) return null;
+    @chmod($target, 0644);
+    return $target;
+}
+
+function nexusThemeStoreImage(array $upload, string $slot, ?string $root = null, array $options = []): string
 {
     $slots = [
         'logo-light' => [NEXUS_THEME_MAX_LOGO_BYTES, 4000, 2000, 'logo'],
@@ -896,6 +1149,7 @@ function nexusThemeStoreImage(array $upload, string $slot, ?string $root = null)
     }
     try {
         @chmod($staged, 0644);
+        nexusThemeProcessImage($staged, $image[2], $options);
         if (!@rename($staged, $target)) {
             throw new RuntimeException('The uploaded image could not be activated.');
         }
@@ -904,7 +1158,26 @@ function nexusThemeStoreImage(array $upload, string $slot, ?string $root = null)
             @unlink($staged);
         }
     }
+    nexusThemeCreateWebpCompanion($target, $image[2]);
     return '/uploads/' . NEXUS_THEME_ASSET_DIRECTORY . '/' . $slot . '-' . $assetId . '.' . $extension;
+}
+
+function nexusThemeAssetMetadata(string $relative, ?string $root = null): array
+{
+    $empty = ['configured' => false, 'exists' => false, 'width' => null, 'height' => null, 'bytes' => null, 'mime' => null, 'animated' => false, 'frames' => 0, 'fps' => null, 'valid_24fps' => false, 'webp' => false, 'warnings' => []];
+    if ($relative === '' || preg_match('#^/uploads/nexus-theme/[a-z-]+-[a-f0-9]{16}\.(?:png|jpe?g|webp|gif)$#', $relative) !== 1) return $empty;
+    $path = nexusThemeDocumentRoot($root) . str_replace('/', DIRECTORY_SEPARATOR, $relative);
+    $empty['configured'] = true;
+    if (!is_file($path) || is_link($path)) { $empty['warnings'][] = 'Configured file is missing.'; return $empty; }
+    $info = @getimagesize($path);
+    if ($info === false) { $empty['warnings'][] = 'File is not a readable image.'; return $empty; }
+    $empty['exists'] = true; $empty['width'] = $info[0]; $empty['height'] = $info[1]; $empty['bytes'] = filesize($path); $empty['mime'] = $info['mime'] ?? null;
+    if ($info[2] === IMAGETYPE_GIF) $empty = array_merge($empty, nexusThemeGifPlaybackReport($path));
+    $empty['webp'] = $info[2] === IMAGETYPE_WEBP || is_file((string)preg_replace('/\.[^.]+$/', '.webp', $path));
+    if ($info[0] > 2400 || $info[1] > 1200) $empty['warnings'][] = 'Large dimensions may slow page rendering.';
+    if ($empty['bytes'] > 2097152) $empty['warnings'][] = 'File size exceeds the recommended 2 MB target.';
+    if ($empty['animated'] && !$empty['valid_24fps']) $empty['warnings'][] = 'GIF playback is not approximately 24fps.';
+    return $empty;
 }
 
 function nexusThemeStoreLogo(array $upload, ?string $root = null): string
@@ -956,6 +1229,15 @@ function nexusThemeVersionedAssetUrl(string $url, ?array $settings = null): stri
 {
     if ($url === '' || preg_match('#^/uploads/nexus-theme/(?:logo-light|logo-dark|favicon|login-background)(?:-[a-f0-9]{16})?\.(?:png|jpe?g|webp|gif)$#', $url) !== 1) {
         return $url;
+    }
+    if (preg_match('/\.(?:png|jpe?g)$/i', $url) === 1) {
+        $webpUrl = (string)preg_replace('/\.(?:png|jpe?g)$/i', '.webp', $url);
+        try {
+            $webpPath = nexusThemeDocumentRoot() . str_replace('/', DIRECTORY_SEPARATOR, $webpUrl);
+            if (is_file($webpPath) && !is_link($webpPath)) $url = $webpUrl;
+        } catch (Throwable) {
+            // Asset optimization must never interfere with rendering.
+        }
     }
     $settings ??= nexusThemeSettings();
     $revision = (string)($settings['branding']['asset_revision'] ?? '');
@@ -1237,6 +1519,11 @@ function nexusThemeCustomCss(?array $settings = null): string
             . '.nexus-agent .brand-link[href="/agent/dashboard.php"] .brand-image::before{content:none}'
             . '.nexus-agent .brand-link[href="/agent/dashboard.php"] .brand-text{clip:rect(0 0 0 0);clip-path:inset(50%);height:1px;overflow:hidden;position:absolute;white-space:nowrap;width:1px}'
             . '@media (min-width:992px){.nexus-agent.sidebar-collapse .brand-link[href="/agent/dashboard.php"] .brand-image{flex:0 0 2rem;height:2rem;width:2rem}}' . "\n";
+        $darkAgentLogo = nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($settings, '', nexusThemeLogoVariantForColor($settings['dark_mode']['colors']['header'])), $settings);
+        if ($darkAgentLogo !== '' && $darkAgentLogo !== $logo) {
+            $css .= '.nexus-agent.nexus-color-mode-dark .brand-link[href="/agent/dashboard.php"] .brand-image{background-image:url("' . $darkAgentLogo . '")}' . "\n";
+            if ($settings['dark_mode']['mode'] === 'system') $css .= '@media (prefers-color-scheme:dark){.nexus-agent.nexus-color-mode-system .brand-link[href="/agent/dashboard.php"] .brand-image{background-image:url("' . $darkAgentLogo . '")}}' . "\n";
+        }
     }
     $logoJustify = $settings['branding']['logo_alignment'] === 'center' ? 'center' : ($settings['branding']['logo_alignment'] === 'right' ? 'flex-end' : 'flex-start');
     $authLogoHeight = number_format(5.5 * $settings['branding']['logo_size'] / 100, 2, '.', '') . 'rem';
@@ -1249,13 +1536,36 @@ function nexusThemeCustomCss(?array $settings = null): string
         $position = $settings['branding']['login_background_position'];
         $css .= '.nexus-auth{background-image:linear-gradient(rgba(0,0,0,' . $overlay . '),rgba(0,0,0,' . $overlay . ')),url("' . $background . '")!important;background-position:center,' . $position . ' center!important;background-repeat:no-repeat!important;background-size:cover!important}' . "\n";
     }
+    $surfaceSelectors = ['technician' => '.nexus-theme.nexus-surface-technician', 'client' => '.nexus-theme.nexus-surface-client', 'auth' => '.nexus-theme.nexus-surface-auth', 'guest' => '.nexus-theme.nexus-surface-guest', 'print' => '.nexus-theme.nexus-surface-print'];
+    foreach ($surfaceSelectors as $surface => $surfaceSelector) {
+        if (!$settings['profiles'][$surface]['enabled']) continue;
+        $surfaceSettings = nexusThemeSettingsForSurface($settings, $surface);
+        $surfaceColors = $surfaceSettings['colors'];
+        $surfaceVariables = [
+            '--nexus-cyan' => $surfaceColors['primary'], '--nexus-cyan-strong' => nexusThemeMixColors($surfaceColors['primary'], '#000000', 88),
+            '--nexus-violet' => $surfaceColors['secondary'], '--nexus-gradient' => 'linear-gradient(110deg,' . $surfaceColors['secondary'] . ' 0%,' . $surfaceColors['primary'] . ' 100%)',
+            '--nexus-night' => $surfaceColors['sidebar'], '--nexus-header' => $surfaceColors['header'], '--nexus-header-text' => $surfaceColors['header_text'], '--nexus-ink' => $surfaceColors['auth_background'],
+            '--nexus-page' => $surfaceColors['page'], '--nexus-surface' => $surfaceColors['surface'], '--nexus-surface-2' => $surfaceColors['page'], '--nexus-text' => $surfaceColors['text'],
+            '--nexus-copy' => nexusThemeMixColors($surfaceColors['text'], $surfaceColors['surface'], 72), '--nexus-muted' => nexusThemeMixColors($surfaceColors['text'], $surfaceColors['surface'], 56), '--nexus-border' => nexusThemeMixColors($surfaceColors['text'], $surfaceColors['surface'], 18),
+        ];
+        $surfaceDeclarations = [];
+        foreach ($surfaceVariables as $name => $value) $surfaceDeclarations[] = $name . ':' . $value;
+        $css .= $surfaceSelector . '{' . implode(';', $surfaceDeclarations) . "}\n";
+    }
+    $darkColors = $settings['dark_mode']['colors'];
+    $darkDeclarations = [
+        '--nexus-cyan:' . $darkColors['primary'], '--nexus-violet:' . $darkColors['secondary'], '--nexus-night:' . $darkColors['sidebar'], '--nexus-header:' . $darkColors['header'], '--nexus-header-text:' . $darkColors['header_text'], '--nexus-ink:' . $darkColors['auth_background'], '--nexus-page:' . $darkColors['page'], '--nexus-surface:' . $darkColors['surface'], '--nexus-surface-2:' . nexusThemeMixColors($darkColors['surface'], '#ffffff', 94), '--nexus-text:' . $darkColors['text'], '--nexus-copy:' . nexusThemeMixColors($darkColors['text'], $darkColors['surface'], 72), '--nexus-muted:' . nexusThemeMixColors($darkColors['text'], $darkColors['surface'], 56), '--nexus-border:' . nexusThemeMixColors($darkColors['text'], $darkColors['surface'], 18),
+    ];
+    $css .= '.nexus-theme.nexus-color-mode-dark,.nexus-theme[data-nexus-color-mode="dark"]{' . implode(';', $darkDeclarations) . "}\n";
+    if ($settings['dark_mode']['mode'] === 'system') $css .= '@media (prefers-color-scheme:dark){.nexus-theme.nexus-color-mode-system{' . implode(';', $darkDeclarations) . '}}' . "\n";
     $css .= '@media (min-width:992px){.nexus-agent:not(.sidebar-collapse) .main-sidebar{width:var(--nexus-sidebar-width)}.nexus-agent:not(.sidebar-collapse) .content-wrapper,.nexus-agent:not(.sidebar-collapse) .main-header,.nexus-agent:not(.sidebar-collapse) .main-footer{margin-left:var(--nexus-sidebar-width)}}' . "\n";
     return $css;
 }
 
-function nexusThemePresentationModel(array $settings, string $fallbackBrand = 'Nexus MSP'): array
+function nexusThemePresentationModel(array $settings, string $fallbackBrand = 'Nexus MSP', ?string $surface = null): array
 {
     $settings = nexusThemeValidateSettings($settings);
+    if ($surface !== null) $settings = nexusThemeSettingsForSurface($settings, $surface);
     $brand = nexusThemeBrandName($fallbackBrand, $settings);
     $authLogo = $settings['branding']['show_login_logo']
         ? nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($settings, '', nexusThemeLogoVariantForColor($settings['colors']['auth_background'])), $settings)
@@ -1274,7 +1584,7 @@ function nexusThemePresentationModel(array $settings, string $fallbackBrand = 'N
         'auth_logo' => $authLogo,
         'agent_logo' => $agentLogo,
         'portal_logo' => $portalLogo,
-        'body_classes' => nexusThemeBodyClasses($settings),
+        'body_classes' => nexusThemeBodyClasses($settings) . ($surface !== null ? ' nexus-surface-' . $surface : '') . ' ' . nexusThemeDarkModeClasses($settings),
         'custom_css' => nexusThemeCustomCss($settings),
     ];
 }
@@ -1382,6 +1692,58 @@ function nexusThemeApplyQualityFixes(array $settings, int $width = 390): array
     return nexusThemeValidateSettings($settings);
 }
 
+function nexusThemeHealthReport(?string $root = null): array
+{
+    $documentRoot = nexusThemeDocumentRoot($root);
+    static $cache = [];
+    if (isset($cache[$documentRoot])) return $cache[$documentRoot];
+    $required = ['includes/nexus_theme.php', 'css/nexus-theme.css', 'css/nexus-theme-custom.php', 'admin/nexus.php', 'admin/post/nexus.php', 'login.php'];
+    $checks = [];
+    foreach ($required as $relative) {
+        $path = $documentRoot . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relative);
+        $checks[$relative] = is_file($path) && !is_link($path) && filesize($path) > 0;
+    }
+    $cssPath = $documentRoot . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'nexus-theme.css';
+    $css = is_file($cssPath) ? (string)file_get_contents($cssPath) : '';
+    $checks['css-balanced'] = $css !== '' && substr_count($css, '{') === substr_count($css, '}') && !str_contains($css, '</style>');
+    $settingsPath = nexusThemeSettingsPath($root);
+    $checks['settings-readable'] = !is_file($settingsPath);
+    if (is_file($settingsPath) && !is_link($settingsPath) && filesize($settingsPath) <= 65536) {
+        try { $decodedSettings = json_decode((string)file_get_contents($settingsPath), true, 32, JSON_THROW_ON_ERROR); $checks['settings-readable'] = is_array($decodedSettings); }
+        catch (JsonException) { $checks['settings-readable'] = false; }
+    }
+    $failed = array_keys(array_filter($checks, static fn(bool $passed): bool => !$passed));
+    return $cache[$documentRoot] = ['healthy' => $failed === [], 'checks' => $checks, 'failed' => $failed, 'checked_at' => gmdate('c')];
+}
+
+function nexusThemeRuntimeEnabled(?string $root = null): bool
+{
+    if (!nexusThemeIsEnabled($root)) return false;
+    try { return nexusThemeHealthReport($root)['healthy']; } catch (Throwable) { return false; }
+}
+
+function nexusThemeEmergencyDisable(?string $root = null): array
+{
+    nexusThemeSetEnabled(false, $root);
+    return nexusThemeHealthReport($root);
+}
+
+function nexusThemeRestoreKnownGood(string $actor = 'Administrator', ?string $root = null): array
+{
+    $revisions = array_reverse(nexusThemeRevisions($root));
+    $selected = null;
+    foreach ($revisions as $revision) {
+        if ($revision['pinned']) { $selected = $revision; break; }
+    }
+    if ($selected === null && $revisions !== []) $selected = $revisions[0];
+    if ($selected === null) throw new RuntimeException('No known-good Nexus revision is available.');
+    nexusThemeSnapshotActive($actor, 'Automatic snapshot before emergency recovery', $root, false);
+    nexusThemeSaveSettings($selected['settings'], $root);
+    nexusThemeDiscardDraft($root);
+    nexusThemeSetEnabled(true, $root);
+    return $selected;
+}
+
 function nexusThemeDiagnostics(?string $root = null): array
 {
     $active = nexusThemeSettings($root);
@@ -1390,12 +1752,7 @@ function nexusThemeDiagnostics(?string $root = null): array
     foreach (['logo_light_path', 'logo_dark_path', 'favicon_path', 'login_background_path'] as $key) {
         $relative = (string)$active['branding'][$key];
         $file = $relative !== '' ? nexusThemeDocumentRoot($root) . str_replace('/', DIRECTORY_SEPARATOR, $relative) : '';
-        $assets[$key] = [
-            'configured' => $relative !== '',
-            'extension' => $relative !== '' ? strtolower(pathinfo($relative, PATHINFO_EXTENSION)) : null,
-            'exists' => $file !== '' && is_file($file) && !is_link($file),
-            'bytes' => $file !== '' && is_file($file) ? filesize($file) : null,
-        ];
+        $assets[$key] = nexusThemeAssetMetadata($relative, $root);
     }
     $revisions = nexusThemeRevisions($root);
     return [
@@ -1407,8 +1764,20 @@ function nexusThemeDiagnostics(?string $root = null): array
         'quality' => ['desktop' => nexusThemeQualityReport($draft ?? $active, 1440), 'mobile' => nexusThemeQualityReport($draft ?? $active, 390)],
         'assets' => $assets,
         'history' => ['revisions' => count($revisions), 'pinned' => count(array_filter($revisions, static fn(array $revision): bool => $revision['pinned']))],
+        'health' => nexusThemeHealthReport($root),
         'updater' => nexusUpdaterStatus($root),
     ];
+}
+
+function nexusThemeTicketSummaryComponent(array $metrics, string $title = 'Ticket queue'): string
+{
+    $e = static fn(mixed $value): string => htmlspecialchars((string)$value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    $values = ['open' => (int)($metrics['open'] ?? 0), 'waiting' => (int)($metrics['waiting'] ?? 0), 'priority' => (int)($metrics['priority'] ?? 0), 'response' => $e($metrics['response'] ?? 'No data')];
+    return '<section class="nexus-ticket-queue-summary" aria-labelledby="nexus-ticket-queue-title"><header class="nexus-ticket-queue-heading"><div><span class="nexus-manager-kicker">Service desk pulse</span><h2 id="nexus-ticket-queue-title">' . $e($title) . '</h2></div><span class="nexus-ticket-queue-live"><i class="fas fa-circle" aria-hidden="true"></i> Live queue</span></header><div class="nexus-ticket-queue-grid">'
+        . '<article class="card nexus-ticket-metric nexus-ticket-metric-open"><div class="card-body"><div><strong>' . $values['open'] . '</strong><span>Open tickets</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-inbox" aria-hidden="true"></i></span></div></article>'
+        . '<article class="card nexus-ticket-metric nexus-ticket-metric-waiting"><div class="card-body"><div><strong>' . $values['waiting'] . '</strong><span>Waiting on client</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-user-clock" aria-hidden="true"></i></span></div></article>'
+        . '<article class="card nexus-ticket-metric nexus-ticket-metric-priority"><div class="card-body"><div><strong>' . $values['priority'] . '</strong><span>High priority</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i></span></div></article>'
+        . '<article class="card nexus-ticket-metric nexus-ticket-metric-response"><div class="card-body"><div><strong>' . $values['response'] . '</strong><span>Median response</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-stopwatch" aria-hidden="true"></i></span></div></article></div></section>';
 }
 
 function nexusThemePreviewDocument(array $settings, string $surface, string $fallbackBrand = 'Nexus MSP'): string
@@ -1416,7 +1785,8 @@ function nexusThemePreviewDocument(array $settings, string $surface, string $fal
     if (!in_array($surface, ['auth', 'reset', 'dashboard', 'technician', 'client', 'mobile', 'invoice', 'print'], true)) {
         throw new RuntimeException('Unknown Nexus preview surface.');
     }
-    $model = nexusThemePresentationModel($settings, $fallbackBrand);
+    $profileSurface = match ($surface) { 'auth', 'reset' => 'auth', 'dashboard', 'technician', 'mobile' => 'technician', 'client' => 'client', 'invoice' => 'guest', 'print' => 'print' };
+    $model = nexusThemePresentationModel($settings, $fallbackBrand, $profileSurface);
     $settings = $model['settings'];
     $e = static fn(mixed $value): string => htmlspecialchars((string)$value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     $brand = $e($model['brand']);
@@ -1434,7 +1804,12 @@ function nexusThemePreviewDocument(array $settings, string $surface, string $fal
     $portalMessage = nl2br($e($settings['content']['portal_message']));
 
     $brandImage = static function (string $url, string $alt, string $class = 'img-fluid') use ($e): string {
-        return $url === '' ? '' : '<img class="' . $e($class) . '" src="' . $url . '" alt="' . $alt . '">';
+        return $url === '' ? '' : '<img class="' . $e($class) . '" data-nexus-color-logo src="' . $url . '" alt="' . $alt . '">';
+    };
+    $navigationMarkup = static function (array $items, string $activeId = '') use ($e): string {
+        $markup = '';
+        foreach ($items as $item) $markup .= '<li class="nav-item"><a class="nav-link ' . ($item['id'] === $activeId ? 'active' : '') . '" href="' . $e($item['href']) . '"><i class="nav-icon ' . $e($item['icon']) . '"></i><p>' . $e($item['label']) . '</p></a></li>';
+        return $markup;
     };
 
     if ($surface === 'reset') {
@@ -1461,14 +1836,15 @@ function nexusThemePreviewDocument(array $settings, string $surface, string $fal
         $brandMark = $agentLogo !== '' ? '<span class="brand-image"></span>' : '<span class="brand-image"><i class="fas fa-layer-group"></i></span>';
         $content = '<body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed nexus-theme nexus-agent ' . $classes . '"><div class="wrapper text-sm">'
             . '<aside class="main-sidebar sidebar-dark-primary"><a class="brand-link" href="/agent/dashboard.php">' . $brandMark . '<span class="brand-text font-weight-light">' . $brand . '</span></a><div class="sidebar"><nav class="mt-2"><ul class="nav nav-pills nav-sidebar flex-column">'
-            . '<li class="nav-header">WORKSPACE</li><li class="nav-item"><a class="nav-link active"><i class="nav-icon fas fa-tachometer-alt"></i><p>Dashboard</p></a></li><li class="nav-item"><a class="nav-link"><i class="nav-icon fas fa-users"></i><p>Clients</p></a></li><li class="nav-header">SUPPORT</li><li class="nav-item"><a class="nav-link"><i class="nav-icon fas fa-ticket-alt"></i><p>Tickets <span class="right badge badge-info">12</span></p></a></li><li class="nav-item"><a class="nav-link"><i class="nav-icon fas fa-project-diagram"></i><p>Projects</p></a></li></ul></nav></div></aside>'
+            . '<li class="nav-header">CUSTOM NAVIGATION</li>' . $navigationMarkup(nexusThemeNavigationItems($settings, 'desktop', 'admin'), $surface === 'dashboard' ? 'dashboard' : 'tickets') . '</ul></nav></div></aside>'
             . '<nav class="main-header navbar navbar-expand navbar-dark"><a class="nav-link"><i class="fas fa-bars"></i></a><span class="navbar-text ml-auto">Alex Technician&nbsp; <i class="fas fa-user-circle"></i></span></nav>'
-            . '<div class="content-wrapper"><section class="content-header"><div class="container-fluid"><h1>' . $technicianTitle . '</h1></div></section><section class="content"><div class="container-fluid"><section class="nexus-ticket-queue-summary"><div class="nexus-ticket-queue-heading"><div><span class="nexus-ticket-queue-kicker">Live operations</span><h2>' . $technicianTitle . '</h2><p>Current support workload and response health.</p></div><span class="nexus-ticket-queue-live"><i></i> Live</span></div><div class="nexus-ticket-queue-grid">'
-            . '<article class="card nexus-ticket-metric nexus-ticket-metric-open"><div class="card-body"><div><strong>12</strong><span>Open tickets</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-inbox"></i></span></div></article><article class="card nexus-ticket-metric nexus-ticket-metric-waiting"><div class="card-body"><div><strong>3</strong><span>Waiting on client</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-user-clock"></i></span></div></article><article class="card nexus-ticket-metric nexus-ticket-metric-priority"><div class="card-body"><div><strong>2</strong><span>High priority</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-exclamation-triangle"></i></span></div></article><article class="card nexus-ticket-metric nexus-ticket-metric-response"><div class="card-body"><div><strong>18m</strong><span>Median response</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-stopwatch"></i></span></div></article></div></section>'
+            . '<div class="content-wrapper"><section class="content-header"><div class="container-fluid"><h1>' . $technicianTitle . '</h1></div></section><section class="content"><div class="container-fluid">' . nexusThemeTicketSummaryComponent(['open' => 12, 'waiting' => 3, 'priority' => 2, 'response' => '18m'], $technicianTitle)
             . '<div class="card"><div class="card-header"><strong>Active tickets</strong></div><div class="card-body"><table class="table"><thead><tr><th>Subject</th><th>Client</th><th>Status</th></tr></thead><tbody><tr><td>New employee setup</td><td>Nexus MSP</td><td><span class="badge badge-info">Open</span></td></tr><tr><td>VPN access</td><td>Example Co.</td><td><span class="badge badge-warning">Waiting</span></td></tr></tbody></table></div></div></div></section></div></div></body>';
     } elseif ($surface === 'mobile') {
         $clientBrand = $portalLogo !== '' ? $brandImage($portalLogo, $logoAlt, 'nexus-client-nav-logo') : '<span>' . $brand . '</span>';
-        $content = '<body class="hold-transition nexus-theme nexus-client nexus-preview-mobile ' . $classes . '"><nav class="navbar navbar-dark nexus-client-nav"><div class="container"><a class="navbar-brand">' . $clientBrand . '</a><button class="navbar-toggler"><i class="fas fa-bars"></i></button></div></nav><aside class="nexus-preview-mobile-menu"><span class="nexus-manager-kicker">Navigation</span><a class="active"><i class="fas fa-home"></i> Home</a><a><i class="fas fa-ticket-alt"></i> Tickets</a><a><i class="fas fa-file-invoice-dollar"></i> Finance</a><a><i class="fas fa-book"></i> Documents</a><button class="btn btn-primary btn-block">Create support request</button></aside><main class="container py-4"><span class="nexus-eyebrow">Phone workspace</span><h1>' . $portalHeading . '</h1><p>' . $portalMessage . '</p></main></body>';
+        $mobileLinks = '';
+        foreach (nexusThemeNavigationItems($settings, 'mobile', 'admin') as $index => $item) $mobileLinks .= '<a class="' . ($index === 0 ? 'active' : '') . '"><i class="' . $e($item['icon']) . '"></i> ' . $e($item['label']) . '</a>';
+        $content = '<body class="hold-transition nexus-theme nexus-agent nexus-client nexus-preview-mobile ' . $classes . '"><nav class="navbar navbar-dark nexus-client-nav"><div class="container"><a class="navbar-brand">' . $clientBrand . '</a><button class="navbar-toggler"><i class="fas fa-bars"></i></button></div></nav><aside class="nexus-preview-mobile-menu"><span class="nexus-manager-kicker">Mobile navigation</span>' . $mobileLinks . '<button class="btn btn-primary btn-block">Create support request</button></aside><main class="container py-4"><span class="nexus-eyebrow">Phone workspace</span><h1>Technician dashboard</h1><p>Independent mobile ordering, labels, icons, and access rules.</p></main></body>';
     } elseif ($surface === 'client') {
         $clientBrand = $portalLogo !== '' ? $brandImage($portalLogo, $logoAlt, 'nexus-client-nav-logo') : '<span>' . $brand . '</span>';
         $content = '<body class="hold-transition nexus-theme nexus-client ' . $classes . '"><nav class="navbar navbar-expand-lg navbar-dark nexus-client-nav"><div class="container"><a class="navbar-brand ' . ($portalLogo !== '' ? 'nexus-client-brand--logo' : 'nexus-client-brand--text') . '">' . $clientBrand . '</a><ul class="navbar-nav mr-auto"><li class="nav-item active"><a class="nav-link">Home</a></li><li class="nav-item"><a class="nav-link">Tickets</a></li><li class="nav-item"><a class="nav-link">Finance</a></li></ul><a class="btn nexus-portal-cta"><i class="fas fa-plus mr-2"></i>Create support request</a></div></nav>'
@@ -1482,5 +1858,5 @@ function nexusThemePreviewDocument(array $settings, string $surface, string $fal
     $title = $e(ucfirst($surface) . ' draft preview');
     return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="/"><title>' . $title . '</title>'
         . '<link rel="stylesheet" href="/libs/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="/libs/adminlte/css/adminlte.min.css"><link rel="stylesheet" href="/css/nexus-theme.css?v=' . $e(NEXUS_THEME_VERSION) . '">'
-        . '<style>' . $customCss . 'html,body{min-height:100%;overflow:auto}body{margin:0}.nexus-preview-note{display:none}.nexus-preview-mobile-menu{background:var(--nexus-surface);box-shadow:0 1rem 2.5rem rgba(11,10,23,.18);display:grid;gap:.35rem;margin:1rem;padding:1rem}.nexus-preview-mobile-menu a{border-radius:var(--nexus-radius);color:var(--nexus-text);display:flex;gap:.75rem;padding:.75rem}.nexus-preview-mobile-menu a.active{background:var(--nexus-gradient);color:var(--nexus-primary-contrast)}.nexus-print-preview{background:#fff!important}.nexus-print-preview .card{box-shadow:none}</style></head>' . $content . '</html>';
+        . '<style>' . $customCss . 'html,body{min-height:100%;overflow:auto}body{background:var(--nexus-page);color:var(--nexus-text);margin:0}.nexus-preview-note{display:none}.nexus-preview-mobile-menu{background:var(--nexus-surface);box-shadow:0 1rem 2.5rem rgba(11,10,23,.18);display:grid;gap:.35rem;margin:1rem;padding:1rem}.nexus-preview-mobile-menu a{border-radius:var(--nexus-radius);color:var(--nexus-text);display:flex;gap:.75rem;padding:.75rem}.nexus-preview-mobile-menu a.active{background:var(--nexus-gradient);color:var(--nexus-primary-contrast)}.nexus-print-preview{background:#fff!important}.nexus-print-preview .card{box-shadow:none}</style></head>' . $content . '<script>' . nexusThemeColorModeScript($settings) . '</script></html>';
 }

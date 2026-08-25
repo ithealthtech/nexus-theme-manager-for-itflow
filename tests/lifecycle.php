@@ -112,6 +112,7 @@ try {
     $adminPostSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'post' . DIRECTORY_SEPARATOR . 'nexus.php');
     $adminNavSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'admin' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'side_nav.php');
     $themeCssSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . 'nexus-theme.css');
+    $themeHelperSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'nexus_theme.php');
     $agentTicketsSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'agent' . DIRECTORY_SEPARATOR . 'tickets.php');
     $agentHeaderSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'header.php');
     $clientHeaderSource = (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'payload' . DIRECTORY_SEPARATOR . 'client' . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'header.php');
@@ -128,7 +129,9 @@ try {
     expect(str_contains($adminPostSource, 'validateCSRFToken()'), 'administration action validates the ITFlow CSRF token');
     expect(!preg_match('/\\b(?:exec|shell_exec|system|passthru|proc_open)\\s*\\(/', $adminPostSource), 'administration action cannot launch lifecycle shell commands');
     expect(str_contains($adminPostSource, "['brand', 'colors', 'layout', 'quality', 'motion', 'content', 'operations', 'system']") && str_contains($adminPostSource, "'#nexus-' . \$returnSection"), 'administration actions can return only to an allow-listed Theme Studio section');
-    expect(substr_count($adminPageSource, 'name="nexus_return_section" value="system"') === 2, 'both updater forms return to the System and Updates section');
+    expect(substr_count($adminPageSource, 'name="nexus_return_section" value="system"') >= 3 && str_contains($adminPostSource, "'?updater=watch'"), 'check, install, retry, and recovery actions return to the live System and Updates workspace');
+    expect(str_contains($adminPageSource, "isset(\$_GET['nexus_update_status'])") && str_contains($adminPageSource, "fetch('/admin/nexus.php?nexus_update_status=1'") && !str_contains($adminPageSource, 'window.location.reload()'), 'Theme Studio polls protected updater status without disruptive page reloads');
+    expect(str_contains($adminPageSource, 'id="nexus-update-timeline"') && str_contains($adminPageSource, 'id="nexus-update-retry-button"') && str_contains($themeCssSource, '.nexus-update-timeline li.is-active'), 'updater UI exposes stage progress, recovery guidance, and safe retry controls');
     expect(str_contains($adminNavSource, '/admin/nexus.php'), 'administration navigation exposes the Nexus Theme Manager');
     expect(str_contains($adminNavSource, 'brand-link nexus-admin-back') && str_contains($themeCssSource, '.nexus-agent .main-sidebar .nexus-admin-back'), 'administration return navigation uses the compact Nexus treatment');
     expect(str_contains($adminNavSource, 'NEXUS_MANAGER_VERSION'), 'administration navigation reports the installed manager version');
@@ -163,11 +166,17 @@ try {
     expect(str_contains($adminPageSource, 'data-responsive-width="1600"') && str_contains($adminPageSource, 'data-responsive-width="1366"') && str_contains($adminPageSource, 'data-responsive-width="768"') && str_contains($adminPageSource, 'data-responsive-width="390"') && str_contains($adminPageSource, 'id="nexus-responsive-width"'), 'responsive tester provides widescreen, laptop, tablet, phone, and custom widths');
     expect(str_contains($adminPageSource, 'availableWidth / width') && str_contains($adminPageSource, 'window.addEventListener(\'resize\', updateResponsivePreview)') && str_contains($themeCssSource, '--nexus-preview-width') && str_contains($themeCssSource, '--nexus-preview-scale'), 'responsive tester fits the shared runtime preview to its available viewport');
     expect(str_contains($adminPageSource, 'id="nexus-preview-toggle"') && str_contains($adminPageSource, 'id="nexus-preview-surface-select"') && str_contains($adminPageSource, "workspace.classList.toggle('is-preview-collapsed')"), 'Theme Studio previews can be hidden and use a compact surface picker on narrow screens');
-    expect(str_contains($agentTicketsSource, 'nexus-ticket-queue-summary') && str_contains($agentTicketsSource, 'Ticket queue') && str_contains($themeCssSource, '.nexus-agent .nexus-ticket-queue-grid'), 'technician tickets render the responsive Nexus queue summary shown in the theme preview');
+    expect(str_contains($agentTicketsSource, 'nexusThemeTicketSummaryComponent($nexus_ticket_metrics)') && str_contains($themeHelperSource, 'function nexusThemeTicketSummaryComponent') && str_contains($themeCssSource, '.nexus-agent .nexus-ticket-queue-grid'), 'technician tickets and preview render the same responsive Nexus queue component');
     expect(str_contains($agentTicketsSource, "ticket_reply_type IN ('Public', 'Client')") && str_contains($agentTicketsSource, "= 'Public' THEN 1 ELSE 0"), 'waiting-on-client counts use the latest client-visible reply direction');
     expect(str_contains($agentTicketsSource, "ticket_priority IN ('High', 'Urgent')") && str_contains($agentTicketsSource, 'TIMESTAMPDIFF(SECOND, ticket_created_at, ticket_first_response_at)'), 'queue metrics use live priority and first-response data');
     expect(str_contains($agentTicketsSource, 'if (!empty($nexus_theme_enabled))') && str_contains($agentTicketsSource, '$nexus_ticket_metrics = null;'), 'pausing Nexus removes the queue summary and skips its aggregate queries');
     expect(str_contains($adminPageSource, 'nexus_logo_light') && str_contains($adminPageSource, 'nexus_logo_dark') && str_contains($adminPageSource, 'nexus_login_background'), 'Theme Studio exposes responsive logos and custom login imagery');
+    expect(str_contains($adminPageSource, 'Advanced asset processing') && str_contains($adminPageSource, 'nexus-asset-health-grid') && str_contains($themeHelperSource, 'nexusThemeCreateWebpCompanion'), 'advanced asset manager exposes crop, resize, metadata warnings, animation inspection, favicon preview, and WebP generation');
+    expect(str_contains($adminPageSource, 'Per-surface design profiles') && str_contains($themeHelperSource, 'nexusThemeSettingsForSurface') && str_contains($invoicePdfEndpointSource, "'print'"), 'global defaults can be overridden independently for every live and print surface');
+    expect(str_contains($adminPageSource, 'Navigation builder') && str_contains($themeHelperSource, 'nexusThemeNavigationItems') && str_contains($agentHeaderSource, 'nexusThemeNavigationScript'), 'navigation builder controls ordered desktop/mobile labels, icons, visibility, and role access');
+    expect(str_contains($adminPageSource, 'Automatic dark mode') && str_contains($themeHelperSource, 'nexusThemeDarkModeState') && str_contains($clientHeaderSource, 'nexusSetColorMode') && str_contains($themeHelperSource, 'data-nexus-color-logo'), 'automatic dark mode supports system, user, schedule, independent palette controls, and mode-aware assets');
+    expect(str_contains($adminPageSource, 'Recovery mode') && str_contains($adminPostSource, 'nexusThemeEmergencyDisable') && str_contains($themeHelperSource, 'nexusThemeRuntimeEnabled'), 'recovery mode detects presentation failures, restores known-good history, and preserves native access');
+    expect(str_contains($adminPageSource, 'nexus-preview-comparison') && substr_count($adminPageSource, 'mobile Nexus preview') === 1, 'runtime preview presents desktop and phone renderings side by side');
     expect(str_contains($adminPageSource, '$nexusBrandPlaceholder = \'Nexus MSP\';') && str_contains($adminPageSource, 'Nexus MSP is preview text only'), 'empty Theme Studio brand fields use the neutral Nexus MSP placeholder');
     expect(!str_contains($adminPageSource, 'placeholder="<?= escapeHtml($session_company_name) ?>"') && !str_contains($adminPageSource, 'json_encode($session_company_name'), 'Theme Studio does not expose the configured company name through empty-field placeholders');
     expect(str_contains($themeCssSource, '.nexus-manager-page { overflow-x: hidden; overflow-x: clip; }') && str_contains($themeCssSource, 'overscroll-behavior-inline: contain') && str_contains($themeCssSource, 'scroll-snap-type: inline proximity'), 'mobile Theme Studio navigation stays within the viewport while preserving horizontal access');
@@ -185,7 +194,7 @@ try {
     expect(str_contains($themeCssSource, '.nexus-guest-invoice') && str_contains($themeCssSource, '.nexus-guest-masthead'), 'guest invoice layout uses the responsive Nexus billing shell');
     expect(str_contains($themeCssSource, '.nexus-guest-masthead.d-print-none') && str_contains($themeCssSource, 'display: block !important') && str_contains($guestHeaderSource, 'nexus-guest-logo-print'), 'browser printing preserves a compact print-safe Nexus invoice masthead');
     expect(str_contains($guestInvoiceSource, 'nexus_invoice_pdf.php?invoice_id=') && !str_contains($guestInvoiceSource, 'guest_post.php?export_invoice_pdf='), 'guest invoice download uses the lifecycle-managed Nexus PDF endpoint');
-    expect(str_contains($invoicePdfEndpointSource, '!nexusThemeIsEnabled()') && str_contains($invoicePdfEndpointSource, "'export_invoice_pdf' => \$invoice_id") && str_contains($invoicePdfEndpointSource, 'nexusThemeInvoicePdfHtml'), 'paused themes redirect PDF downloads to the original ITFlow renderer');
+    expect(str_contains($invoicePdfEndpointSource, '!nexusThemeRuntimeEnabled()') && str_contains($invoicePdfEndpointSource, "'export_invoice_pdf' => \$invoice_id") && str_contains($invoicePdfEndpointSource, 'nexusThemeInvoicePdfHtml'), 'paused or unhealthy themes redirect PDF downloads to the original ITFlow renderer');
     expect(str_contains($invoicePdfHelperSource, 'SECURE BILLING PORTAL') && str_contains($invoicePdfHelperSource, 'BILLING DOCUMENT') && str_contains($invoicePdfHelperSource, 'BALANCE DUE'), 'downloadable invoices use the Nexus document hierarchy');
     expect(str_contains($adminPostSource, 'nexusThemeSaveDraftSettings(') && str_contains($adminPostSource, 'nexusThemePublishDraft(') && str_contains($adminPostSource, 'nexusThemeDiscardDraft('), 'administration actions keep draft saving separate from atomic publishing and discard');
     expect(str_contains($adminPageSource, 'nexus_draft_version') && str_contains($adminPostSource, "['nexus_draft_version']"), 'draft mutations carry optimistic concurrency protection across administrator sessions');
@@ -221,6 +230,10 @@ try {
     expect(!nexusThemeIsEnabled($fixture), 'web control pauses the Nexus visual layer');
     nexusThemeSetEnabled(true, $fixture);
     expect(nexusThemeIsEnabled($fixture), 'web control reactivates the Nexus visual layer');
+    expect(nexusThemeHealthReport($fixture)['healthy'] && nexusThemeRuntimeEnabled($fixture), 'recovery health gate permits a complete managed installation');
+    nexusThemeEmergencyDisable($fixture);
+    expect(!nexusThemeRuntimeEnabled($fixture), 'one-click emergency disable bypasses every Nexus customization');
+    nexusThemeSetEnabled(true, $fixture);
 
     $invoicePdfHtml = nexusThemeInvoicePdfHtml([
         'brand_name' => 'Nexus Support',
@@ -253,6 +266,9 @@ try {
     expect(isset(nexusThemeAllowedImageTypes('logo-light')[IMAGETYPE_GIF]) && !isset(nexusThemeAllowedImageTypes('favicon')[IMAGETYPE_GIF]), 'animated GIFs are allow-listed only for logo assets');
     expect($themeDefaults['branding']['show_agent_logo'] === true, 'theme customization shows a custom logo in technician navigation by default');
     expect($themeDefaults['appearance']['motion_style'] === 'fluid', 'theme customization starts with the fluid popup motion profile');
+    expect(array_keys($themeDefaults['profiles']) === ['technician', 'client', 'auth', 'guest', 'print'], 'theme customization defines five independently overridable surfaces');
+    expect(count($themeDefaults['navigation']['desktop']) === 6 && count($themeDefaults['navigation']['mobile']) === 4, 'navigation builder has separate validated desktop and mobile structures');
+    expect($themeDefaults['dark_mode']['mode'] === 'system' && $themeDefaults['dark_mode']['user_selectable'] === true, 'automatic dark mode follows system preference and permits user choice by default');
     $legacyTheme = $themeDefaults;
     unset($legacyTheme['branding']['show_agent_logo']);
     expect(nexusThemeValidateSettings($legacyTheme)['branding']['show_agent_logo'] === true, 'existing settings inherit technician navigation logo placement when upgraded');
@@ -313,6 +329,18 @@ try {
     expect(nexusThemeMixColors('#ffffff', '#000000', 50) === '#808080', 'theme customization derives supporting palette colors');
     expect(nexusThemeValidateSettings(['preset' => 'ocean'])['colors']['primary'] === nexusThemePresets()['ocean']['primary'], 'curated presets resolve to their protected palette');
     expect(nexusThemeValidateSettings(['appearance' => ['motion_style' => 'spin-forever']])['appearance']['motion_style'] === 'fluid', 'theme customization rejects unknown popup motion profiles');
+    $profileTheme = $themeDefaults;
+    $profileTheme['profiles']['auth'] = ['enabled' => true, 'colors' => ['primary' => '#123456', 'page' => 'bad'], 'appearance' => ['density' => 'compact']];
+    $resolvedAuth = nexusThemeSettingsForSurface($profileTheme, 'auth');
+    expect($resolvedAuth['colors']['primary'] === '#123456' && $resolvedAuth['colors']['page'] === $themeDefaults['colors']['page'] && $resolvedAuth['appearance']['density'] === 'compact', 'surface resolver applies valid overrides and rejects malformed values');
+    $invalidNavigation = $themeDefaults;
+    $invalidNavigation['navigation']['desktop'][0]['icon'] = 'fas fa-home onclick=alert(1)';
+    $invalidNavigation['navigation']['desktop'][0]['href'] = 'https://attacker.example';
+    $validatedNavigation = nexusThemeValidateSettings($invalidNavigation);
+    expect($validatedNavigation['navigation']['desktop'][0]['icon'] === 'fas fa-tachometer-alt' && $validatedNavigation['navigation']['desktop'][0]['href'] === '/agent/dashboard.php', 'navigation builder constrains icons and destinations to approved values');
+    expect(nexusThemeDarkModeState($themeDefaults, 'dark') === 'dark' && nexusThemeDarkModeState($themeDefaults, 'light') === 'light', 'user dark-mode preference safely overrides the global system default');
+    $scheduledTheme = $themeDefaults; $scheduledTheme['dark_mode']['mode'] = 'scheduled'; $scheduledTheme['dark_mode']['schedule_start'] = '19:00'; $scheduledTheme['dark_mode']['schedule_end'] = '07:00';
+    expect(nexusThemeDarkModeState($scheduledTheme, null, strtotime('2026-08-25 23:00:00')) === 'dark' && nexusThemeDarkModeState($scheduledTheme, null, strtotime('2026-08-25 12:00:00')) === 'light', 'scheduled dark mode handles an overnight activation window');
     $gifLogoTheme = $themeDefaults;
     $gifLogoTheme['branding']['logo_light_path'] = '/uploads/nexus-theme/logo-light.gif';
     expect(nexusThemeValidateSettings($gifLogoTheme)['branding']['logo_light_path'] === '/uploads/nexus-theme/logo-light.gif', 'theme customization preserves validated GIF logo paths');
@@ -345,13 +373,15 @@ try {
         mkdir($assetDirectory, 0777, true);
     }
     $draftAssetName = 'logo-light-aaaaaaaaaaaaaaaa.png';
+    $draftWebpName = 'logo-light-aaaaaaaaaaaaaaaa.webp';
     $orphanAssetName = 'logo-light-bbbbbbbbbbbbbbbb.png';
     file_put_contents($assetDirectory . DIRECTORY_SEPARATOR . $draftAssetName, 'draft asset');
+    file_put_contents($assetDirectory . DIRECTORY_SEPARATOR . $draftWebpName, 'optimized draft asset');
     file_put_contents($assetDirectory . DIRECTORY_SEPARATOR . $orphanAssetName, 'orphan asset');
     $concurrentDraft['branding']['logo_light_path'] = '/uploads/nexus-theme/' . $draftAssetName;
     $concurrentDraft['branding']['logo_path'] = $concurrentDraft['branding']['logo_light_path'];
     nexusThemeSaveDraftSettings($concurrentDraft, $fixture);
-    expect(is_file($assetDirectory . DIRECTORY_SEPARATOR . $draftAssetName) && !is_file($assetDirectory . DIRECTORY_SEPARATOR . $orphanAssetName), 'immutable asset cleanup preserves referenced draft media and removes abandoned uploads');
+    expect(is_file($assetDirectory . DIRECTORY_SEPARATOR . $draftAssetName) && is_file($assetDirectory . DIRECTORY_SEPARATOR . $draftWebpName) && !is_file($assetDirectory . DIRECTORY_SEPARATOR . $orphanAssetName), 'immutable asset cleanup preserves referenced originals and WebP companions while removing abandoned uploads');
     foreach (['auth', 'reset', 'dashboard', 'technician', 'client', 'mobile', 'invoice', 'print'] as $previewSurface) {
         $previewDocument = nexusThemePreviewDocument(nexusThemeDraftSettings($fixture), $previewSurface);
         expect(str_contains($previewDocument, '/css/nexus-theme.css?v=') && str_contains($previewDocument, '--nexus-header:#123456') && str_contains($previewDocument, 'Private draft heading') === ($previewSurface === 'auth'), $previewSurface . ' preview is generated from shared runtime CSS and draft presentation data');
@@ -448,10 +478,16 @@ try {
         'current_version' => '2.5.1',
         'latest_version' => '3.0.0',
         'release_url' => 'https://evil.invalid/release',
+        'phase' => 'install',
+        'progress' => 140,
+        'action' => 'update',
+        'can_retry' => true,
+        'recovery' => '<b>Retry safely</b>',
         'updated_at' => gmdate('c'),
     ], JSON_THROW_ON_ERROR));
     $runningUpdate = nexusUpdaterStatus($fixture);
     expect($runningUpdate['message'] === 'Installing' && $runningUpdate['release_url'] === null, 'GUI updater sanitizes privileged-service status before display');
+    expect($runningUpdate['phase'] === 'install' && $runningUpdate['phase_label'] === 'Installing Nexus' && $runningUpdate['progress'] === 100 && $runningUpdate['action'] === 'update' && $runningUpdate['can_retry'] && $runningUpdate['recovery'] === 'Retry safely', 'GUI updater normalizes stage progress and recovery metadata');
     try {
         nexusUpdaterQueue('update', $fixture);
         throw new RuntimeException('busy queue unexpectedly accepted');
@@ -464,7 +500,8 @@ try {
         'message' => 'Installing',
         'updated_at' => gmdate('c', time() - 1800),
     ], JSON_THROW_ON_ERROR));
-    expect(nexusUpdaterStatus($fixture)['state'] === 'failed', 'GUI updater turns stale progress into a recoverable failure state');
+    $staleUpdate = nexusUpdaterStatus($fixture);
+    expect($staleUpdate['state'] === 'failed' && $staleUpdate['can_retry'] && $staleUpdate['recovery'] !== null, 'GUI updater turns stale progress into a recoverable retry state');
 
     runManager($manager, array_merge(['verify'], $common), 0);
     [$statusJson] = runManager($manager, array_merge(['status'], $common, ['--json']), 0);

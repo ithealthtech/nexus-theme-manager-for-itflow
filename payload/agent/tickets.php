@@ -406,28 +406,7 @@ if (!empty($nexus_theme_enabled)) {
 
 ?>
 
-<?php if ($nexus_ticket_metrics !== null) { ?>
-<section class="nexus-ticket-queue-summary" aria-labelledby="nexus-ticket-queue-title">
-    <header class="nexus-ticket-queue-heading">
-        <div><span class="nexus-manager-kicker">Service desk pulse</span><h2 id="nexus-ticket-queue-title">Ticket queue</h2></div>
-        <span class="nexus-ticket-queue-live"><i class="fas fa-circle" aria-hidden="true"></i> Live queue</span>
-    </header>
-    <div class="nexus-ticket-queue-grid">
-        <article class="card nexus-ticket-metric nexus-ticket-metric-open">
-            <div class="card-body"><div><strong><?= $nexus_ticket_metrics['open'] ?></strong><span>Open tickets</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-inbox" aria-hidden="true"></i></span></div>
-        </article>
-        <article class="card nexus-ticket-metric nexus-ticket-metric-waiting">
-            <div class="card-body"><div><strong><?= $nexus_ticket_metrics['waiting'] ?></strong><span>Waiting on client</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-user-clock" aria-hidden="true"></i></span></div>
-        </article>
-        <article class="card nexus-ticket-metric nexus-ticket-metric-priority">
-            <div class="card-body"><div><strong><?= $nexus_ticket_metrics['priority'] ?></strong><span>High priority</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i></span></div>
-        </article>
-        <article class="card nexus-ticket-metric nexus-ticket-metric-response">
-            <div class="card-body"><div><strong><?= escapeHtml($nexus_ticket_metrics['response']) ?></strong><span>Median response</span></div><span class="nexus-ticket-metric-icon"><i class="fas fa-stopwatch" aria-hidden="true"></i></span></div>
-        </article>
-    </div>
-</section>
-<?php } ?>
+<?php if ($nexus_ticket_metrics !== null) echo nexusThemeTicketSummaryComponent($nexus_ticket_metrics); ?>
 
 <div class="card card-dark">
     <div class="card-header py-2">

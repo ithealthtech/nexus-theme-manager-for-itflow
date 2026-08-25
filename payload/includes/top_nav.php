@@ -57,6 +57,13 @@
         <?php } ?>
         <!-- End Custom Nav Links -->
 
+        <?php if (!empty($nexus_theme_enabled) && !empty($nexus_theme_settings['dark_mode']['user_selectable'])) { ?>
+        <li class="nav-item dropdown nexus-color-mode-menu">
+            <a class="nav-link" href="#" data-toggle="dropdown" aria-label="Choose color mode"><i class="fas fa-adjust" aria-hidden="true"></i></a>
+            <div class="dropdown-menu dropdown-menu-right"><span class="dropdown-header">Appearance</span><button type="button" class="dropdown-item" onclick="window.nexusSetColorMode('light')"><i class="fas fa-sun fa-fw mr-2"></i>Light</button><button type="button" class="dropdown-item" onclick="window.nexusSetColorMode('dark')"><i class="fas fa-moon fa-fw mr-2"></i>Dark</button><button type="button" class="dropdown-item" onclick="window.nexusSetColorMode('system')"><i class="fas fa-laptop fa-fw mr-2"></i>System</button></div>
+        </li>
+        <?php } ?>
+
         <!-- New Notifications Dropdown -->
         <?php
         $row = mysqli_fetch_assoc(mysqli_query($mysqli, "SELECT COUNT('notification_id') AS num FROM notifications WHERE notification_user_id = $session_user_id AND notification_dismissed_at IS NULL"));

@@ -2,9 +2,10 @@
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
 nexusThemeApplyDueSchedule();
-$nexus_guest_enabled = nexusThemeIsEnabled();
+$nexus_guest_enabled = nexusThemeRuntimeEnabled();
 $nexus_guest_settings = nexusThemeSettings();
-$nexus_guest_presentation = nexusThemePresentationModel($nexus_guest_settings, $session_company_name);
+$nexus_guest_is_invoice = basename((string)($_SERVER['SCRIPT_NAME'] ?? '')) === 'guest_view_invoice.php';
+$nexus_guest_presentation = nexusThemePresentationModel($nexus_guest_settings, $session_company_name, $nexus_guest_is_invoice ? 'guest' : 'client');
 $nexus_guest_brand = $nexus_guest_presentation['brand'];
 $nexus_guest_logo_raw = nexusThemeLogoUrl($nexus_guest_settings, '', nexusThemeLogoVariantForColor($nexus_guest_settings['colors']['sidebar']));
 $nexus_guest_print_logo_raw = nexusThemeLogoUrl($nexus_guest_settings, '', 'dark');
@@ -14,7 +15,6 @@ $nexus_guest_native_favicon = is_file($_SERVER['DOCUMENT_ROOT'] . '/uploads/favi
 $nexus_guest_favicon = $nexus_guest_enabled
     ? nexusThemeVersionedAssetUrl(nexusThemeFaviconUrl($nexus_guest_settings, $nexus_guest_native_favicon), $nexus_guest_settings)
     : $nexus_guest_native_favicon;
-$nexus_guest_is_invoice = basename((string)($_SERVER['SCRIPT_NAME'] ?? '')) === 'guest_view_invoice.php';
 if ($nexus_guest_enabled) {
     $tab_title = nexusThemePageTitle($session_company_name, '', $nexus_guest_settings);
 }
@@ -47,6 +47,7 @@ if ($nexus_guest_enabled) {
     <script src="/libs/jquery/jquery.min.js"></script>
     <script src="/libs/toastr/toastr.min.js"></script>
 
+    <?php if ($nexus_guest_enabled) { ?><script><?= nexusThemeColorModeScript($nexus_guest_settings) ?></script><?php } ?>
 </head>
 <body class="layout-top-nav <?= $nexus_guest_enabled ? 'nexus-theme nexus-guest ' . ($nexus_guest_is_invoice ? 'nexus-guest-invoice ' : '') . $nexus_guest_presentation['body_classes'] : '' ?>">
     <div class="wrapper text-sm">
@@ -55,7 +56,7 @@ if ($nexus_guest_enabled) {
                 <div class="container nexus-guest-masthead-inner">
                     <a class="nexus-guest-brand" href="/login.php" aria-label="<?= escapeHtml($nexus_guest_brand) ?> support portal">
                         <?php if ($nexus_guest_logo !== '') { ?>
-                            <img class="nexus-guest-logo-screen" src="<?= escapeHtml($nexus_guest_logo) ?>" alt="<?= escapeHtml($nexus_guest_settings['branding']['logo_alt'] ?: $nexus_guest_brand . ' logo') ?>">
+                            <img class="nexus-guest-logo-screen" data-nexus-color-logo src="<?= escapeHtml($nexus_guest_logo) ?>" alt="<?= escapeHtml($nexus_guest_settings['branding']['logo_alt'] ?: $nexus_guest_brand . ' logo') ?>">
                             <?php if ($nexus_guest_print_logo_raw !== '' && $nexus_guest_print_logo_raw !== $nexus_guest_logo_raw) { ?>
                                 <img class="nexus-guest-logo-print" src="<?= escapeHtml($nexus_guest_print_logo) ?>" alt="">
                             <?php } else { ?>

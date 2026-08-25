@@ -8,19 +8,19 @@ Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 
 | File | Purpose | Privilege boundary |
 |---|---|---|
-| `updater.php` | Installs/removes the per-instance systemd bridge and executes fixed-policy, checksum-verified Nexus updates with rollback | CLI/root only; rejects web execution and arbitrary arguments |
-| `tests/updater.php` | Exercises updater request, version, archive, checksum, manifest, argument, and hardening invariants | Test-only |
+| `updater.php` | Installs/removes the per-instance systemd bridge and executes fixed-policy, checksum-verified Nexus updates with staged progress, health checks, and explicit rollback outcomes | CLI/root only; rejects web execution and arbitrary arguments |
+| `tests/updater.php` | Exercises updater request, progress context, recovery outcome, version, archive, checksum, manifest, argument, and hardening invariants | Test-only |
 
 ### Managed ITFlow payload
 
 | File | Purpose | Upgrade conflict risk |
 |---|---|---|
-| `css/nexus-theme.css` | Scoped design system plus the responsive eight-section Theme Studio workspace, quality findings, eight runtime previews, palette, density, sidebar/header, motion, radius, and responsive states | Low |
+| `css/nexus-theme.css` | Scoped design system plus responsive Theme Studio, side-by-side previews, profile/navigation/asset/recovery controls, palette, density, sidebar/header, motion, radius, and responsive states | Low |
 | `css/nexus-theme-custom.php` | CSP-compatible same-origin stylesheet generated exclusively from validated settings | Low |
-| `includes/nexus_theme.php` | Presentation state, allow-listed customization, atomic drafts/publishing, protected revisions and snapshots, accessibility/responsive quality checks, sanitized diagnostics, eight preview documents, palette derivation, inspected raster-asset storage, and fixed update request/status helpers | Low |
+| `includes/nexus_theme.php` | Presentation state, per-surface resolution, shared preview/live components, constrained navigation, automatic dark mode, recovery health gating, atomic drafts/publishing, protected revisions, quality checks, sanitized diagnostics, raster processing/WebP/GIF inspection, and fixed update request/status helpers | Low |
 | `includes/nexus_invoice_pdf.php` | Pure escaped Nexus invoice-document HTML builder for ITFlow's bundled TCPDF runtime | Low |
-| `admin/nexus.php` | Administrator-only Theme Studio with focused sub-navigation, exact eight-surface previews, responsive testing, design-quality findings and remediation links, responsive branding, protected revisions, presets, scheduling, diagnostics, import/export, reset, and update actions | Low |
-| `admin/post/nexus.php` | CSRF-protected state, settings, assets, quality fixes, revision pinning, automatic snapshots, diagnostics, presets, schedule, rollback, import/reset, and allow-listed update queue actions with audit/application logging | Low |
+| `admin/nexus.php` | Administrator-only Theme Studio with focused sub-navigation, side-by-side eight-surface previews, per-surface profiles, navigation builder, advanced asset metadata, dark mode, responsive testing, recovery mode, protected revisions, diagnostics, and a live staged updater | Low |
+| `admin/post/nexus.php` | CSRF-protected state, validated asset processing, emergency disable/known-good recovery, settings, quality fixes, revision pinning, automatic snapshots, diagnostics, presets, schedule, rollback, import/reset, and allow-listed update/retry actions | Low |
 | `guest/nexus_invoice_pdf.php` | URL-key-validated themed invoice download endpoint; redirects to ITFlow's original renderer whenever Nexus presentation is paused | Medium |
 
 ## Edited
@@ -28,8 +28,8 @@ Baseline: ITFlow 26.08 at `89b080b430aaafba5d520c4e52c57b28a9559085`
 | File | Change | Business/security logic |
 |---|---|---|
 | `login.php` | Loads static and generated theme CSS; applies custom logo, identity, and login copy while preserving auth behavior | Preserved |
-| `includes/header.php` | Loads static and generated theme CSS; applies agent density, scale, motion, and palette while preserving accent and user dark mode | Preserved |
-| `includes/top_nav.php` | Adds accessible names/label associations, meaningful image alt text, and discreet company website link | Preserved |
+| `includes/header.php` | Loads static/generated CSS; applies technician profile, mode-aware assets, health fallback, and constrained navigation without changing authorization | Preserved |
+| `includes/top_nav.php` | Adds accessible labels, company link, and user-selectable light/dark/system control | Preserved |
 | `client/includes/header.php` | Applies the custom identity and cache-busted logo directly to the persistent portal navigation, plus portal copy, generated palette, explicit landmarks, and responsive behavior | Module/permission conditions preserved |
 | `client/includes/footer.php` | Uses the configured Nexus identity with ITFlow fallback; existing scripts and TinyMCE initialization preserved | Preserved |
 | `client/index.php` | Clarifies support overview hierarchy and primary create-request action | Queries and permission branches preserved |

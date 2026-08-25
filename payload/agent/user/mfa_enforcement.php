@@ -6,7 +6,7 @@ require_once '../../libs/totp/totp.php'; //TOTP MFA Lib
 require_once '../../includes/nexus_theme.php';
 
 nexusThemeApplyDueSchedule();
-$nexus_theme_enabled = nexusThemeIsEnabled();
+$nexus_theme_enabled = nexusThemeRuntimeEnabled();
 $nexus_theme_settings = nexusThemeSettings();
 $nexus_native_favicon = is_file('../../uploads/favicon.ico') ? '/uploads/favicon.ico' : '';
 $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon), $nexus_theme_settings) : $nexus_native_favicon;
@@ -63,7 +63,7 @@ $data = "otpauth://totp/ITFlow:$session_email?secret=$token";
     <script src="../../libs/toastr/toastr.min.js"></script>
 
 </head>
-<body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth ' . nexusThemeBodyClasses($nexus_theme_settings) : '' ?>">
+<body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth ' . nexusThemePresentationModel($nexus_theme_settings, 'Nexus MSP', 'auth')['body_classes'] : '' ?>">
     <?php require_once "../../includes/inc_alert_feedback.php"; ?>
     <div class="login-box">
         <?php
@@ -72,7 +72,7 @@ $data = "otpauth://totp/ITFlow:$session_email?secret=$token";
         ?>
         <div class="login-logo <?= $nexus_mfa_has_logo ? 'nexus-auth-brand--logo' : 'nexus-auth-brand--text' ?>">
             <?php if ($nexus_mfa_has_logo) { ?>
-                <img alt="<?= escapeHtml($nexus_theme_settings['branding']['logo_alt'] ?: nexusThemeBrandName($company_name, $nexus_theme_settings) . ' logo') ?>" height="110" width="380" class="img-fluid" src="<?= escapeHtml($nexus_mfa_logo) ?>">
+                <img alt="<?= escapeHtml($nexus_theme_settings['branding']['logo_alt'] ?: nexusThemeBrandName($company_name, $nexus_theme_settings) . ' logo') ?>" height="110" width="380" class="img-fluid" data-nexus-color-logo src="<?= escapeHtml($nexus_mfa_logo) ?>">
             <?php } else { ?>
                 <span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml(nexusThemeBrandName($session_company_name, $nexus_theme_settings)) ?></span>
             <?php } ?>
