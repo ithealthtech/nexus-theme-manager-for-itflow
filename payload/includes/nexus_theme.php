@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-const NEXUS_MANAGER_VERSION = '3.7.0';
-const NEXUS_THEME_VERSION = '26.08.21';
+const NEXUS_MANAGER_VERSION = '3.8.0';
+const NEXUS_THEME_VERSION = '26.08.22';
 const NEXUS_ITFLOW_COMMIT = '89b080b430aaafba5d520c4e52c57b28a9559085';
 const NEXUS_THEME_DISABLED_MARKER = '.nexus-theme-disabled';
 const NEXUS_THEME_SETTINGS_FILE = '.nexus-theme-settings.json';

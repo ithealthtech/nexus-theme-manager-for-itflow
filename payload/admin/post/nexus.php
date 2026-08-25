@@ -3,7 +3,10 @@
 defined('FROM_POST_HANDLER') || die('Direct file access is not allowed');
 
 $nexusRedirect = static function (): never {
-    header('Location: /admin/nexus.php');
+    $allowedSections = ['brand', 'colors', 'layout', 'quality', 'motion', 'content', 'operations', 'system'];
+    $returnSection = (string)($_POST['nexus_return_section'] ?? '');
+    $fragment = in_array($returnSection, $allowedSections, true) ? '#nexus-' . $returnSection : '';
+    header('Location: /admin/nexus.php' . $fragment);
     exit;
 };
 

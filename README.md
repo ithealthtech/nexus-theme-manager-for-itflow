@@ -6,7 +6,7 @@
 
 Nexus gives ITFlow a polished, customizable interface without changing its database or business logic. It adds an administrator-only Theme Studio, exact page previews, safe draft publishing, revision history, and verified updates.
 
-![Nexus Theme Studio](docs/images/nexus-theme-studio-v3-7.png)
+![Nexus Theme Studio](docs/images/nexus-theme-studio-v3-8.jpg)
 
 ## What you can customize
 
@@ -32,8 +32,8 @@ After installation, open **Administration → NEXUS → Theme Manager**.
 
 | Component | Supported version |
 |---|---|
-| Nexus manager | 3.7.0 |
-| Nexus theme | 26.08.21 |
+| Nexus manager | 3.8.0 |
+| Nexus theme | 26.08.22 |
 | ITFlow | 26.08 |
 | ITFlow commit | `89b080b430aaafba5d520c4e52c57b28a9559085` |
 | PHP | 8.1 or newer |
@@ -62,9 +62,9 @@ Open Theme Studio after installation and confirm that the theme is active and th
 Use the versioned ZIP and `.sha256.txt` file from the [latest release](https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/latest). Do not use GitHub's automatically generated source archive as the installation package.
 
 ```bash
-sha256sum --check Nexus-Theme-Manager-for-ITFlow-3.7.0.zip.sha256.txt
-sudo unzip Nexus-Theme-Manager-for-ITFlow-3.7.0.zip -d /opt
-cd /opt/Nexus-Theme-Manager-for-ITFlow-3.7.0
+sha256sum --check Nexus-Theme-Manager-for-ITFlow-3.8.0.zip.sha256.txt
+sudo unzip Nexus-Theme-Manager-for-ITFlow-3.8.0.zip -d /opt
+cd /opt/Nexus-Theme-Manager-for-ITFlow-3.8.0
 
 sudo php manager.php doctor --root /var/www/itflow.example.com
 sudo php manager.php install --root /var/www/itflow.example.com --yes
@@ -112,7 +112,7 @@ ITFlow currently has no native theme or plugin hook system, so Nexus manages a b
 
 ## Documentation
 
-- [v3.7.0 release notes](docs/release-v3.7.0.md)
+- [v3.8.0 release notes](docs/release-v3.8.0.md)
 - [Architecture and privilege boundaries](docs/architecture.md)
 - [Managed file list](docs/changed-files.md)
 - [Validation report](docs/test-report.md)
