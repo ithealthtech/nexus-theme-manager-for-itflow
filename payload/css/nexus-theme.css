@@ -48,6 +48,27 @@
     -webkit-font-smoothing: antialiased;
 }
 
+/* Theme Studio v3.9 design-system controls */
+.nexus-asset-health-grid { display:grid; gap:.75rem; grid-template-columns:repeat(2,minmax(0,1fr)); margin-top:1rem; }
+.nexus-asset-health-grid > div { background:var(--nexus-surface-2); border:1px solid var(--nexus-border); border-radius:var(--nexus-radius); display:flex; flex-direction:column; padding:.8rem; }
+.nexus-favicon-preview { align-items:center; background:var(--nexus-surface-2); border:1px solid var(--nexus-border); border-radius:.55rem; display:inline-flex; gap:.7rem; padding:.55rem .8rem; }
+.nexus-favicon-preview img { height:24px; object-fit:contain; width:24px; }
+.nexus-profile-card { border:1px solid var(--nexus-border)!important; box-shadow:none!important; margin-bottom:.65rem; }
+.nexus-profile-card .card-header { background:var(--nexus-surface-2); padding:.8rem 1rem; }
+.nexus-profile-color { min-height:2.6rem!important; padding:.25rem!important; }
+.nexus-navigation-builder { display:grid; gap:.5rem; margin-top:.65rem; }
+.nexus-navigation-row { align-items:center; background:var(--nexus-surface-2); border:1px solid var(--nexus-border); border-radius:var(--nexus-radius); display:grid; gap:.45rem; grid-template-columns:auto auto minmax(8rem,1fr) minmax(7rem,.7fr) auto auto auto; padding:.55rem; }
+.nexus-navigation-row label { align-items:center; display:flex; font-size:.74rem; gap:.25rem; margin:0; white-space:nowrap; }
+.nexus-preview-comparison { display:grid; gap:.65rem; grid-template-columns:minmax(0,1fr) minmax(130px,.34fr); padding:.65rem; }
+.nexus-preview-comparison > div > small { display:block; font-weight:700; margin:0 0 .35rem; text-transform:uppercase; }
+.nexus-preview-phone .nexus-runtime-preview-viewport { border:2px solid var(--nexus-night); border-radius:1rem; }
+.nexus-recovery-card { border-left:4px solid var(--nexus-warning); }
+@media (max-width:767.98px) {
+    .nexus-asset-health-grid,.nexus-preview-comparison { grid-template-columns:1fr; }
+    .nexus-navigation-row { grid-template-columns:auto auto 1fr; }
+    .nexus-navigation-row .form-control,.nexus-navigation-row .custom-select { grid-column:1/-1; }
+}
+
 .nexus-theme.dark-mode,
 .nexus-theme.nexus-auth,
 .nexus-theme.nexus-client {

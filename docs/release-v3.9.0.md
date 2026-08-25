@@ -1,6 +1,6 @@
 # Nexus Theme Manager 3.9.0
 
-Version 3.9.0 turns GUI updating into a clear, observable workflow while preserving the protected service boundary introduced in earlier releases.
+Version 3.9.0 turns Theme Studio into a broader visual design system and makes GUI updating a clear, observable workflow while preserving the protected service boundary introduced in earlier releases.
 
 ## Highlights
 
@@ -11,6 +11,16 @@ Version 3.9.0 turns GUI updating into a clear, observable workflow while preserv
 - Automatic rollback reports whether the previous version was restored and verified or whether manual recovery is required.
 - The updater distinguishes package staging, clean transition, application verification, and updater-registration failures.
 - Progress, recovery, and action controls remain readable and touch-friendly on phones.
+
+## Design system
+
+- Five per-surface profiles independently override the shared technician, client portal, authentication, guest invoice, and print defaults.
+- Preview and live ticket-queue metrics use the same server-rendered component, and every preview is shown in a side-by-side desktop/phone comparison.
+- The navigation builder independently orders desktop and mobile items, changes labels and approved icons, hides items, and applies administrator/technician visibility.
+- Automatic dark mode supports operating-system preference, forced light/dark, overnight schedules, user choice, a dedicated dark palette, and separate light/dark logo assets.
+- The asset manager supports validated pixel crop and resize, dimension/size warnings, favicon preview, GIF frame-rate inspection including 24fps playback, and automatic WebP companions when PHP image support is available.
+- Recovery mode can immediately bypass every Nexus customization, validate required managed files and CSS structure, or restore the latest pinned known-good revision after taking a safety snapshot.
+- Runtime health gating falls back to native ITFlow presentation when required Nexus presentation files or CSS are incomplete, keeping login and administrator access available.
 
 ## Compatibility
 
@@ -27,10 +37,8 @@ The administrator page remains read-only with respect to privileged execution. I
 ## Validation
 
 - PHP syntax checks for every managed and baseline PHP file
-- 257 lifecycle assertions
+- 272 lifecycle assertions, including profiles, navigation safety, dark-mode scheduling, shared components, asset processing, and recovery
 - 35 GUI updater security assertions
 - Linux systemd and same-filesystem activation checks in CI
 - Manifest and complete package checksum verification
 - Desktop and 390px phone visual verification with no horizontal overflow
-
-Version 3.8.0 remains the published stable release until this development version completes the normal pull-request and release workflow.

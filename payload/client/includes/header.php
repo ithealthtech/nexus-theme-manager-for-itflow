@@ -8,9 +8,9 @@ header("X-Frame-Options: DENY"); // Legacy
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
 nexusThemeApplyDueSchedule();
-$nexus_theme_enabled = nexusThemeIsEnabled();
+$nexus_theme_enabled = nexusThemeRuntimeEnabled();
 $nexus_theme_settings = nexusThemeSettings();
-$nexus_theme_presentation = nexusThemePresentationModel($nexus_theme_settings, $session_company_name);
+$nexus_theme_presentation = nexusThemePresentationModel($nexus_theme_settings, $session_company_name, 'client');
 $nexus_brand_name = $nexus_theme_presentation['brand'];
 $nexus_logo_url = nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($nexus_theme_settings, $session_company_logo ? '/uploads/settings/' . $session_company_logo : '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['sidebar'])), $nexus_theme_settings);
 $nexus_portal_has_logo = $nexus_theme_enabled && $nexus_theme_settings['branding']['show_portal_logo'] && $nexus_logo_url !== '';
@@ -44,6 +44,7 @@ $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThe
         <link rel="stylesheet" href="/css/nexus-theme-custom.php?v=<?= nexusThemeSettingsVersion() ?>">
     <?php } ?>
 
+    <?php if ($nexus_theme_enabled) { ?><script><?= nexusThemeColorModeScript($nexus_theme_settings) ?></script><?php } ?>
 </head>
 <body class="hold-transition <?= $nexus_theme_enabled ? 'nexus-theme nexus-client ' . $nexus_theme_presentation['body_classes'] : '' ?>">
 <a class="sr-only sr-only-focusable" href="#main-content">Skip to main content</a>
@@ -54,7 +55,7 @@ $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThe
     <div class="container">
         <a class="navbar-brand <?= $nexus_portal_has_logo ? 'nexus-client-brand--logo' : 'nexus-client-brand--text' ?>" href="index.php" aria-label="<?= escapeHtml(($nexus_theme_enabled ? $nexus_brand_name : $session_company_name) . ' home') ?>">
             <?php if ($nexus_portal_has_logo) { ?>
-                <img height="48" width="176" class="nexus-client-nav-logo" src="<?= escapeHtml($nexus_logo_url) ?>" alt="<?= escapeHtml($nexus_theme_settings['branding']['logo_alt'] ?: $nexus_brand_name . ' logo') ?>">
+                <img height="48" width="176" class="nexus-client-nav-logo" data-nexus-color-logo src="<?= escapeHtml($nexus_logo_url) ?>" alt="<?= escapeHtml($nexus_theme_settings['branding']['logo_alt'] ?: $nexus_brand_name . ' logo') ?>">
             <?php } else { ?>
                 <span><?= escapeHtml($nexus_theme_enabled ? $nexus_brand_name : $session_company_name) ?></span>
             <?php } ?>
@@ -131,6 +132,7 @@ $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThe
                 <li class="nav-item mr-lg-2">
                     <a class="btn nexus-portal-cta" href="/client/ticket_add.php"><i class="fas fa-plus mr-2" aria-hidden="true"></i>Create support request</a>
                 </li>
+                <?php if ($nexus_theme_enabled && $nexus_theme_settings['dark_mode']['user_selectable']) { ?><li class="nav-item dropdown"><a class="nav-link" href="#" data-toggle="dropdown" aria-label="Choose color mode"><i class="fas fa-adjust"></i></a><div class="dropdown-menu dropdown-menu-right"><button type="button" class="dropdown-item" onclick="window.nexusSetColorMode('light')">Light</button><button type="button" class="dropdown-item" onclick="window.nexusSetColorMode('dark')">Dark</button><button type="button" class="dropdown-item" onclick="window.nexusSetColorMode('system')">System</button></div></li><?php } ?>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <?= stripslashes(escapeHtml($session_contact_name)) ?>

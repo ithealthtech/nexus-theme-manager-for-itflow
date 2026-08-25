@@ -10,16 +10,23 @@ All notable changes to this project are documented here.
 - Added live updater status polling so progress changes in place without reloading Theme Studio or losing the active workspace.
 - Added bounded progress percentages, clear phase labels, recovery guidance, release-note links, and a safe retry action that repeats only the previous allow-listed operation.
 - Added explicit rollback reporting that distinguishes a verified automatic restore from a rollback requiring manual attention.
+- Added five optional surface profiles with shared global fallbacks for technician, client, authentication, guest invoice, and print/PDF presentation.
+- Added independent desktop/mobile navigation builders for order, label, approved icon, visibility, and administrator/technician access.
+- Added system, user-selectable, forced, and scheduled dark modes with an independent dark palette and mode-aware light/dark assets.
+- Added asset crop/resize controls, dimension and size warnings, favicon preview, GIF frame-rate inspection, and automatic WebP companions.
+- Added one-click emergency disable, known-good recovery, and managed-file/settings/CSS health gating that falls back to native ITFlow presentation.
+- Added side-by-side desktop and phone previews and a shared server-rendered ticket summary used by both the live page and Theme Studio.
 
 ### Changed
 
 - The protected updater now preserves request context across status writes and reports staging, transition, health-check, finalization, and updater-registration failures separately.
 - Update actions return to a temporary watch view in Updates & System and stop polling after the new terminal result arrives.
 - Updater controls and progress stages collapse into a touch-friendly single-column layout on phones.
+- Preview, live surfaces, print output, navigation, and dark mode now resolve through the same validated settings model.
 
 ### Validation
 
-- Expanded lifecycle coverage to 257 assertions and updater security coverage to 35 assertions.
+- Expanded lifecycle coverage to 272 assertions and updater security coverage to 35 assertions.
 - Verified running, completed, recovery, and retry layouts at desktop and 390px phone widths with no horizontal overflow.
 
 ## [3.8.0] - 2026-08-25

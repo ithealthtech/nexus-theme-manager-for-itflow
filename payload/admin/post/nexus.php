@@ -54,6 +54,32 @@ if (isset($_POST['nexus_revision_pin'])) {
     $nexusRedirect();
 }
 
+if (isset($_POST['nexus_recovery_action'])) {
+    validateCSRFToken();
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
+    try {
+        $action = (string)$_POST['nexus_recovery_action'];
+        if ($action === 'disable') {
+            $health = nexusThemeEmergencyDisable();
+            $message = 'Emergency mode enabled. Every Nexus customization is bypassed and native ITFlow remains available.';
+        } elseif ($action === 'restore') {
+            $revision = nexusThemeRestoreKnownGood((string)$session_name);
+            $message = 'Known-good revision restored and activated: ' . $revision['action'] . '.';
+        } elseif ($action === 'check') {
+            $health = nexusThemeHealthReport();
+            $message = $health['healthy'] ? 'Recovery health check passed.' : 'Recovery health check found: ' . implode(', ', $health['failed']) . '.';
+        } else {
+            throw new RuntimeException('Invalid recovery action.');
+        }
+        logAudit('Nexus Theme Manager', 'Edit', "$session_name used Nexus recovery: $action");
+        flashAlert($message, isset($health) && !$health['healthy'] ? 'error' : 'success');
+    } catch (Throwable $error) {
+        logApp('Nexus Theme Manager', 'error', $error->getMessage());
+        flashAlert('Nexus recovery could not complete: ' . escapeHtml($error->getMessage()), 'error');
+    }
+    $nexusRedirect();
+}
+
 if (isset($_POST['nexus_theme_state'])) {
     validateCSRFToken();
     require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
@@ -88,11 +114,23 @@ if (isset($_POST['nexus_theme_save'])) {
         foreach (['logo_path', 'logo_light_path', 'logo_dark_path', 'favicon_path', 'login_background_path', 'asset_revision'] as $asset) {
             $submitted['branding'][$asset] = $current['branding'][$asset];
         }
+        $submitted['dark_mode'] = is_array($submitted['dark_mode'] ?? null) ? $submitted['dark_mode'] : [];
+        $submitted['dark_mode']['colors'] = array_merge($current['dark_mode']['colors'], is_array($submitted['dark_mode']['colors'] ?? null) ? $submitted['dark_mode']['colors'] : []);
 
         $assetChanged = false;
         foreach (['nexus_logo_light' => ['logo_light_path', 'logo-light'], 'nexus_logo_dark' => ['logo_dark_path', 'logo-dark'], 'nexus_favicon' => ['favicon_path', 'favicon'], 'nexus_login_background' => ['login_background_path', 'login-background']] as $uploadName => [$setting, $slot]) {
             if (isset($_FILES[$uploadName]) && ($_FILES[$uploadName]['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
-                $submitted['branding'][$setting] = nexusThemeStoreImage($_FILES[$uploadName], $slot);
+                $assetOptions = [];
+                if (in_array($slot, ['logo-light', 'logo-dark'], true)) {
+                    $rawOptions = is_array($_POST['nexus_asset']['logo'] ?? null) ? $_POST['nexus_asset']['logo'] : [];
+                    $assetOptions = [
+                        'resize_width' => (int)($rawOptions['resize_width'] ?? 0),
+                        'resize_height' => (int)($rawOptions['resize_height'] ?? 0),
+                        'crop' => is_array($rawOptions['crop'] ?? null) ? $rawOptions['crop'] : [],
+                    ];
+                    if (($assetOptions['crop']['width'] ?? 0) < 1 || ($assetOptions['crop']['height'] ?? 0) < 1) $assetOptions['crop'] = [];
+                }
+                $submitted['branding'][$setting] = nexusThemeStoreImage($_FILES[$uploadName], $slot, null, $assetOptions);
                 $assetChanged = true;
             }
         }

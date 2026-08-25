@@ -27,11 +27,11 @@ require_once __DIR__ . "/includes/session_init.php";
 try {
     nexusThemeApplyDueSchedule();
     $nexus_theme_settings = nexusThemeSettings();
-    $nexus_theme_enabled = nexusThemeIsEnabled();
+    $nexus_theme_enabled = nexusThemeRuntimeEnabled();
     $nexus_fallback_brand = isset($company_name) && is_string($company_name) && trim($company_name) !== ''
         ? $company_name
         : 'ITFlow';
-    $nexus_theme_presentation = nexusThemePresentationModel($nexus_theme_settings, $nexus_fallback_brand);
+    $nexus_theme_presentation = nexusThemePresentationModel($nexus_theme_settings, $nexus_fallback_brand, 'auth');
     $nexus_favicon_url = $nexus_theme_enabled
         ? nexusThemeVersionedAssetUrl(nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon), $nexus_theme_settings)
         : $nexus_native_favicon;
@@ -741,7 +741,7 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
     ?>
     <div class="login-logo <?= $nexus_login_has_logo ? 'nexus-auth-brand--logo' : 'nexus-auth-brand--text' ?>">
         <?php if ($nexus_login_has_logo) { ?>
-            <img alt="<?= escapeHtml($nexus_theme_enabled ? ($nexus_theme_settings['branding']['logo_alt'] ?: nexusThemeBrandName($company_name, $nexus_theme_settings) . ' logo') : $company_name . ' logo') ?>" height="110" width="380" class="img-fluid" src="<?= escapeHtml($nexus_login_logo) ?>">
+            <img alt="<?= escapeHtml($nexus_theme_enabled ? ($nexus_theme_settings['branding']['logo_alt'] ?: nexusThemeBrandName($company_name, $nexus_theme_settings) . ' logo') : $company_name . ' logo') ?>" height="110" width="380" class="img-fluid" <?= $nexus_theme_enabled ? 'data-nexus-color-logo' : '' ?> src="<?= escapeHtml($nexus_login_logo) ?>">
         <?php } else { ?>
             <span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml($nexus_theme_enabled ? $nexus_theme_presentation['brand'] : $company_name) ?></span>
         <?php } ?>

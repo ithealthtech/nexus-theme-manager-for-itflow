@@ -22,7 +22,7 @@ if ($invoice_id < 1 || $url_key_raw === '') {
     exit('Invoice reference is invalid.');
 }
 
-if (!nexusThemeIsEnabled()) {
+if (!nexusThemeRuntimeEnabled()) {
     header('Location: guest_post.php?' . http_build_query([
         'export_invoice_pdf' => $invoice_id,
         'url_key' => $url_key_raw,
@@ -121,7 +121,7 @@ while ($itemsSql && ($item = mysqli_fetch_assoc($itemsSql))) {
     ];
 }
 
-$settings = nexusThemeSettings();
+$settings = nexusThemeSettingsForSurface(nexusThemeSettings(), 'print');
 $brand_name = nexusThemeBrandName($company_name, $settings);
 $logo_url = nexusThemeLogoUrl($settings, '', 'light');
 $logo_file = '';

@@ -8,9 +8,9 @@ header("X-Frame-Options: DENY");
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/nexus_theme.php';
 nexusThemeApplyDueSchedule();
-$nexus_theme_enabled = nexusThemeIsEnabled();
+$nexus_theme_enabled = nexusThemeRuntimeEnabled();
 $nexus_theme_settings = nexusThemeSettings();
-$nexus_theme_presentation = nexusThemePresentationModel($nexus_theme_settings, $session_company_name);
+$nexus_theme_presentation = nexusThemePresentationModel($nexus_theme_settings, $session_company_name, 'technician');
 $nexus_brand_name = $nexus_theme_presentation['brand'];
 $nexus_native_favicon = is_file($_SERVER['DOCUMENT_ROOT'] . '/uploads/favicon.ico') ? '/uploads/favicon.ico' : '';
 $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon), $nexus_theme_settings) : $nexus_native_favicon;
@@ -54,6 +54,7 @@ $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThe
     <!-- Scripts -->
     <script src="/libs/jquery/jquery.min.js"></script>
     <script src="/libs/toastr/toastr.min.js"></script>
+    <?php if ($nexus_theme_enabled) { ?><script><?= nexusThemeColorModeScript($nexus_theme_settings) ?></script><?php } ?>
 </head>
 <body class="
     hold-transition sidebar-mini layout-fixed layout-navbar-fixed <?= $nexus_theme_enabled ? 'nexus-theme nexus-agent ' . $nexus_theme_presentation['body_classes'] : '' ?>
@@ -61,3 +62,4 @@ $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThe
     <?php if ($user_config_theme_dark) echo 'dark-mode'; ?>
 ">
     <div class="wrapper text-sm">
+        <?php if ($nexus_theme_enabled) { ?><script><?= nexusThemeNavigationScript($nexus_theme_settings, !empty($session_is_admin) ? 'admin' : 'tech') ?></script><?php } ?>

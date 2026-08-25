@@ -12,7 +12,7 @@ require_once '../includes/load_global_settings.php';
 require_once '../includes/nexus_theme.php';
 
 nexusThemeApplyDueSchedule();
-$nexus_theme_enabled = nexusThemeIsEnabled();
+$nexus_theme_enabled = nexusThemeRuntimeEnabled();
 $nexus_theme_settings = nexusThemeSettings();
 $nexus_native_favicon = is_file('../uploads/favicon.ico') ? '/uploads/favicon.ico' : '';
 $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon), $nexus_theme_settings) : $nexus_native_favicon;
@@ -200,7 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 </head>
 
-<body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth ' . nexusThemeBodyClasses($nexus_theme_settings) : '' ?>">
+<body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth ' . nexusThemePresentationModel($nexus_theme_settings, 'Nexus MSP', 'auth')['body_classes'] : '' ?>">
 <div class="login-box">
     <?php
     $nexus_reset_logo = nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($nexus_theme_settings, '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['auth_background'])), $nexus_theme_settings);
@@ -208,7 +208,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     ?>
     <div class="login-logo <?= $nexus_reset_has_logo ? 'nexus-auth-brand--logo' : 'nexus-auth-brand--text' ?>">
         <?php if ($nexus_reset_has_logo) { ?>
-            <img alt="<?= escapeHtml($nexus_theme_settings['branding']['logo_alt'] ?: nexusThemeBrandName($company_name_display, $nexus_theme_settings) . ' logo') ?>" height="110" width="380" class="img-fluid" src="<?= escapeHtml($nexus_reset_logo) ?>">
+            <img alt="<?= escapeHtml($nexus_theme_settings['branding']['logo_alt'] ?: nexusThemeBrandName($company_name_display, $nexus_theme_settings) . ' logo') ?>" height="110" width="380" class="img-fluid" data-nexus-color-logo src="<?= escapeHtml($nexus_reset_logo) ?>">
         <?php } else { ?>
             <span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml(nexusThemeBrandName($company_name_display, $nexus_theme_settings)) ?></span>
         <?php } ?>
