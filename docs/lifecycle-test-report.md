@@ -1,24 +1,28 @@
 # Lifecycle test report
 
 - Date: 2026-08-25
-- Manager version: 3.9.0
-- Payload version: 26.08.23
+- Manager version: 3.9.1
+- Payload version: 26.08.24
 - PHP runtime: 8.3.33 CLI
 
 ## Syntax validation
 
 - `manager.php`: Pass
 - `updater.php`: Pass
+- `upgrade.php`: Pass
 - `tests/lifecycle.php`: Pass
 - `tests/updater.php`: Pass
+- `tests/upgrade.php`: Pass
 - Payload PHP files: 22/22 pass
 - Baseline PHP files: 16/16 pass
-- Total PHP files: 43/43 pass
-- Shell entrypoints: 3/3 syntax checks pass
+- Total unique PHP files: 45/45 pass
+- Shell entrypoints/tests: 4/4 syntax checks pass
 
 ## Automated lifecycle simulation
 
-Result: **257 assertions passed, 0 failed**
+Result: **272 assertions passed, 0 failed**
+
+Additional command-line updater results: **38 security assertions passed** and **8 transactional upgrade assertions passed**.
 
 The test creates isolated initialized ITFlow fixtures and state roots, then runs the manager as external CLI processes.
 

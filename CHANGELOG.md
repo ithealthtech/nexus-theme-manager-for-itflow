@@ -2,6 +2,19 @@
 
 All notable changes to this project are documented here.
 
+## [3.9.1] - 2026-08-25
+
+### Fixed
+
+- `install-latest.sh` now detects a managed installation and performs a verified in-place upgrade instead of refusing it.
+- Command-line upgrades preserve enabled or disabled mode and automatically reinstall and verify the previous package when replacement activation fails.
+- The bootstrap downloader accepts the established `.zip.sha256.txt` checksum name and the `.zip.sha256` name published with v3.9.0.
+- Corrected the README to use real release asset names and a copy-paste command-line update procedure.
+
+### Validation
+
+- Added an executable upgrade regression suite covering a successful enabled upgrade and a deliberately failed replacement with verified disabled-mode rollback.
+
 ## [3.9.0] - 2026-08-25
 
 ### Added

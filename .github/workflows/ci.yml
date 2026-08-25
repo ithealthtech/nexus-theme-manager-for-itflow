@@ -33,7 +33,7 @@ jobs:
           set -euo pipefail
           while IFS= read -r -d '' file; do
             php -l "$file"
-          done < <(find manager.php updater.php tests payload baseline -type f -name '*.php' -print0)
+          done < <(find manager.php updater.php upgrade.php tests payload baseline -type f -name '*.php' -print0)
 
       - name: Run lifecycle tests
         run: php tests/lifecycle.php
@@ -41,12 +41,18 @@ jobs:
       - name: Run GUI updater security tests
         run: php tests/updater.php
 
+      - name: Run command-line upgrade tests
+        run: php tests/upgrade.php
+
+      - name: Run installer upgrade integration
+        run: sudo sh tests/install_latest.sh
+
       - name: Validate Linux package activation
         run: sudo php tests/linux_activation.php
 
       - name: Validate shell entrypoints
         shell: bash
-        run: sh -n install.sh uninstall.sh install-latest.sh
+        run: sh -n install.sh uninstall.sh install-latest.sh tests/install_latest.sh
 
       - name: Verify package checksums
         shell: bash

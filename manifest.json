@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "package_id": "org.nexus-theme-manager.itflow",
-  "package_version": "3.9.0",
-  "theme_version": "26.08.23",
+  "package_version": "3.9.1",
+  "theme_version": "26.08.24",
   "name": "Nexus Theme Manager for IT Flow",
   "vendor": "Nexus Theme Manager contributors",
   "compatible_itflow": {
@@ -12,7 +12,7 @@
   "files": [
     {
       "path": "includes/nexus_theme.php",
-      "payload_sha256": "3ec18a3dc57da7c4f9ff28df8a8593e02bfbfdc18907b261a1f0b2df3a4a193a",
+      "payload_sha256": "bdae7984ea514e4b645e8f77168c5f962327d5f1ccba5fa24f0d22ed9ba77aca",
       "baseline_sha256": null,
       "php": true
     },
