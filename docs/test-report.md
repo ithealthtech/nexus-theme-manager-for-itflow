@@ -23,7 +23,7 @@
 | Lifecycle simulation | 272 passed, 0 failed |
 | GUI updater security suite | 38 passed, 0 failed |
 | Command-line package upgrade suite | 8 passed, 0 failed |
-| Full `install-latest.sh` Linux wrapper | Added to required GitHub CI; result pending branch run |
+| Full `install-latest.sh` Linux wrapper | Pass on PHP 8.2, 8.3, and 8.4; verified 3.9.0 → 3.9.1 `/opt` transition and final managed-file state |
 | Responsive browser checks | Side-by-side desktop/390px preview passed; 1280px shell measured 1265px with no page-level overflow |
 | Manifest payload hashes | 23/23 verified |
 | Manifest baseline hashes | 16/16 verified |
