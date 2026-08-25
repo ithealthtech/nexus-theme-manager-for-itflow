@@ -1,9 +1,9 @@
 # Lifecycle test report
 
 - Date: 2026-08-25
-- Manager version: 3.7.0
-- Payload version: 26.08.21
-- PHP runtime: 8.4.24 CLI
+- Manager version: 3.8.0
+- Payload version: 26.08.22
+- PHP runtime: 8.3.33 CLI
 
 ## Syntax validation
 
@@ -18,7 +18,7 @@
 
 ## Automated lifecycle simulation
 
-Result: **246 assertions passed, 0 failed**
+Result: **254 assertions passed, 0 failed**
 
 The test creates isolated initialized ITFlow fixtures and state roots, then runs the manager as external CLI processes.
 
@@ -37,6 +37,8 @@ The test creates isolated initialized ITFlow fixtures and state roots, then runs
 | Text sanitization, palette enforcement, scale limits, and contrast derivation | Pass |
 | Private draft isolation, exact field comparison, and optimistic stale-write rejection | Pass |
 | Eight-surface runtime preview generation from the shared live presentation model | Pass |
+| Responsive section picker, guided navigation, preview visibility, and compact surface picker | Pass |
+| Login initialization order and native-interface failure fallback | Pass |
 | Server-side quality audit, direct remediation targets, and safe draft corrections | Pass |
 | Atomic named publication, revision capture, protected known-good designs, restore-to-draft, and discard | Pass |
 | Automatic pre-operation snapshots and sanitized diagnostics | Pass |

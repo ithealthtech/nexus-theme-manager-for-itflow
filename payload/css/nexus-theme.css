@@ -1320,7 +1320,7 @@ body.nexus-client {
     z-index: -1;
 }
 
-.nexus-agent .nexus-manager-hero h1 {
+.nexus-manager-hero h1 {
     color: var(--nexus-white);
 }
 
@@ -1477,6 +1477,9 @@ body.nexus-client {
     padding: 0.3rem 0.45rem 0.9rem;
 }
 
+.nexus-section-select,
+.nexus-preview-surface-select { display: none; }
+
 .nexus-workspace-navigation-title strong {
     color: var(--nexus-text);
     font-size: 1.05rem;
@@ -1576,11 +1579,16 @@ body.nexus-client {
 .nexus-workspace-content { min-width: 0; }
 .nexus-workspace-heading { margin-bottom: 1rem; }
 .nexus-workspace-heading .card-body { align-items: center; display: flex; justify-content: space-between; }
+.nexus-workspace-heading-actions { align-items: center; display: flex; flex: 0 0 auto; gap: 0.45rem; }
 .nexus-workspace-step { background: var(--nexus-surface-2); border: 1px solid var(--nexus-border); border-radius: 999px; color: var(--nexus-muted); flex: 0 0 auto; font-size: 0.72rem; font-weight: 800; padding: 0.38rem 0.7rem; }
 .nexus-workspace-row { margin-left: -0.5rem; margin-right: -0.5rem; }
 .nexus-workspace-row > [class*="col-"] { padding-left: 0.5rem; padding-right: 0.5rem; }
 .nexus-studio-editor { min-height: 38rem; }
 .nexus-studio-editor > .card-footer { backdrop-filter: blur(12px); background: color-mix(in srgb, var(--nexus-surface) 88%, transparent) !important; bottom: 0; position: sticky; z-index: 3; }
+.nexus-studio .form-text { font-size: 0.76rem; line-height: 1.45; }
+.nexus-studio .btn { min-height: 2.35rem; }
+.nexus-studio-workspace:not([data-active-section="operations"]):not([data-active-section="system"]).is-preview-collapsed .nexus-workspace-editor-column { flex: 0 0 100%; max-width: 100%; }
+.nexus-studio-workspace:not([data-active-section="operations"]):not([data-active-section="system"]).is-preview-collapsed .nexus-workspace-side-column { display: none; }
 .nexus-workspace-panel { display: none; }
 .nexus-studio-workspace[data-active-section="operations"] .nexus-workspace-editor-column,
 .nexus-studio-workspace[data-active-section="system"] .nexus-workspace-editor-column,
@@ -2151,6 +2159,16 @@ body.nexus-client {
     .nexus-agent .nexus-ticket-queue-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+@media (max-width: 991.98px) {
+    .nexus-workspace-navigation > .card-body { padding: 0.75rem !important; }
+    .nexus-workspace-navigation-title { align-items: center; flex-direction: row; gap: 0.75rem; justify-content: space-between; padding: 0.1rem; }
+    .nexus-workspace-navigation-title > div { display: flex; flex-direction: column; }
+    .nexus-section-select { display: block; flex: 0 1 14rem; min-height: 2.75rem; }
+    .nexus-studio-tabs { display: none; }
+    .nexus-preview-surface-tabs { display: none; }
+    .nexus-preview-surface-select { display: block; min-height: 2.75rem; }
+}
+
 @media (max-width: 767.98px) {
     .nexus-manager-page { padding-bottom: 1rem; }
     .nexus-manager-hero .card-body { padding: 1.35rem !important; }
@@ -2171,7 +2189,8 @@ body.nexus-client {
     .nexus-draft-actions { width: 100%; }
     .nexus-draft-actions .btn,
     .nexus-draft-actions .form-control { min-width: 0; width: 100%; }
-    .nexus-preview-surface-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .nexus-preview-surface-tabs { display: none; }
+    .nexus-preview-surface-select { display: block; min-height: 2.75rem; }
     .nexus-runtime-preview-viewport { height: 18.2rem; }
     .nexus-responsive-tester { padding-left: 0.85rem; padding-right: 0.85rem; }
     .nexus-quality-score,
@@ -2208,21 +2227,23 @@ body.nexus-client {
     .nexus-logo-dropzone .form-control-file { max-width: 100%; min-width: 0; width: 100%; }
     .nexus-logo-dropzone > .btn { width: 100%; }
 
-    .nexus-workspace-navigation > .card-body { overflow: hidden; padding: 0.75rem !important; }
-    .nexus-workspace-navigation-title { padding: 0.1rem 0.25rem 0.6rem; }
-    .nexus-studio-tabs { margin-left: -0.15rem; margin-right: -0.15rem; padding-left: 0.15rem; padding-right: 0.15rem; }
-    .nexus-studio-tabs .nav-link { gap: 0.45rem; min-width: 7.75rem; padding: 0.5rem; }
-    .nexus-studio-tabs .nav-link > i { flex-basis: 1.9rem; height: 1.9rem; }
-    .nexus-studio-tabs .nav-link strong { font-size: 0.76rem; }
+    .nexus-workspace-navigation > .card-body { padding: 0.75rem !important; }
+    .nexus-workspace-navigation-title { align-items: center; flex-direction: row; gap: 0.75rem; justify-content: space-between; padding: 0.1rem; }
+    .nexus-workspace-navigation-title > div { display: flex; flex-direction: column; }
+    .nexus-section-select { display: block; flex: 0 1 14rem; min-height: 2.75rem; }
+    .nexus-studio-tabs { display: none; }
 
-    .nexus-workspace-heading .card-body { align-items: flex-start; flex-direction: column; gap: 0.65rem; }
+    .nexus-workspace-heading .card-body { align-items: stretch; flex-direction: column; gap: 0.8rem; }
     .nexus-workspace-heading p { font-size: 0.78rem; }
-    .nexus-workspace-step { margin-left: 0; }
+    .nexus-workspace-heading-actions { display: grid; grid-template-columns: 1fr auto 1fr; width: 100%; }
+    .nexus-workspace-heading-actions .nexus-preview-toggle { grid-column: 1 / -1; }
+    .nexus-workspace-heading-actions .btn { min-height: 2.75rem; }
+    .nexus-workspace-step { margin-left: 0; text-align: center; }
     .nexus-workspace-row { margin-left: 0; margin-right: 0; }
     .nexus-workspace-row > [class*="col-"] { padding-left: 0; padding-right: 0; }
     .nexus-studio-editor { min-height: 0; }
     .nexus-studio-editor > .card-body { padding: 1rem; }
-    .nexus-studio-editor > .card-footer { align-items: stretch !important; flex-direction: column; gap: 0.75rem; position: static; }
+    .nexus-studio-editor > .card-footer { align-items: stretch !important; bottom: 0; box-shadow: 0 -0.65rem 1.5rem rgba(11, 10, 23, 0.12); flex-direction: column; gap: 0.65rem; position: sticky; }
     .nexus-studio-editor > .card-footer .btn { width: 100%; }
 
     .nexus-section-heading { align-items: flex-start; gap: 0.7rem; }
@@ -2239,8 +2260,8 @@ body.nexus-client {
     .nexus-update-versions div:last-child { text-align: left; }
     .nexus-manager-command { max-width: 100%; overflow-wrap: anywhere; }
     .nexus-saved-preset-list > div { align-items: flex-start; flex-wrap: wrap; gap: 0.4rem; }
-    .nexus-responsive-presets { flex-direction: column; }
-    .nexus-responsive-presets .btn { flex-basis: auto; width: 100%; }
+    .nexus-responsive-presets { display: grid !important; gap: 0.4rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .nexus-responsive-presets .btn { border-radius: var(--nexus-radius) !important; flex-basis: auto; margin: 0 !important; width: 100%; }
     .nexus-design-operations .form-row > [class*="col-"] { flex: 0 0 100%; margin-bottom: 0.65rem; max-width: 100%; }
     .nexus-design-operations .d-flex.align-items-center.justify-content-between { align-items: flex-start !important; flex-direction: column; gap: 0.65rem; }
     .nexus-workspace-panel .btn-group.w-100 { display: grid; grid-template-columns: 1fr; }
@@ -2249,6 +2270,9 @@ body.nexus-client {
     .nexus-theme .modal-dialog { margin: 0.5rem; }
     .nexus-theme .modal-footer { align-items: stretch; flex-direction: column; }
     .nexus-theme .modal-footer .btn { margin: 0 0 0.5rem !important; width: 100%; }
+    .nexus-studio .btn,
+    .nexus-studio .form-control,
+    .nexus-studio .custom-select { min-height: 2.75rem; }
 }
 
 @media (max-width: 575.98px) {
