@@ -209,6 +209,27 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
                                 <div class="form-row"><div class="form-group col-md-6"><label for="nexus-header-style">Header treatment</label><select class="custom-select nexus-navigation-control" id="nexus-header-style" name="nexus[appearance][header_style]"><?php foreach (['solid' => 'Solid', 'gradient' => 'Gradient', 'glass' => 'Glass'] as $value => $label) { ?><option value="<?= $value ?>" <?= $nexusSettings['appearance']['header_style'] === $value ? 'selected' : '' ?>><?= $label ?></option><?php } ?></select></div><div class="form-group col-md-6"><label for="nexus-navigation-style">Active navigation</label><select class="custom-select nexus-navigation-control" id="nexus-navigation-style" name="nexus[appearance][navigation_style]"><?php foreach (['pill' => 'Gradient pill', 'rail' => 'Accent rail', 'outline' => 'Outline'] as $value => $label) { ?><option value="<?= $value ?>" <?= $nexusSettings['appearance']['navigation_style'] === $value ? 'selected' : '' ?>><?= $label ?></option><?php } ?></select></div></div>
                                 <div class="custom-control custom-switch mb-3"><input type="checkbox" class="custom-control-input nexus-navigation-control" id="nexus-sidebar-compact" name="nexus[appearance][sidebar_compact]" value="1" <?= $nexusSettings['appearance']['sidebar_compact'] ? 'checked' : '' ?>><label class="custom-control-label" for="nexus-sidebar-compact">Compact sidebar labels and section spacing</label></div>
                                 <div class="form-group"><div class="d-flex justify-content-between"><label for="nexus-font-scale">Interface scale</label><output id="nexus-font-scale-output"><?= (int)$nexusSettings['appearance']['font_scale'] ?>%</output></div><input type="range" class="custom-range" id="nexus-font-scale" name="nexus[appearance][font_scale]" min="90" max="110" step="1" value="<?= (int)$nexusSettings['appearance']['font_scale'] ?>"></div>
+                                <div class="nexus-accessibility-inspector mt-4" id="nexus-accessibility-inspector" aria-live="polite">
+                                    <div class="d-flex align-items-start justify-content-between flex-wrap mb-3">
+                                        <div>
+                                            <span class="nexus-manager-kicker">Accessibility inspector</span>
+                                            <h3 class="h6 mb-1">Current draft checks</h3>
+                                            <p class="text-muted mb-0">Tracks contrast, reduced-motion, brand text, and logo accessibility before you publish.</p>
+                                        </div>
+                                        <span class="badge badge-light" id="nexus-accessibility-summary">Checking</span>
+                                    </div>
+                                    <div class="nexus-accessibility-grid">
+                                        <div><span>Body contrast</span><strong id="nexus-accessibility-body-contrast">--</strong><small id="nexus-accessibility-body-status">Waiting</small></div>
+                                        <div><span>Primary button</span><strong id="nexus-accessibility-button-contrast">--</strong><small id="nexus-accessibility-button-status">Waiting</small></div>
+                                        <div><span>Reduced motion</span><strong id="nexus-accessibility-motion">--</strong><small>Respects OS preference</small></div>
+                                        <div><span>Branding</span><strong id="nexus-accessibility-brand">--</strong><small id="nexus-accessibility-brand-status">Waiting</small></div>
+                                    </div>
+                                    <div class="nexus-accessibility-checklist mt-3">
+                                        <div><i class="fas fa-check-circle"></i><span id="nexus-accessibility-logo-check">Logo alt text present</span></div>
+                                        <div><i class="fas fa-check-circle"></i><span id="nexus-accessibility-heading-check">Login heading and tagline supplied</span></div>
+                                        <div><i class="fas fa-check-circle"></i><span id="nexus-accessibility-nav-check">Navigation labels remain readable at compact widths</span></div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="tab-pane fade" id="nexus-motion" role="tabpanel">
@@ -239,7 +260,7 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
             <div class="col-xl-5 mt-4 mt-xl-0 nexus-workspace-side-column">
                 <div class="nexus-preview-sticky">
                     <section class="card nexus-preview-card nexus-workspace-preview">
-                        <div class="card-header border-0"><div class="d-flex align-items-start justify-content-between flex-wrap"><div><span class="nexus-manager-kicker">Exact runtime preview</span><h2 class="h5 mb-1" id="nexus-preview-title">Authentication</h2><small class="text-muted">Uses the same validated settings model, generated CSS, AdminLTE markup, and Nexus stylesheet as live pages.</small></div><span class="badge badge-<?= $nexusHasDraft ? 'warning' : 'success' ?> mt-1"><?= $nexusHasDraft ? 'Saved draft' : 'Published' ?></span></div><div class="nexus-preview-surface-tabs mt-3" role="group" aria-label="Preview surface"><button type="button" class="btn btn-info nexus-preview-mode active" data-mode="auth">Login</button><button type="button" class="btn btn-outline-info nexus-preview-mode" data-mode="technician">Technician</button><button type="button" class="btn btn-outline-info nexus-preview-mode" data-mode="client">Client</button><button type="button" class="btn btn-outline-info nexus-preview-mode" data-mode="invoice">Invoice</button></div></div>
+                        <div class="card-header border-0"><div class="d-flex align-items-start justify-content-between flex-wrap"><div><span class="nexus-manager-kicker">Exact runtime preview</span><h2 class="h5 mb-1" id="nexus-preview-title">Authentication</h2><small class="text-muted">Uses the same validated settings model, generated CSS, AdminLTE markup, and Nexus stylesheet as live pages.</small></div><span class="badge badge-<?= $nexusHasDraft ? 'warning' : 'success' ?> mt-1"><?= $nexusHasDraft ? 'Saved draft' : 'Published' ?></span></div><div class="nexus-preview-surface-tabs mt-3" role="group" aria-label="Preview surface"><button type="button" class="btn btn-info nexus-preview-mode active" data-mode="auth">Login</button><button type="button" class="btn btn-outline-info nexus-preview-mode" data-mode="technician">Technician</button><button type="button" class="btn btn-outline-info nexus-preview-mode" data-mode="client">Client</button><button type="button" class="btn btn-outline-info nexus-preview-mode" data-mode="invoice">Invoice</button></div><div class="nexus-responsive-tester mt-3"><div class="d-flex align-items-center justify-content-between flex-wrap mb-2"><div><span class="nexus-manager-kicker">Responsive tester</span><strong>Preview size</strong></div><small class="text-muted" id="nexus-responsive-copy">Desktop 1440px</small></div><div class="btn-group btn-group-sm w-100 nexus-responsive-presets" role="group" aria-label="Responsive preview presets"><button type="button" class="btn btn-outline-info active" data-responsive-mode="desktop" data-responsive-width="1440">Desktop</button><button type="button" class="btn btn-outline-info" data-responsive-mode="tablet" data-responsive-width="960">Tablet</button><button type="button" class="btn btn-outline-info" data-responsive-mode="mobile" data-responsive-width="390">Mobile</button></div><div class="form-group mt-3 mb-0"><label for="nexus-responsive-width">Custom width</label><input type="range" class="custom-range" id="nexus-responsive-width" min="320" max="1440" step="10" value="1440"><small class="form-text text-muted">Drag to inspect narrow breakpoints without leaving Theme Studio.</small></div></div></div>
                         <div class="card-body p-0"><div class="nexus-runtime-preview" id="nexus-live-preview">
                             <?php foreach ($nexusPreviewDocuments as $nexusPreviewSurface => $nexusPreviewDocument) { ?>
                                 <div class="nexus-runtime-preview-panel <?= $nexusPreviewSurface === 'auth' ? '' : 'd-none' ?>" data-preview-panel="<?= escapeHtml($nexusPreviewSurface) ?>"><div class="nexus-preview-windowbar"><i></i><i></i><i></i><span><?= ucfirst(escapeHtml($nexusPreviewSurface)) ?> · <?= $nexusHasDraft ? 'Draft' : 'Published' ?></span></div><div class="nexus-runtime-preview-viewport"><iframe class="nexus-runtime-preview-frame" sandbox="" loading="lazy" title="<?= ucfirst(escapeHtml($nexusPreviewSurface)) ?> Nexus preview" srcdoc="<?= escapeHtml($nexusPreviewDocument) ?>"></iframe></div></div>
@@ -393,7 +414,7 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
     });
     studio.querySelectorAll('.nexus-preset').forEach(function (button) { button.addEventListener('click', function () { var colors = JSON.parse(button.dataset.colors); Object.keys(colors).forEach(function (key) { var input = studio.querySelector('[data-color="' + key + '"]'); if (input) { input.value = colors[key]; input.closest('.nexus-color-field').querySelector('.nexus-color-picker').value = colors[key]; } }); presetField.value = button.dataset.preset; studio.querySelectorAll('.nexus-preset').forEach(function (item) { item.classList.toggle('active', item === button); }); updateStudioPalette(); updateContrast(); }); });
     studio.querySelectorAll('.nexus-image-input').forEach(function (logoInput) { logoInput.addEventListener('change', function () { var file = logoInput.files && logoInput.files[0]; if (!file || !/^image\/(png|jpeg|webp|gif)$/.test(file.type)) return; var reader = new FileReader(); reader.onload = function (event) { document.getElementById(logoInput.dataset.previewTargetId).innerHTML = '<img src="' + event.target.result + '" alt="Selected logo preview">'; }; reader.readAsDataURL(file); }); });
-    function showPreviewMode(mode) { var labels = {auth:'Authentication', technician:'Technician workspace', client:'Client portal', invoice:'Guest invoice'}; studio.querySelectorAll('.nexus-preview-mode').forEach(function (item) { var selected = item.dataset.mode === mode; item.classList.toggle('active', selected); item.classList.toggle('btn-info', selected); item.classList.toggle('btn-outline-info', !selected); item.setAttribute('aria-pressed', selected ? 'true' : 'false'); }); studio.querySelectorAll('.nexus-runtime-preview-panel').forEach(function (panel) { panel.classList.toggle('d-none', panel.dataset.previewPanel !== mode); }); document.getElementById('nexus-preview-title').textContent = labels[mode] || 'Exact preview'; }
+    function showPreviewMode(mode) { var labels = {auth:'Authentication', technician:'Technician workspace', client:'Client portal', invoice:'Guest invoice'}; studio.querySelectorAll('.nexus-preview-mode').forEach(function (item) { var selected = item.dataset.mode === mode; item.classList.toggle('active', selected); item.classList.toggle('btn-info', selected); item.classList.toggle('btn-outline-info', !selected); item.setAttribute('aria-pressed', selected ? 'true' : 'false'); }); studio.querySelectorAll('.nexus-runtime-preview-panel').forEach(function (panel) { panel.classList.toggle('d-none', panel.dataset.previewPanel !== mode); }); document.getElementById('nexus-preview-title').textContent = labels[mode] || 'Exact preview'; updateResponsivePreview(); updateAccessibilityReport(); }
     studio.querySelectorAll('.nexus-preview-mode').forEach(function (button) { button.addEventListener('click', function () { showPreviewMode(button.dataset.mode); }); });
     function updateNavigationPreview() { var width = document.getElementById('nexus-sidebar-width').value; document.getElementById('nexus-sidebar-width-output').textContent = width + 'px'; }
     studio.querySelectorAll('.nexus-navigation-control').forEach(function (control) { function refreshLayoutPreview() { updateNavigationPreview(); showPreviewMode('technician'); } control.addEventListener('input', refreshLayoutPreview); control.addEventListener('change', refreshLayoutPreview); });
@@ -406,11 +427,67 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
     function updateMotionPreview() { ['subtle', 'fluid', 'snappy'].forEach(function (profile) { document.body.classList.toggle('nexus-motion-' + profile, motionStyle.value === profile); }); document.body.classList.toggle('nexus-motion-reduced', reduceMotion.checked); }
     motionStyle.addEventListener('change', updateMotionPreview);
     reduceMotion.addEventListener('change', updateMotionPreview);
+    var responsiveWidth = document.getElementById('nexus-responsive-width');
+    var responsiveCopy = document.getElementById('nexus-responsive-copy');
+    var responsivePresetButtons = Array.prototype.slice.call(studio.querySelectorAll('[data-responsive-mode]'));
+    function updateResponsivePreview() {
+        var activePanel = studio.querySelector('.nexus-runtime-preview-panel:not(.d-none)');
+        var viewport = activePanel ? activePanel.querySelector('.nexus-runtime-preview-viewport') : null;
+        var frame = activePanel ? activePanel.querySelector('.nexus-runtime-preview-frame') : null;
+        var width = Math.max(320, Math.min(1440, parseInt(responsiveWidth.value, 10) || 1440));
+        var preset = 'desktop';
+        if (width < 600) preset = 'mobile';
+        else if (width < 1024) preset = 'tablet';
+        responsivePresetButtons.forEach(function (button) { var selected = button.dataset.responsiveMode === preset; button.classList.toggle('active', selected); button.classList.toggle('btn-info', selected); button.classList.toggle('btn-outline-info', !selected); });
+        responsiveCopy.textContent = (preset.charAt(0).toUpperCase() + preset.slice(1)) + ' ' + width + 'px';
+        if (!viewport || !frame) return;
+        viewport.dataset.responsiveMode = preset;
+        viewport.style.setProperty('--nexus-preview-width', width + 'px');
+        var availableWidth = Math.max(1, viewport.clientWidth - 24);
+        var scaleFactor = Math.min(1, availableWidth / width);
+        viewport.style.setProperty('--nexus-preview-scale', scaleFactor);
+        frame.style.height = width >= 1200 ? '50rem' : (width >= 900 ? '58rem' : (width >= 600 ? '72rem' : '80rem'));
+    }
+    responsivePresetButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            responsiveWidth.value = button.dataset.responsiveWidth;
+            updateResponsivePreview();
+        });
+    });
+    responsiveWidth.addEventListener('input', updateResponsivePreview);
+    window.addEventListener('resize', updateResponsivePreview);
+    function updateAccessibilityReport() {
+        var primary = studio.querySelector('[data-color="primary"]').value;
+        var text = studio.querySelector('[data-color="text"]').value;
+        var surface = studio.querySelector('[data-color="surface"]').value;
+        var bodyRatio = contrast(text, surface);
+        var buttonRatio = contrast(primary, contrastInk(primary));
+        var logoAltField = document.getElementById('nexus-logo-alt').value.trim();
+        var logoPresent = document.getElementById('nexus-logo-preview').querySelector('img') !== null || document.getElementById('nexus-dark-logo-preview').querySelector('img') !== null;
+        var heading = document.getElementById('nexus-login-heading').value.trim();
+        var tagline = document.getElementById('nexus-tagline').value.trim();
+        var motion = reduceMotion.checked ? 'Reduced' : motionStyle.value.charAt(0).toUpperCase() + motionStyle.value.slice(1);
+        document.getElementById('nexus-accessibility-body-contrast').textContent = bodyRatio.toFixed(2) + ':1';
+        document.getElementById('nexus-accessibility-button-contrast').textContent = buttonRatio.toFixed(2) + ':1';
+        document.getElementById('nexus-accessibility-motion').textContent = motion;
+        document.getElementById('nexus-accessibility-brand').textContent = logoPresent ? 'Configured' : 'Text-only';
+        document.getElementById('nexus-accessibility-body-status').textContent = bodyRatio >= 4.5 ? 'Pass' : 'Needs attention';
+        document.getElementById('nexus-accessibility-button-status').textContent = buttonRatio >= 4.5 ? 'Pass' : 'Needs attention';
+        document.getElementById('nexus-accessibility-brand-status').textContent = logoAltField !== '' || !logoPresent ? 'Pass' : 'Needs alt text';
+        document.getElementById('nexus-accessibility-logo-check').textContent = logoAltField !== '' || !logoPresent ? 'Logo alt text present' : 'Add alt text for uploaded logos';
+        document.getElementById('nexus-accessibility-heading-check').textContent = heading !== '' && tagline !== '' ? 'Login heading and tagline supplied' : 'Login copy should stay complete';
+        document.getElementById('nexus-accessibility-nav-check').textContent = (parseInt(document.getElementById('nexus-sidebar-width').value, 10) <= 280 || document.getElementById('nexus-sidebar-compact').checked) ? 'Navigation labels remain readable at compact widths' : 'Navigation remains spacious';
+        var summary = document.getElementById('nexus-accessibility-summary');
+        var score = [bodyRatio >= 4.5, buttonRatio >= 4.5, logoAltField !== '' || !logoPresent, heading !== '' && tagline !== ''].filter(Boolean).length;
+        summary.textContent = score + '/4 checks';
+        summary.classList.toggle('badge-success', score === 4);
+        summary.classList.toggle('badge-warning', score < 4);
+    }
     document.getElementById('nexus-export').addEventListener('click', function () { var blob = new Blob([document.getElementById('nexus-export-json').value], {type:'application/json'}); var link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'nexus-theme-configuration.json'; document.body.appendChild(link); link.click(); link.remove(); setTimeout(function () { URL.revokeObjectURL(link.href); }, 0); });
     var exportPresets = document.getElementById('nexus-export-presets'); if (exportPresets) exportPresets.addEventListener('click', function () { var blob = new Blob([document.getElementById('nexus-export-presets-json').value], {type:'application/json'}); var link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = 'nexus-theme-presets.json'; document.body.appendChild(link); link.click(); link.remove(); setTimeout(function () { URL.revokeObjectURL(link.href); }, 0); });
     var scheduleForm = document.getElementById('nexus-schedule-form'); scheduleForm.addEventListener('submit', function (event) { var local = document.getElementById('nexus-schedule-local').value; if (!local) return; var date = new Date(local); if (isNaN(date.getTime())) { event.preventDefault(); return; } document.getElementById('nexus-schedule-at').value = date.toISOString(); });
     updateNavigationPreview(); updateLogoPreview(); updateBackgroundPreview();
-    updateContrast();
+    updateContrast(); updateAccessibilityReport(); updateResponsivePreview();
     showWorkspaceSection(requestedSection, false);
     function markDraftDirty() { workspace.classList.add('is-dirty'); var freshness = document.getElementById('nexus-preview-freshness'); if (freshness) freshness.innerHTML = '<i class="fas fa-exclamation-circle mr-1 text-warning"></i>Form edits are newer than this exact snapshot. Save draft to regenerate all four previews.'; var state = document.getElementById('nexus-draft-save-state'); if (state) state.innerHTML = '<i class="fas fa-circle mr-1 text-warning"></i>Unsaved form changes'; }
     document.getElementById('nexus-customizer-form').addEventListener('input', markDraftDirty);
