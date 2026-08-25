@@ -134,6 +134,9 @@ try {
         expect(str_contains($authSource, "'nexus-auth-brand--logo' : 'nexus-auth-brand--text'"), 'authentication template marks logo and text branding as mutually exclusive');
         expect(str_contains($authSource, "['branding']['tagline']"), 'authentication template renders the configured brand tagline');
     }
+    expect(strpos($loginSource, 'require_once __DIR__ . "/includes/session_init.php";') < strpos($loginSource, 'nexusThemePresentationModel('), 'login loads ITFlow company settings before building the Nexus presentation model');
+    expect(str_contains($loginSource, 'catch (Throwable $nexus_theme_error)') && str_contains($loginSource, '$nexus_theme_enabled = false;'), 'login falls back to the native interface when Nexus presentation initialization fails');
+    expect(str_contains($loginSource, 'isset($company_name) && is_string($company_name)') && str_contains($loginSource, ": 'ITFlow';"), 'login always supplies a non-empty string fallback brand to the typed presentation model');
     expect(str_contains($themeCssSource, '.nexus-auth .login-logo.nexus-auth-brand--logo > :not(img)') && str_contains($themeCssSource, 'font-size: 0;'), 'logo branding suppresses duplicate title content while preserving the image');
     expect(str_contains($clientHeaderSource, 'nexus-client-brand--logo') && str_contains($clientHeaderSource, 'nexus-client-nav-logo') && str_contains($clientHeaderSource, '$nexus_portal_has_logo'), 'client portal renders the configured logo inside the navigation brand');
     expect(str_contains($themeCssSource, '.navbar-brand.nexus-client-brand--logo::before') && str_contains($themeCssSource, '.nexus-client .nexus-client-nav-logo'), 'client portal replaces the decorative brand marker with the configured responsive logo');

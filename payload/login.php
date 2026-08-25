@@ -14,14 +14,32 @@ require_once "functions.php";
 require_once "libs/totp/totp.php";
 require_once __DIR__ . "/includes/nexus_theme.php";
 
-nexusThemeApplyDueSchedule();
-$nexus_theme_enabled = nexusThemeIsEnabled();
-$nexus_theme_settings = nexusThemeSettings();
-$nexus_theme_presentation = nexusThemePresentationModel($nexus_theme_settings, $company_name);
 $nexus_native_favicon = is_file(__DIR__ . '/uploads/favicon.ico') ? '/uploads/favicon.ico' : '';
-$nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon), $nexus_theme_settings) : $nexus_native_favicon;
+$nexus_theme_enabled = false;
+$nexus_theme_settings = [];
+$nexus_theme_presentation = ['body_classes' => '', 'brand' => 'ITFlow'];
+$nexus_favicon_url = $nexus_native_favicon;
 
 require_once __DIR__ . "/includes/session_init.php";
+
+// Company settings are loaded by the session bootstrap. Theme presentation
+// must run afterwards, and must never prevent access to the native login.
+try {
+    nexusThemeApplyDueSchedule();
+    $nexus_theme_settings = nexusThemeSettings();
+    $nexus_theme_enabled = nexusThemeIsEnabled();
+    $nexus_fallback_brand = isset($company_name) && is_string($company_name) && trim($company_name) !== ''
+        ? $company_name
+        : 'ITFlow';
+    $nexus_theme_presentation = nexusThemePresentationModel($nexus_theme_settings, $nexus_fallback_brand);
+    $nexus_favicon_url = $nexus_theme_enabled
+        ? nexusThemeVersionedAssetUrl(nexusThemeFaviconUrl($nexus_theme_settings, $nexus_native_favicon), $nexus_theme_settings)
+        : $nexus_native_favicon;
+} catch (Throwable $nexus_theme_error) {
+    $nexus_theme_enabled = false;
+    $nexus_favicon_url = $nexus_native_favicon;
+    error_log('Nexus Theme Manager: login presentation disabled after initialization failure: ' . $nexus_theme_error->getMessage());
+}
 
 if (!isset($config_enable_setup) || $config_enable_setup == 1) {
     header("Location: /setup");
@@ -732,12 +750,14 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
     <div class="card">
         <div class="card-body login-card-body">
 
-            <span class="nexus-eyebrow"><?= escapeHtml($nexus_theme_settings['content']['login_eyebrow']) ?></span>
+            <?php if ($nexus_theme_enabled) { ?>
+                <span class="nexus-eyebrow"><?= escapeHtml($nexus_theme_settings['content']['login_eyebrow']) ?></span>
+            <?php } ?>
             <h1 class="nexus-auth-title">
-                <?php if ($show_role_choice) { ?>Choose your workspace<?php } elseif ($show_mfa_form) { ?>Verify your identity<?php } else { ?><?= escapeHtml($nexus_theme_settings['content']['login_heading']) ?><?php } ?>
+                <?php if ($show_role_choice) { ?>Choose your workspace<?php } elseif ($show_mfa_form) { ?>Verify your identity<?php } elseif ($nexus_theme_enabled) { ?><?= escapeHtml($nexus_theme_settings['content']['login_heading']) ?><?php } else { ?>Welcome back<?php } ?>
             </h1>
             <p class="nexus-auth-copy">
-                <?php if ($show_role_choice) { ?>Select the workspace you need for this session.<?php } elseif ($show_mfa_form) { ?>Enter the code from your authenticator to continue securely.<?php } else { ?><?= nl2br(escapeHtml($nexus_theme_settings['content']['login_message'])) ?><?php } ?>
+                <?php if ($show_role_choice) { ?>Select the workspace you need for this session.<?php } elseif ($show_mfa_form) { ?>Enter the code from your authenticator to continue securely.<?php } elseif ($nexus_theme_enabled) { ?><?= nl2br(escapeHtml($nexus_theme_settings['content']['login_message'])) ?><?php } else { ?>Sign in to continue.<?php } ?>
             </p>
 
             <?php if (!empty($config_login_message)){ ?>
