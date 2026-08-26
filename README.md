@@ -33,6 +33,8 @@ Theme Studio also includes:
 
 After installation, open **Administration → NEXUS → Theme Manager**.
 
+New to Theme Studio? Read the **[complete beginner guide](docs/theme-manager-guide.md)** for a field-by-field explanation of every option, safe draft/publish workflows, previews, updates, recovery, and troubleshooting.
+
 ## Compatibility
 
 | Component | Supported version |
@@ -150,6 +152,7 @@ ITFlow currently has no native theme or plugin hook system, so Nexus manages a b
 
 ## Documentation
 
+- [Theme Manager beginner guide](docs/theme-manager-guide.md)
 - [v3.9.1 release notes](docs/release-v3.9.1.md)
 - [v3.9.0 release notes](docs/release-v3.9.0.md)
 - [Architecture and privilege boundaries](docs/architecture.md)
