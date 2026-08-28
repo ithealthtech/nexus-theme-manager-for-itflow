@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Complete installation, configuration, update, rollback, and daily-use guide for Nexus Theme Manager for ITFlow.">
+  <meta name="theme-color" content="#0b0a17">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <title>Guides · Nexus Theme Manager for ITFlow</title>
+  <link rel="stylesheet" href="assets/site.css">
+  <script src="assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="nav-shell">
+      <a class="brand" href="index.html" aria-label="Nexus documentation home"><span class="brand-mark" aria-hidden="true">N</span><span>Nexus for ITFlow</span></a>
+      <nav class="site-nav" data-site-nav aria-label="Primary navigation">
+        <a href="index.html">Overview</a><a href="guide.html" aria-current="page">Guides</a><a href="demo.html">Interactive demo</a><a href="support.html">Support</a><a href="https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/latest">Download</a>
+      </nav>
+      <div class="nav-actions"><button class="icon-button" type="button" data-doc-theme-toggle aria-label="Use light documentation theme">☀</button><button class="menu-button" type="button" data-menu-toggle aria-label="Open navigation" aria-expanded="false">☰</button></div>
+    </div>
+  </header>
+
+  <main id="main">
+    <header class="page-hero">
+      <div class="container">
+        <p class="eyebrow">Complete end-user guide</p>
+        <h1>Install, design, publish, update, and recover.</h1>
+        <p>Use the guided path for a first installation or jump directly to a safe operational playbook. Examples target Nexus 3.9.1 and its exact ITFlow compatibility pin.</p>
+      </div>
+    </header>
+
+    <div class="container docs-layout">
+      <nav class="toc" aria-label="Guide contents">
+        <strong>On this page</strong>
+        <a href="#before">Before installation</a>
+        <a href="#install">Install</a>
+        <a href="#acceptance">Acceptance testing</a>
+        <a href="#first-design">First design</a>
+        <a href="#workspaces">Workspace reference</a>
+        <a href="#daily">Daily workflows</a>
+        <a href="#update">Update</a>
+        <a href="#pause-remove">Pause or remove</a>
+        <a href="#itflow-update">Update ITFlow</a>
+        <a href="#command-builder">Command builder</a>
+      </nav>
+
+      <article class="docs-content">
+        <section id="before">
+          <p class="section-kicker">Preparation</p>
+          <h2>Before installation</h2>
+          <div class="notice notice-warning"><span aria-hidden="true">!</span><p><strong>Back up first.</strong> Create and verify an application-file backup and database backup. Nexus changes presentation templates but does not replace a full recovery plan.</p></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Check</th><th>Required value or action</th></tr></thead>
+              <tbody>
+                <tr><td>Nexus</td><td>3.9.1</td></tr>
+                <tr><td>ITFlow</td><td>26.08 at commit <code>89b080b430aaafba5d520c4e52c57b28a9559085</code></td></tr>
+                <tr><td>Runtime</td><td>PHP 8.1+ CLI on Debian/Ubuntu with systemd</td></tr>
+                <tr><td>Access</td><td>Root or approved <code>sudo</code>, SSH, and a known absolute ITFlow document root</td></tr>
+                <tr><td>Change plan</td><td>Staging acceptance, maintenance window, service reload method, rollback owner</td></tr>
+                <tr><td>Backup proof</td><td>Readable file archive, database dump, location, timestamp, and restore owner</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Nexus verifies supported templates before writing. A missing, modified, older, or newer baseline is refused without changing the ITFlow instance. Do not edit checksums or manager state to bypass this safeguard.</p>
+        </section>
+
+        <section id="install">
+          <p class="section-kicker">Installation</p>
+          <h2>Recommended installer</h2>
+          <p>Run from SSH as an operator with the required privileges. Replace the example root with the real ITFlow document root.</p>
+          <div class="code-block"><button class="copy-button" type="button" data-copy-target="#install-command">Copy</button><pre><code id="install-command">curl --fail --location --remote-name \
+  https://raw.githubusercontent.com/ithealthtech/nexus-theme-manager-for-itflow/main/install-latest.sh
+
+chmod +x install-latest.sh
+sudo ./install-latest.sh --root /var/www/itflow.example.com</code></pre></div>
+          <p>The installer resolves the latest published release, downloads its versioned ZIP and adjacent checksum, verifies the archive, extracts under <code>/opt</code>, checks the ITFlow baseline, installs and verifies Nexus, and configures the protected GUI updater.</p>
+          <h3>Custom state directory</h3>
+          <p>If the default protected state location is unsuitable, choose a local directory outside the document root and pass it consistently for every later lifecycle command.</p>
+          <div class="code-block"><button class="copy-button" type="button" data-copy-target="#state-command">Copy</button><pre><code id="state-command">sudo ./install-latest.sh \
+  --root /var/www/itflow.example.com \
+  --state-root /srv/secure/nexus-theme-state</code></pre></div>
+          <h3>Manual release installation</h3>
+          <p>Use the versioned ZIP and checksum from the latest release. GitHub's automatically generated source archive is not the tested installation artifact.</p>
+          <div class="code-block"><button class="copy-button" type="button" data-copy-target="#manual-command">Copy</button><pre><code id="manual-command">sha256sum --check Nexus-Theme-Manager-for-ITFlow-3.9.1.zip.sha256.txt
+sudo unzip Nexus-Theme-Manager-for-ITFlow-3.9.1.zip -d /opt
+cd /opt/Nexus-Theme-Manager-for-ITFlow-3.9.1
+
+sudo php manager.php doctor --root /var/www/itflow.example.com
+sudo php manager.php install --root /var/www/itflow.example.com --yes
+sudo php updater.php install-service --root /var/www/itflow.example.com
+sudo php manager.php verify --root /var/www/itflow.example.com</code></pre></div>
+        </section>
+
+        <section id="acceptance">
+          <p class="section-kicker">Verification</p>
+          <h2>Acceptance checklist</h2>
+          <ol class="step-list">
+            <li><strong>Verify lifecycle state</strong>Run <code>status</code> and <code>verify</code>. Both must report a healthy enabled installation.</li>
+            <li><strong>Open Theme Studio</strong>Sign in as an administrator and open Administration → NEXUS → Theme Manager.</li>
+            <li><strong>Confirm updater readiness</strong>Open Updates & System and confirm the protected updater reports Ready.</li>
+            <li><strong>Test authentication</strong>Check password login, reset, MFA, role selection, remember-me, and Entra paths used by the deployment.</li>
+            <li><strong>Test customer workflows</strong>Open the portal, list tickets, create a request, view a conversation, and check permission-controlled navigation.</li>
+            <li><strong>Test operations</strong>Inspect ticket queues, client context, administration pages, modals, tables, and configured integrations.</li>
+            <li><strong>Test responsive and print</strong>Check phone navigation, horizontal table containment, guest invoice, and print/PDF output.</li>
+            <li><strong>Pin known good</strong>After the initial design is published, pin its revision for recovery.</li>
+          </ol>
+        </section>
+
+        <section id="first-design">
+          <p class="section-kicker">First configuration</p>
+          <h2>Build a first design safely</h2>
+          <div class="notice"><span aria-hidden="true">i</span><p><strong>Draft is private; published is live.</strong> Editing a field does not change user-facing pages. Save the draft, inspect regenerated previews and quality results, then publish only when ready.</p></div>
+          <ol>
+            <li>Set display name, logo alt text, tagline, and approved light/dark logos in <strong>Branding</strong>.</li>
+            <li>Select the closest built-in palette in <strong>Colors</strong>, then make restrained adjustments.</li>
+            <li>Keep global <strong>Layout</strong> defaults until the basic visual language is stable.</li>
+            <li>Select <strong>Save draft</strong>.</li>
+            <li>Review all eight surfaces at laptop, tablet, phone, and one custom width.</li>
+            <li>Resolve important <strong>Design quality</strong> findings.</li>
+            <li>Compare unpublished values with live values.</li>
+            <li>Select <strong>Publish draft</strong> and use a meaningful revision name.</li>
+            <li>Pin the accepted revision under <strong>Presets & schedule</strong>.</li>
+          </ol>
+          <p><strong>Discard draft</strong> removes unpublished changes only. Applying a preset, restoring a revision, importing a workspace, loading defaults, or applying quality fixes changes the draft and never publishes by itself.</p>
+        </section>
+
+        <section id="workspaces">
+          <p class="section-kicker">Reference</p>
+          <h2>Theme Studio workspaces</h2>
+          <div class="accordion">
+            <details open><summary>Branding</summary><div><p>Manage display name, accessible logo text, tagline, browser title, light/dark logos, favicon, authentication artwork, surface visibility, sizing, alignment, crop and resize settings. Asset health reports dimensions, size, animation, frame rate, format companions, and warnings.</p></div></details>
+            <details><summary>Colors</summary><div><p>Begin with Aurora, Ocean, Emerald, Ember, or Slate. Adjust six-digit hex values for accent, gradient, shell, page, card, text, and other surfaces. Use the live contrast warning, then run the complete quality audit after saving.</p></div></details>
+            <details><summary>Layout and surface profiles</summary><div><p>Control corners, content density, menu density, sidebar width, header treatment, active navigation, compact labels, and interface scale. Enable overrides only where technician, client, authentication, guest, or print surfaces need to diverge from global settings.</p></div></details>
+            <details><summary>Navigation builder</summary><div><p>Reorder approved destinations, change labels and icons, set administrator/technician visibility, and independently control desktop and mobile presentation. Hiding a link is not authorization; ITFlow permission checks remain authoritative.</p></div></details>
+            <details><summary>Automatic dark mode</summary><div><p>Follow system preference, force light/dark, schedule a range using server-local time, or allow user selection. A saved user choice takes priority when user selection is allowed. Configure an independent dark palette and appropriate logos.</p></div></details>
+            <details><summary>Design quality</summary><div><p>Audit the saved draft at a 390px phone width. Findings name the surface and link to the responsible setting. Automatic fixes are allow-listed and remain unpublished until reviewed and published.</p></div></details>
+            <details><summary>Motion and content</summary><div><p>Choose subtle, fluid, or snappy UI motion while respecting reduced-motion preferences. Configure presentation-only authentication and portal copy without changing business logic.</p></div></details>
+            <details><summary>Presets, revisions, and schedule</summary><div><p>Compare draft to live, retain up to 50 revisions, pin known-good versions, restore into a draft, manage up to 20 reusable presets, import/export presets, and schedule whole-theme activation or pause.</p></div></details>
+            <details><summary>Updates and system</summary><div><p>Check and install verified releases, inspect update stages and rollback status, run health checks, restore known-good, emergency-disable, export/import workspace settings, download sanitized diagnostics, or load defaults into a draft.</p></div></details>
+          </div>
+        </section>
+
+        <section id="daily">
+          <p class="section-kicker">Playbooks</p>
+          <h2>Common daily workflows</h2>
+          <h3>Change a logo</h3>
+          <ol><li>Open Branding and enter useful alt text.</li><li>Upload approved light/dark assets and adjust size/alignment.</li><li>Save the draft.</li><li>Review every relevant surface in light, dark, desktop, and phone views.</li><li>Resolve asset and quality warnings.</li><li>Publish with a named revision.</li></ol>
+          <h3>Change colors</h3>
+          <ol><li>Select the closest built-in palette.</li><li>Adjust individual colors and watch contrast.</li><li>Save the draft.</li><li>Review both light and dark modes across surface profiles.</li><li>Run Design quality and publish only after acceptance.</li></ol>
+          <h3>Undo a published design</h3>
+          <ol><li>Open Presets & schedule.</li><li>Compare the target revision with live.</li><li>Select Restore to load it into the draft.</li><li>Review the restored draft.</li><li>Publish it as a new named revision.</li></ol>
+          <h3>Move a design between installations</h3>
+          <ol><li>Export the workspace from Updates & system.</li><li>Review the JSON and transfer it using an approved method.</li><li>Import it to the destination draft.</li><li>Uploaded asset references remain destination-specific unless managed separately.</li><li>Review previews and publish deliberately.</li></ol>
+        </section>
+
+        <section id="update">
+          <p class="section-kicker">Nexus releases</p>
+          <h2>Update Nexus</h2>
+          <h3>From Theme Studio</h3>
+          <p>Open Updates & System, select <strong>Check for updates</strong>, review the offered release, then install. Theme Studio queues only allow-listed operations. The root-owned service downloads the fixed repository release, verifies checksums and the package manifest, stages the package, protects the current version, activates, runs health checks, and restores the previous release if activation fails.</p>
+          <h3>From SSH</h3>
+          <div class="code-block"><button class="copy-button" type="button" data-copy-target="#update-command">Copy</button><pre><code id="update-command">cd /tmp
+curl --fail --location --output install-latest.sh \
+  https://raw.githubusercontent.com/ithealthtech/nexus-theme-manager-for-itflow/main/install-latest.sh
+chmod +x install-latest.sh
+sudo ./install-latest.sh --root /var/www/itflow.example.com</code></pre></div>
+          <p>The installer installs when unmanaged, upgrades when newer, preserves enabled/disabled state, verifies the replacement, restores the previous package after activation failure, and reports when no update is needed. It refuses downgrades, invalid tags, bad checksums, incompatible ITFlow, mismatched state, and a missing current package.</p>
+        </section>
+
+        <section id="pause-remove">
+          <p class="section-kicker">Rollback</p>
+          <h2>Pause, disable, or remove Nexus</h2>
+          <div class="table-wrap"><table><thead><tr><th>Action</th><th>Use when</th><th>What remains</th></tr></thead><tbody>
+            <tr><td>Pause theme</td><td>Temporarily remove presentation customizations</td><td>Settings, drafts, revisions, and package</td></tr>
+            <tr><td>Emergency disable</td><td>Native administrator presentation is urgently needed</td><td>Settings/history for later recovery</td></tr>
+            <tr><td>Restore known-good</td><td>A published configuration is unhealthy</td><td>A safety snapshot plus restored pinned/newest revision</td></tr>
+            <tr><td>Lifecycle disable</td><td>Restore exact upstream templates or prepare for ITFlow update</td><td>Manager state and backups</td></tr>
+            <tr><td>Uninstall</td><td>Remove the package-managed theme</td><td>Archived recovery state by default</td></tr>
+          </tbody></table></div>
+          <div class="code-block"><button class="copy-button" type="button" data-copy-target="#disable-command">Copy</button><pre><code id="disable-command">sudo php manager.php status --root /var/www/itflow.example.com
+sudo php manager.php disable --root /var/www/itflow.example.com --yes
+sudo php manager.php verify --root /var/www/itflow.example.com</code></pre></div>
+          <div class="code-block"><button class="copy-button" type="button" data-copy-target="#enable-command">Copy</button><pre><code id="enable-command">sudo php manager.php enable --root /var/www/itflow.example.com --yes
+sudo php manager.php verify --root /var/www/itflow.example.com</code></pre></div>
+          <div class="code-block"><button class="copy-button" type="button" data-copy-target="#uninstall-command">Copy</button><pre><code id="uninstall-command">sudo ./uninstall.sh --root /var/www/itflow.example.com --yes</code></pre></div>
+          <p>Nexus refuses to overwrite a managed file that changed after installation. Preserve and investigate reported drift instead of bypassing verification.</p>
+        </section>
+
+        <section id="itflow-update">
+          <p class="section-kicker">Compatibility</p>
+          <h2>Update ITFlow safely</h2>
+          <div class="notice notice-danger"><span aria-hidden="true">!</span><p><strong>Do not run the ITFlow updater over an enabled Nexus payload.</strong> ITFlow has no native theme-hook system, so Nexus only claims compatibility with templates it has tested.</p></div>
+          <ol class="step-list">
+            <li><strong>Record and verify</strong>Capture Nexus status and complete verification.</li>
+            <li><strong>Disable or uninstall Nexus</strong>Restore the exact supported upstream templates before the ITFlow update.</li>
+            <li><strong>Update ITFlow</strong>Complete upstream migrations, checks, and application acceptance.</li>
+            <li><strong>Obtain a compatible Nexus release</strong>Its table and manifest must explicitly name the new ITFlow revision.</li>
+            <li><strong>Run doctor, install, and test</strong>Proceed only after the exact compatibility preflight succeeds.</li>
+          </ol>
+        </section>
+
+        <section id="command-builder">
+          <p class="section-kicker">Personalized commands</p>
+          <h2>Command builder</h2>
+          <p>This builder only formats commands in your browser. It does not contact a server, validate a path, or run anything.</p>
+          <div class="command-builder" data-command-builder>
+            <div class="field-grid">
+              <div class="field"><label for="command-root">ITFlow document root</label><input id="command-root" data-command-root value="/var/www/itflow.example.com" spellcheck="false"></div>
+              <div class="field"><label for="command-state">Custom state root (optional)</label><input id="command-state" data-command-state placeholder="/srv/secure/nexus-theme-state" spellcheck="false"></div>
+            </div>
+            <p class="field-label">Operation</p>
+            <div class="segmented" aria-label="Command operation">
+              <button type="button" data-command-mode="install" aria-pressed="true">Install</button>
+              <button type="button" data-command-mode="update" aria-pressed="false">Update</button>
+              <button type="button" data-command-mode="verify" aria-pressed="false">Verify</button>
+              <button type="button" data-command-mode="disable" aria-pressed="false">Disable</button>
+            </div>
+            <div class="code-block"><button class="copy-button" type="button" data-copy-target="#built-command">Copy</button><pre><code id="built-command" data-command-output></code></pre></div>
+          </div>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="site-footer"><div class="container footer-grid"><div><a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">N</span><span>Nexus for ITFlow</span></a><p class="footer-note">Independent GPL-3.0 integration. Exact compatibility is mandatory.</p></div><div><h3>Learn</h3><a href="guide.html">End-user guides</a><a href="demo.html">Interactive demo</a><a href="support.html">Troubleshooting</a></div><div><h3>Project</h3><a href="https://github.com/ithealthtech/nexus-theme-manager-for-itflow">Repository</a><a href="https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/latest">Latest release</a></div><div><h3>Legal</h3><a href="https://github.com/ithealthtech/nexus-theme-manager-for-itflow/blob/main/LICENSE">GPL-3.0</a><a href="https://github.com/ithealthtech/nexus-theme-manager-for-itflow/security/policy">Security</a><p class="footer-note">© <span data-current-year></span></p></div></div></footer>
+  <div class="sr-only" aria-live="polite" data-live-region></div>
+</body>
+</html>

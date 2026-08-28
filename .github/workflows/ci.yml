@@ -47,6 +47,9 @@ jobs:
       - name: Run installer upgrade integration
         run: sudo sh tests/install_latest.sh
 
+      - name: Validate GitHub Pages portal
+        run: node tests/pages_site.mjs
+
       - name: Validate Linux package activation
         run: sudo php tests/linux_activation.php
 

@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Safe fictional front-end simulation of Nexus Theme Manager surfaces for ITFlow.">
+  <meta name="theme-color" content="#0b0a17">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <title>Interactive demo · Nexus Theme Manager for ITFlow</title>
+  <link rel="stylesheet" href="assets/site.css">
+  <script src="assets/site.js" defer></script>
+  <script src="assets/demo.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="nav-shell">
+      <a class="brand" href="index.html" aria-label="Nexus documentation home"><span class="brand-mark" aria-hidden="true">N</span><span>Nexus for ITFlow</span></a>
+      <nav class="site-nav" data-site-nav aria-label="Primary navigation"><a href="index.html">Overview</a><a href="guide.html">Guides</a><a href="demo.html" aria-current="page">Interactive demo</a><a href="support.html">Support</a><a href="https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/latest">Download</a></nav>
+      <div class="nav-actions"><button class="icon-button" type="button" data-doc-theme-toggle aria-label="Use light documentation theme">☀</button><button class="menu-button" type="button" data-menu-toggle aria-label="Open navigation" aria-expanded="false">☰</button></div>
+    </div>
+  </header>
+
+  <main id="main">
+    <header class="page-hero">
+      <div class="container">
+        <p class="eyebrow">Safe browser-only simulation</p>
+        <h1>Explore the experience without an ITFlow server.</h1>
+        <p>Switch surfaces, palettes, and modes; filter fictional tickets; and try simulated actions. This preview demonstrates presentation only.</p>
+      </div>
+    </header>
+
+    <section class="section-compact">
+      <div class="container">
+        <div class="demo-disclosure">
+          <div><strong>Simulation—not a live ITFlow instance.</strong> Every organization, user, and ticket below is fictional.</div>
+          <span class="badge badge-warning">No backend</span>
+        </div>
+        <div class="grid-4">
+          <div class="card"><h3>No login</h3><p>There are no accounts, credentials, cookies, or authentication flows.</p></div>
+          <div class="card"><h3>No network calls</h3><p>The simulation is blocked from sending or retrieving application data.</p></div>
+          <div class="card"><h3>No persistence</h3><p>Changes disappear when the page reloads and are not stored.</p></div>
+          <div class="card"><h3>No ITFlow logic</h3><p>Permissions, tickets, invoices, and workflows are illustrative only.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-compact">
+      <div class="container">
+        <div class="demo-toolbar" aria-label="Demo controls">
+          <div class="demo-control-group">
+            <span>Surface</span>
+            <div class="segmented">
+              <button type="button" data-demo-view-button="client" aria-pressed="true">Client portal</button>
+              <button type="button" data-demo-view-button="technician" aria-pressed="false">Technician</button>
+              <button type="button" data-demo-view-button="studio" aria-pressed="false">Theme Studio</button>
+            </div>
+          </div>
+          <div class="demo-control-group">
+            <span>Palette</span>
+            <div class="palette-row">
+              <button class="palette-button palette-aurora" type="button" data-demo-palette="aurora" aria-label="Aurora" aria-pressed="true"></button>
+              <button class="palette-button palette-ocean" type="button" data-demo-palette="ocean" aria-label="Ocean" aria-pressed="false"></button>
+              <button class="palette-button palette-emerald" type="button" data-demo-palette="emerald" aria-label="Emerald" aria-pressed="false"></button>
+              <button class="palette-button palette-ember" type="button" data-demo-palette="ember" aria-label="Ember" aria-pressed="false"></button>
+              <button class="palette-button palette-slate" type="button" data-demo-palette="slate" aria-label="Slate" aria-pressed="false"></button>
+            </div>
+          </div>
+          <div class="demo-control-group">
+            <span>Mode</span>
+            <div class="segmented"><button type="button" data-demo-mode="light" aria-pressed="true">Light</button><button type="button" data-demo-mode="dark" aria-pressed="false">Dark</button></div>
+          </div>
+        </div>
+
+        <div class="demo-frame" data-demo-frame data-mode="light">
+          <header class="demo-topbar">
+            <div class="demo-brand"><span class="demo-brand-mark" aria-hidden="true">E</span><span>Example MSP</span></div>
+            <div><span class="demo-status">Fictional demo</span></div>
+          </header>
+          <div class="demo-main">
+            <section class="demo-view is-active" data-demo-view="client" aria-label="Fictional client portal">
+              <div class="demo-client-hero"><p class="section-kicker">Customer support portal</p><h2>Welcome back, Jordan</h2><p>Track requests, share updates, and find the right support path.</p></div>
+              <div class="demo-content">
+                <div class="demo-stats"><div class="demo-stat"><strong>3</strong><span>Active requests</span></div><div class="demo-stat"><strong>1</strong><span>Waiting on you</span></div><div class="demo-stat"><strong>2</strong><span>Resolved this month</span></div><div class="demo-stat"><strong>18m</strong><span>Median response</span></div></div>
+                <article class="demo-card"><header class="demo-card-header"><h3>Recent support requests</h3><button class="demo-action" type="button" data-open-demo-modal>+ New request</button></header><div class="table-wrap"><table class="demo-table"><thead><tr><th>Ticket</th><th>Subject</th><th>Priority</th><th>Status</th><th>Updated</th></tr></thead><tbody><tr><td><strong>T-1842</strong></td><td>VPN disconnects after sleep</td><td>High</td><td><span class="demo-status">Waiting on us</span></td><td>12 min</td></tr><tr><td><strong>T-1839</strong></td><td>New employee onboarding</td><td>Normal</td><td><span class="demo-status">In progress</span></td><td>28 min</td></tr><tr><td><strong>T-1836</strong></td><td>Printer queue unavailable</td><td>Normal</td><td><span class="demo-status">Scheduled</span></td><td>1 hr</td></tr></tbody></table></div></article>
+              </div>
+            </section>
+
+            <section class="demo-view" data-demo-view="technician" aria-label="Fictional technician workspace">
+              <div class="demo-technician">
+                <aside class="demo-sidebar"><p class="demo-sidebar-label">Service desk</p><button class="is-active" type="button">▣ Tickets</button><button type="button" data-demo-action="Dashboard navigation">◫ Dashboard</button><button type="button" data-demo-action="Client navigation">◉ Clients</button><p class="demo-sidebar-label">Operations</p><button type="button" data-demo-action="Asset navigation">◇ Assets</button><button type="button" data-demo-action="Billing navigation">▤ Billing</button></aside>
+                <div class="demo-workspace"><p class="section-kicker">Service desk</p><h2>Ticket queue</h2><p>Fictional records for presentation testing.</p><div class="demo-stats"><div class="demo-stat"><strong>12</strong><span>Open tickets</span></div><div class="demo-stat"><strong>3</strong><span>Waiting on client</span></div><div class="demo-stat"><strong>2</strong><span>High priority</span></div><div class="demo-stat"><strong>18m</strong><span>Median response</span></div></div><div class="demo-filter-row"><label class="sr-only" for="demo-ticket-search">Search fictional tickets</label><input id="demo-ticket-search" data-demo-ticket-search type="search" placeholder="Search fictional tickets"><label class="sr-only" for="demo-ticket-status">Filter by status</label><select id="demo-ticket-status" data-demo-ticket-status><option value="all">All statuses</option><option>Waiting on us</option><option>In progress</option><option>Scheduled</option><option>Waiting on client</option></select></div><article class="demo-card"><header class="demo-card-header"><h3>Assigned to me</h3><button class="demo-action" type="button" data-open-demo-modal>+ New ticket</button></header><div class="table-wrap"><table class="demo-table"><thead><tr><th>Ticket</th><th>Client / subject</th><th>Priority</th><th>Status</th><th>Updated</th></tr></thead><tbody data-demo-ticket-body></tbody></table></div></article></div>
+              </div>
+            </section>
+
+            <section class="demo-view" data-demo-view="studio" aria-label="Fictional Theme Studio preview">
+              <div class="demo-studio">
+                <aside class="demo-studio-controls"><p class="section-kicker">Draft workspace</p><h2>Theme Studio</h2><p>Try a few local presentation controls. Nothing is saved.</p><div class="demo-form"><label for="demo-density">Content density<select id="demo-density" data-demo-density><option value="compact">Compact</option><option value="comfortable" selected>Comfortable</option><option value="spacious">Spacious</option></select></label><label for="demo-corners">Corner style<select id="demo-corners" data-demo-corners><option value="sharp">Sharp</option><option value="balanced" selected>Balanced</option><option value="rounded">Rounded</option></select></label><button class="demo-action" type="button" data-demo-action="Draft save">Save draft</button><button class="demo-action demo-secondary" type="button" data-demo-action="Design quality audit">Run design quality</button><button class="demo-action demo-secondary" type="button" data-demo-action="Draft publication">Publish draft</button></div></aside>
+                <div class="demo-studio-preview"><article class="demo-preview-card"><p class="section-kicker">Saved draft preview</p><h3>Support that stays clear.</h3><p>This fictional card responds to the palette, mode, density, and corner controls on this page.</p><button class="demo-action" type="button" data-demo-action="Preview action">Create support request</button></article></div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section"><div class="container"><div class="cta-panel"><div><p class="section-kicker">Ready for the real workflow?</p><h2>Use the staged installation guide.</h2><p>Back up first, verify exact compatibility, install, smoke-test, and pin a known-good revision.</p></div><a class="button button-primary" href="guide.html#install">Open installation guide</a></div></div></section>
+  </main>
+
+  <dialog class="demo-modal" data-demo-modal aria-labelledby="demo-modal-title"><form data-demo-form><div class="modal-header"><h2 id="demo-modal-title">Simulate a support request</h2><button class="icon-button" type="button" data-close-demo-modal aria-label="Close">×</button></div><div class="modal-body"><div class="notice notice-warning"><span aria-hidden="true">!</span><p>Fictional simulation only. Do not enter real or sensitive information.</p></div><div class="demo-form"><label for="demo-subject">Subject<input id="demo-subject" required value="Example request"></label><label for="demo-priority">Priority<select id="demo-priority"><option>Normal</option><option>High</option><option>Low</option></select></label><label for="demo-details">Details<textarea id="demo-details" required>Demonstration text only.</textarea></label></div></div><div class="modal-footer"><button class="button button-small" type="button" data-close-demo-modal>Cancel</button><button class="button button-primary button-small" type="submit">Simulate request</button></div></form></dialog>
+  <div class="toast" role="status" data-demo-toast></div><div class="sr-only" aria-live="polite" data-demo-live></div>
+  <footer class="site-footer"><div class="container footer-grid"><div><a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">N</span><span>Nexus for ITFlow</span></a><p class="footer-note">This demo contains only fictional records and local presentation behavior.</p></div><div><h3>Learn</h3><a href="guide.html">End-user guides</a><a href="support.html">Troubleshooting</a></div><div><h3>Project</h3><a href="https://github.com/ithealthtech/nexus-theme-manager-for-itflow">Repository</a><a href="https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/latest">Latest release</a></div><div><h3>Legal</h3><a href="https://github.com/ithealthtech/nexus-theme-manager-for-itflow/blob/main/LICENSE">GPL-3.0</a><p class="footer-note">© <span data-current-year></span></p></div></div></footer>
+  <div class="sr-only" aria-live="polite" data-live-region></div>
+</body>
+</html>
