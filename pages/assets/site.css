@@ -1109,6 +1109,14 @@ tr:last-child td {
 .demo-table {
   width: 100%;
   border-collapse: collapse;
+  background: var(--demo-card);
+}
+
+.demo-card .table-wrap {
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--demo-card);
 }
 
 .demo-table th,
@@ -1135,6 +1143,10 @@ tr:last-child td {
   color: var(--demo-text);
   font-size: 11px;
   font-weight: 850;
+}
+
+.demo-topbar .demo-status {
+  color: #ffffff;
 }
 
 .demo-technician {
