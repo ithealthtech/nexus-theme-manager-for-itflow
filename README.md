@@ -3,6 +3,7 @@
 [![CI](https://github.com/ithealthtech/nexus-theme-manager-for-itflow/actions/workflows/ci.yml/badge.svg)](https://github.com/ithealthtech/nexus-theme-manager-for-itflow/actions/workflows/ci.yml)
 [![Latest release](https://img.shields.io/github/v/release/ithealthtech/nexus-theme-manager-for-itflow)](https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/latest)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+[![Documentation portal](https://img.shields.io/badge/docs-GitHub%20Pages-69bff5.svg)](https://ithealthtech.github.io/nexus-theme-manager-for-itflow/)
 
 Nexus gives ITFlow a polished, customizable interface without changing its database or business logic. Version 3.9 adds surface-specific design profiles, configurable navigation, automatic dark mode, an advanced asset workflow, recovery controls, side-by-side responsive previews, an observable protected updater, and a verified command-line upgrade path.
 
@@ -34,6 +35,8 @@ Theme Studio also includes:
 After installation, open **Administration → NEXUS → Theme Manager**.
 
 New to Theme Studio? Read the **[complete beginner guide](docs/theme-manager-guide.md)** for a field-by-field explanation of every option, safe draft/publish workflows, previews, updates, recovery, and troubleshooting.
+
+For a guided installation path, interactive command builder, end-user playbooks, searchable troubleshooting, and a safe fictional interface demo, open the **[Nexus documentation portal](https://ithealthtech.github.io/nexus-theme-manager-for-itflow/)**.
 
 ## Compatibility
 

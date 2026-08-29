@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Install, customize, update, recover, and safely preview Nexus Theme Manager for ITFlow.">
+  <meta name="theme-color" content="#0b0a17">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <title>Nexus Theme Manager for ITFlow</title>
+  <link rel="stylesheet" href="assets/site.css">
+  <script src="assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="nav-shell">
+      <a class="brand" href="index.html" aria-label="Nexus documentation home">
+        <span class="brand-mark" aria-hidden="true">N</span>
+        <span>Nexus for ITFlow</span>
+      </a>
+      <nav class="site-nav" data-site-nav aria-label="Primary navigation">
+        <a href="index.html" aria-current="page">Overview</a>
+        <a href="guide.html">Guides</a>
+        <a href="demo.html">Interactive demo</a>
+        <a href="support.html">Support</a>
+        <a href="https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/latest">Download</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="icon-button" type="button" data-doc-theme-toggle aria-label="Use light documentation theme">☀</button>
+        <button class="menu-button" type="button" data-menu-toggle aria-label="Open navigation" aria-expanded="false">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <p class="eyebrow">Nexus Theme Manager 3.9.1</p>
+          <h1>Make ITFlow feel like your service desk.</h1>
+          <p class="hero-copy">A polished, customizable presentation layer with safe drafts, responsive previews, protected updates, recovery controls, and exact-version lifecycle management.</p>
+          <div class="button-row">
+            <a class="button button-primary" href="guide.html#install">Start installation</a>
+            <a class="button" href="demo.html">Try the safe demo</a>
+            <a class="button" href="https://github.com/ithealthtech/nexus-theme-manager-for-itflow">View on GitHub</a>
+          </div>
+        </div>
+        <aside class="hero-panel" aria-label="Current compatibility">
+          <div class="release-line">
+            <div>
+              <span class="status-dot" aria-hidden="true"></span>
+              <span class="badge badge-success">Current release</span>
+            </div>
+            <strong>v3.9.1</strong>
+          </div>
+          <dl class="meta-list">
+            <div class="meta-row"><dt>Theme payload</dt><dd>26.08.24</dd></div>
+            <div class="meta-row"><dt>ITFlow release</dt><dd>26.08</dd></div>
+            <div class="meta-row"><dt>ITFlow commit</dt><dd class="mono">89b080b…9559085</dd></div>
+            <div class="meta-row"><dt>PHP runtime</dt><dd>8.1 or newer</dd></div>
+            <div class="meta-row"><dt>Production host</dt><dd>Debian / Ubuntu</dd></div>
+          </dl>
+          <div class="notice notice-warning">
+            <span aria-hidden="true">!</span>
+            <p><strong>Exact compatibility matters.</strong> Nexus refuses unsupported or modified ITFlow templates before changing files.</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section-compact">
+      <div class="container grid-4" aria-label="Product highlights">
+        <article class="card">
+          <div class="card-icon" aria-hidden="true">01</div>
+          <h3>Draft before live</h3>
+          <p>Save private work, inspect eight preview surfaces, compare with production, then publish deliberately.</p>
+        </article>
+        <article class="card">
+          <div class="card-icon" aria-hidden="true">02</div>
+          <h3>Design every surface</h3>
+          <p>Set global defaults or override technician, client, authentication, guest, and print profiles independently.</p>
+        </article>
+        <article class="card">
+          <div class="card-icon" aria-hidden="true">03</div>
+          <h3>Recover safely</h3>
+          <p>Pause presentation, restore a pinned revision, run health checks, or emergency-disable without losing settings.</p>
+        </article>
+        <article class="card">
+          <div class="card-icon" aria-hidden="true">04</div>
+          <h3>Update with proof</h3>
+          <p>Checksums, compatibility checks, observable stages, health verification, and automatic rollback protect updates.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="quick-start">
+      <div class="container">
+        <div class="section-heading">
+          <p class="section-kicker">Quick start</p>
+          <h2>From backup to Theme Studio</h2>
+          <p>The latest installer handles download, checksum verification, extraction, compatibility checks, activation, verification, and GUI updater setup.</p>
+        </div>
+        <div class="grid-2">
+          <ol class="step-list">
+            <li><strong>Back up ITFlow</strong>Create and verify both application-file and database backups.</li>
+            <li><strong>Confirm the target</strong>Identify the absolute ITFlow document root and supported revision.</li>
+            <li><strong>Run the verified installer</strong>Download the version-controlled installer from the repository's default branch.</li>
+            <li><strong>Open Theme Studio</strong>Sign in as an administrator and use Administration → NEXUS → Theme Manager.</li>
+            <li><strong>Save, inspect, publish</strong>Work in a draft, review previews and quality checks, then publish.</li>
+          </ol>
+          <div>
+            <div class="code-block">
+              <button class="copy-button" type="button" data-copy-target="#home-install-command">Copy</button>
+              <pre><code id="home-install-command">curl --fail --location --remote-name \
+  https://raw.githubusercontent.com/ithealthtech/nexus-theme-manager-for-itflow/main/install-latest.sh
+
+chmod +x install-latest.sh
+sudo ./install-latest.sh --root /var/www/itflow.example.com</code></pre>
+            </div>
+            <div class="notice">
+              <span aria-hidden="true">i</span>
+              <p>Replace the example document root. The installer refuses a bad checksum, incompatible baseline, invalid release, unsafe downgrade, or mismatched managed state.</p>
+            </div>
+            <a class="button" href="guide.html#command-builder">Build commands for your path</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
+          <p class="section-kicker">Theme Studio</p>
+          <h2>Eight workspaces, one controlled workflow</h2>
+          <p>Customize presentation without changing ITFlow authentication, ticket permissions, invoice authorization, or database logic.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card"><span class="badge">Branding</span><h3>Identity and assets</h3><p>Light/dark logos, animated GIF inspection, favicon, browser title, login artwork, alt text, crop, resize, and WebP companions.</p></article>
+          <article class="card"><span class="badge">Colors</span><h3>Accessible palettes</h3><p>Aurora, Ocean, Emerald, Ember, and Slate presets plus validated global and dark-mode color controls.</p></article>
+          <article class="card"><span class="badge">Layout</span><h3>Density and navigation</h3><p>Spacing, sidebar width, header treatment, active navigation, typography scale, and desktop/mobile menu presentation.</p></article>
+          <article class="card"><span class="badge">Design quality</span><h3>Actionable checks</h3><p>Saved-draft audits at phone width with direct links to responsible settings and allow-listed automatic corrections.</p></article>
+          <article class="card"><span class="badge">Motion</span><h3>Respectful interaction</h3><p>Subtle, fluid, or snappy motion with a user preference and operating-system reduced-motion override.</p></article>
+          <article class="card"><span class="badge">Content</span><h3>Support-focused copy</h3><p>Authentication and portal headings, eyebrow text, and messages—without altering application behavior.</p></article>
+          <article class="card"><span class="badge">Presets & schedule</span><h3>Reusable releases</h3><p>Named revisions, known-good pins, import/export, saved presets, comparisons, and scheduled activate/pause actions.</p></article>
+          <article class="card"><span class="badge">Updates & system</span><h3>Operate with confidence</h3><p>Protected update stages, health checks, recovery, emergency disable, sanitized diagnostics, and workspace tools.</p></article>
+          <article class="card"><span class="badge badge-success">Preview</span><h3>Eight responsive surfaces</h3><p>Desktop and 390px phone views for login, reset, dashboard, queue, client, mobile navigation, invoice, and print/PDF.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="cta-panel">
+          <div>
+            <p class="section-kicker">Interactive preview</p>
+            <h2>Explore without an ITFlow server.</h2>
+            <p>The demo uses fictional records and local browser interactions. It has no login, backend, network requests, or persistent storage.</p>
+          </div>
+          <a class="button button-primary" href="demo.html">Launch simulation</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-heading">
+          <p class="section-kicker">Operational safety</p>
+          <h2>Visual changes should never become silent server changes.</h2>
+        </div>
+        <div class="grid-3">
+          <article class="card"><h3>Exact managed files</h3><p>Unexpected drift stops lifecycle commands instead of overwriting an ITFlow update or administrator change.</p></article>
+          <article class="card"><h3>Separated privileges</h3><p>Theme Studio queues an allow-listed request; a root-owned system service performs protected updater work.</p></article>
+          <article class="card"><h3>Independent recovery</h3><p>Pause, emergency disable, lifecycle disable, uninstall, and updater rollback remain deliberately distinct.</p></article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">N</span><span>Nexus for ITFlow</span></a>
+        <p class="footer-note">An independent GPL-3.0 integration. Install only on the exact ITFlow revision named by the release.</p>
+      </div>
+      <div><h3>Learn</h3><a href="guide.html">End-user guides</a><a href="demo.html">Interactive demo</a><a href="support.html">Troubleshooting</a></div>
+      <div><h3>Project</h3><a href="https://github.com/ithealthtech/nexus-theme-manager-for-itflow">Repository</a><a href="https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/latest">Latest release</a><a href="https://github.com/ithealthtech/nexus-theme-manager-for-itflow/issues">Issues</a></div>
+      <div><h3>Upstream</h3><a href="https://github.com/itflow-org/itflow">ITFlow</a><a href="https://docs.itflow.org">ITFlow docs</a><p class="footer-note">© <span data-current-year></span> Nexus contributors</p></div>
+    </div>
+  </footer>
+  <div class="sr-only" aria-live="polite" data-live-region></div>
+</body>
+</html>
