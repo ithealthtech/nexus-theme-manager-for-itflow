@@ -49,6 +49,15 @@ for (const primitive of ['fetch(', 'XMLHttpRequest', 'WebSocket', 'navigator.sen
   if (demoScript.includes(primitive)) failures.push(`Demo must remain offline and ephemeral; found ${primitive}`);
 }
 
+const siteCss = fs.readFileSync(path.join(pagesRoot, 'assets', 'site.css'), 'utf8');
+for (const demoContrastRule of [
+  '.demo-table {\n  width: 100%;\n  border-collapse: collapse;\n  background: var(--demo-card);',
+  '.demo-card .table-wrap {',
+  '.demo-topbar .demo-status {'
+]) {
+  if (!siteCss.includes(demoContrastRule)) failures.push(`Missing demo contrast rule: ${demoContrastRule}`);
+}
+
 const pagesText = required
   .filter((relative) => fs.existsSync(path.join(pagesRoot, relative)) && fs.statSync(path.join(pagesRoot, relative)).isFile())
   .map((relative) => fs.readFileSync(path.join(pagesRoot, relative), 'utf8'))
