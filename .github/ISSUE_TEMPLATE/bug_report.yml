@@ -1,0 +1,102 @@
+name: Bug report
+description: Something behaved incorrectly
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Do not use this form for security defects.** Report those privately —
+        see [SECURITY.md](https://github.com/ithealthtech/nexus-theme-manager-for-itflow/blob/main/SECURITY.md).
+
+        Never include production configuration, credentials, databases, backups, logs,
+        customer information, or private screenshots.
+
+        If Nexus refused to install or activate, that is often correct behavior — it
+        declines revisions and templates it has not verified. Check the compatibility
+        table for your release first.
+
+  - type: input
+    id: nexus_version
+    attributes:
+      label: Nexus version
+      placeholder: "3.9.1"
+    validations:
+      required: true
+
+  - type: input
+    id: itflow_revision
+    attributes:
+      label: ITFlow release and commit
+      description: The exact revision, from your installation.
+      placeholder: "26.08, commit 89b080b"
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Host OS and PHP version
+      placeholder: "Debian 12, PHP 8.3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Where did it happen?
+      options:
+        - Installation
+        - Update
+        - Theme Studio / drafts and publishing
+        - Previews
+        - Navigation builder
+        - Pause, restore, or uninstall
+        - GUI updater
+        - Command-line upgrade
+        - Something else
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What actually happened?
+      description: Include the exact command or action, and any exit code or message.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Sanitized diagnostics
+      description: |
+        Output of `php manager.php status --root <path>` and `php manager.php verify --root <path>`,
+        with paths and hostnames redacted.
+      render: shell
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: This is not a security defect.
+          required: true
+        - label: I have removed credentials, customer data, and private details.
+          required: true
+        - label: I took a backup before the action that failed.
+          required: false
