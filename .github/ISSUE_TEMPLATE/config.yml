@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/ithealthtech/nexus-theme-manager-for-itflow/security/advisories/new
+    about: Report privately. Never open a public issue for a security defect.
+  - name: Documentation portal
+    url: https://ithealthtech.github.io/nexus-theme-manager-for-itflow/
+    about: Guides, interactive demo, and troubleshooting.
+  - name: ITFlow itself
+    url: https://github.com/itflow-org/itflow
+    about: Nexus is an independent integration. Report ITFlow defects upstream.

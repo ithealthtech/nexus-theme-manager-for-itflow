@@ -1,0 +1,59 @@
+name: ITFlow revision support
+description: Ask for support for a new or different ITFlow revision
+title: "[compat] ITFlow "
+labels: ["compatibility"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Nexus pins each release to one verified ITFlow release and commit, because ITFlow
+        has no native theme or plugin hook system. Supporting a new revision means
+        re-verifying every managed template — it is not a version-number bump.
+
+  - type: input
+    id: itflow_release
+    attributes:
+      label: ITFlow release
+      placeholder: "26.09"
+    validations:
+      required: true
+
+  - type: input
+    id: itflow_commit
+    attributes:
+      label: ITFlow commit
+      description: The exact commit you want supported.
+    validations:
+      required: true
+
+  - type: input
+    id: current_nexus
+    attributes:
+      label: Nexus version you are running now
+      placeholder: "3.9.1"
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Why do you need this revision?
+      description: Security fix, required feature, already upgraded, or something else.
+    validations:
+      required: true
+
+  - type: textarea
+    id: templates
+    attributes:
+      label: Which managed templates changed upstream, if you know?
+      description: |
+        See the [managed file list](https://github.com/ithealthtech/nexus-theme-manager-for-itflow/blob/main/docs/changed-files.md).
+        Leave blank if you have not checked.
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: I understand Nexus should be disabled or uninstalled before updating ITFlow.
+          required: true
+        - label: I am not asking for an untested revision to be force-enabled.
+          required: true
