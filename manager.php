@@ -657,10 +657,17 @@ final class ThemeManager
     /*
      * Classify every managed file against what it is supposed to be.
      *
-     * ITFlow 26.09 changed how it updates itself: `php scripts/update_cli.php`
-     * forces the file update and discards local edits to shipped files, and
-     * Maintenance > Update hands that same job to cron. Nexus overlays shipped
-     * files, so a routine ITFlow update silently reverts the whole overlay.
+     * ITFlow 26.09 changed how it updates itself. scripts/update_cli.php runs
+     * `git fetch --all` then `git reset --hard origin/<branch>`, and Maintenance
+     * > Update hands that same job to cron.
+     *
+     * Two properties of a hard reset shape everything below. It restores tracked
+     * files to exactly the upstream blob, so a reverted overlay lands on precisely
+     * the baseline hash this package recorded - which is what makes "reverted"
+     * decidable rather than a guess. And it leaves untracked files alone, so the
+     * theme-owned files ITFlow knows nothing about survive: what is left is a
+     * half-state where nexus_theme.php is still present but no ITFlow template
+     * requires it any more, and the theme quietly stops applying.
      *
      * A plain hash mismatch cannot tell that apart from an administrator editing
      * a managed file by hand, and the two want opposite responses: the first is
@@ -683,14 +690,17 @@ final class ThemeManager
             $ownedByPackage = $entry['baseline_sha256'] === null;
 
             if (!is_file($target)) {
-                /* A theme-owned file has no upstream counterpart, so ITFlow
-                   cannot have rewritten it - only a wholesale file replace
-                   removes one. Either way re-applying restores it safely. */
+                /* An ITFlow update does not cause this: a hard reset leaves
+                   untracked files alone, and every theme-owned file is untracked
+                   upstream. Something else removed it - a redeploy over the tree,
+                   a zip reinstall, a manual clean. Still classed as restorable
+                   rather than held back, because writing a file this package owns
+                   into a gap destroys nothing either way. */
                 $drift[] = [
                     'path' => $relative,
                     'kind' => $ownedByPackage ? 'reverted' : 'missing',
                     'detail' => $ownedByPackage
-                        ? 'Theme-owned file was removed, which an ITFlow file update does.'
+                        ? 'Theme-owned file is absent and will be reinstalled from this package.'
                         : 'Managed file is missing from the ITFlow tree.',
                 ];
                 continue;

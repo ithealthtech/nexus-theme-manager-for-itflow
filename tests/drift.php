@@ -5,8 +5,9 @@ declare(strict_types=1);
 /*
  * Drift detection and re-apply.
  *
- * ITFlow 26.09 forces its file update and discards local edits to shipped files,
- * so a routine ITFlow update reverts the Nexus overlay with no warning. These
+ * ITFlow 26.09 updates itself with `git fetch --all` then `git reset --hard`, so a
+ * routine ITFlow update puts every overlaid template back on the upstream blob.
+ * Theme-owned files are untracked and survive, which is why nothing noticed. These
  * tests cover the three outcomes that matter: a reverted overlay is detected and
  * restored unattended, an administrator's own edit is never overwritten without
  * --force, and an ITFlow tree from the wrong release is refused with a message
@@ -135,8 +136,12 @@ try {
     driftExpect($status['reapply_recommended'] === false, 'a fresh install does not recommend reapply');
     driftExpect($status['itflow_version_supported'] === true, 'status reports the fixture ITFlow version as supported');
 
-    // An ITFlow update: shipped files go back to upstream content, and a
-    // wholesale file replace drops the theme-owned files ITFlow does not know.
+    /* An ITFlow update, plus the one case that is not one.
+       `git reset --hard` puts tracked files back on the upstream blob, which is
+       the login.php case below. It does NOT remove untracked files, so a
+       theme-owned file going missing is something else entirely - a redeploy, a
+       zip reinstall, a manual clean - and is covered here because it is
+       restorable on the same terms, not because ITFlow causes it. */
     $manifest = json_decode(
         (string)file_get_contents($packageRoot . DIRECTORY_SEPARATOR . 'manifest.json'),
         true,
@@ -154,9 +159,9 @@ try {
     $status = driftStatusJson($manager, $common);
     $kinds = array_column($status['drift'], 'kind', 'path');
     driftExpect(($kinds[$reverted] ?? null) === 'reverted', 'a file restored to the ITFlow baseline is classified as reverted');
-    driftExpect(($kinds[$ownedPath] ?? null) === 'reverted', 'a removed theme-owned file is classified as reverted');
+    driftExpect(($kinds[$ownedPath] ?? null) === 'reverted', 'an absent theme-owned file is classified as reverted');
     driftExpect($status['reapply_recommended'] === true, 'purely reverted drift recommends reapply');
-    driftExpect($status['drift_counts']['modified'] === 0, 'an ITFlow update produces no externally-modified files');
+    driftExpect($status['drift_counts']['modified'] === 0, 'an ITFlow hard reset produces no externally-modified files');
 
     driftRun(array_merge([PHP_BINARY, $manager, 'reapply'], $common, ['--yes']), 0);
     $status = driftStatusJson($manager, $common);

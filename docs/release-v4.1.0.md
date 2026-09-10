@@ -5,14 +5,33 @@ no template changes.
 
 ## What this fixes
 
-4.0.0 shipped with a known issue: ITFlow 26.09 forces its own file update and
-discards local edits to shipped files, so `php scripts/update_cli.php` — or
-Maintenance > Update, which now hands the same job to cron — silently reverts the
-entire Nexus overlay. Nothing on either side said so. Theme Studio kept reporting
-perfect health, because every Nexus-owned file was still sitting there; it was the
-sixteen *ITFlow* templates that had gone back to stock.
+4.0.0 shipped with a known issue. ITFlow 26.09's `scripts/update_cli.php` runs
+`git fetch --all` followed by `git reset --hard origin/<branch>`, and Maintenance
+> Update now hands that same job to cron. Nexus overlays sixteen tracked ITFlow
+templates, so an ordinary ITFlow update reverts the entire overlay.
 
-4.1.0 makes that visible and reversible.
+Two properties of a hard reset matter here:
+
+- **Tracked files land on exactly the upstream blob.** A reverted overlay file
+  therefore hashes to precisely the baseline this package recorded, which is what
+  lets 4.1.0 tell an ITFlow update apart from a hand edit with certainty rather
+  than by guesswork.
+- **Untracked files are left alone.** Every theme-owned file — `nexus_theme.php`,
+  `nexus-theme.css`, `admin/nexus.php` and the rest — is untracked upstream, so
+  they all survive. What is left is a half-state: the theme's machinery is
+  entirely present and healthy, but no ITFlow template requires it any more.
+
+That half-state is why nothing caught it. Theme Studio checked that Nexus-owned
+files were present, and they were; it was the sixteen *ITFlow* templates around
+them that had gone back to stock. `update_cli.php` does print "Discarding local
+changes to 16 tracked file(s)" when run at a terminal, but the cron path buries
+that in a log, and afterwards nothing on either side says the theme has stopped
+applying.
+
+An install deployed from a zip rather than a git checkout has no `.git`, so ITFlow
+skips the application update entirely and the overlay is never touched.
+
+4.1.0 makes all of this visible and reversible.
 
 ## After an ITFlow update
 
@@ -39,7 +58,7 @@ Drift is classified three ways, because the responses differ:
 
 | Classification | Meaning | `reapply` |
 |---|---|---|
-| `reverted` | Matches the supported ITFlow baseline, or a theme-owned file was removed | Restores it |
+| `reverted` | Matches the supported ITFlow baseline, or a theme-owned file is absent | Restores it |
 | `missing` | Managed file absent from the tree | Restores it |
 | `modified` | Matches neither this package nor the baseline | **Refuses** |
 
