@@ -155,14 +155,18 @@ ITFlow currently has no native theme or plugin hook system, so Nexus manages a b
 
 ## Documentation
 
+The full documentation index, including notes for every release, is in
+[docs/README.md](docs/README.md). The published portal is at
+<https://ithealthtech.github.io/nexus-theme-manager-for-itflow/>.
+
+Start here:
+
 - [Theme Manager beginner guide](docs/theme-manager-guide.md)
-- [v3.9.1 release notes](docs/release-v3.9.1.md)
-- [v3.9.0 release notes](docs/release-v3.9.0.md)
 - [Architecture and privilege boundaries](docs/architecture.md)
 - [Managed file list](docs/changed-files.md)
-- [Validation report](docs/test-report.md)
-- [Lifecycle test report](docs/lifecycle-test-report.md)
-- [Security policy](SECURITY.md)
+- [Validation report](docs/test-report.md) and [lifecycle test report](docs/lifecycle-test-report.md)
+- [Release notes index](docs/README.md#release-notes)
+- [Security policy](SECURITY.md) and [contributing guide](CONTRIBUTING.md)
 
 ## License
 
