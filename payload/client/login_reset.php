@@ -170,7 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en" data-bs-theme="light" data-lte-color-mode="off">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -193,32 +193,42 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     <!-- Theme style -->
     <link rel="stylesheet" href="../libs/adminlte/css/adminlte.min.css">
+    <link rel="stylesheet" href="../css/itflow_custom.css">
     <?php if ($nexus_theme_enabled) { ?>
         <link rel="stylesheet" href="../css/nexus-theme.css?v=<?= escapeHtml(NEXUS_THEME_VERSION) ?>">
         <link rel="stylesheet" href="../css/nexus-theme-custom.php?v=<?= nexusThemeSettingsVersion() ?>">
+        <script><?= nexusThemeColorModeScript($nexus_theme_settings) ?></script>
     <?php } ?>
 
 </head>
 
-<body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth ' . nexusThemePresentationModel($nexus_theme_settings, 'Nexus MSP', 'auth')['body_classes'] : '' ?>">
+<body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth ' . nexusThemePresentationModel($nexus_theme_settings, $company_name_display, 'auth')['body_classes'] : '' ?>">
 <div class="login-box">
     <?php
-    $nexus_reset_logo = nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($nexus_theme_settings, '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['auth_background'])), $nexus_theme_settings);
-    $nexus_reset_has_logo = $nexus_theme_settings['branding']['show_login_logo'] && $nexus_reset_logo !== '';
+    $nexus_reset_logo = $nexus_theme_enabled
+        ? nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($nexus_theme_settings, '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['auth_background'])), $nexus_theme_settings)
+        : '';
+    $nexus_reset_has_logo = $nexus_theme_enabled && $nexus_theme_settings['branding']['show_login_logo'] && $nexus_reset_logo !== '';
     ?>
+    <?php if ($nexus_theme_enabled) { ?>
     <div class="login-logo <?= $nexus_reset_has_logo ? 'nexus-auth-brand--logo' : 'nexus-auth-brand--text' ?>">
         <?php if ($nexus_reset_has_logo) { ?>
             <img alt="<?= escapeHtml($nexus_theme_settings['branding']['logo_alt'] ?: nexusThemeBrandName($company_name_display, $nexus_theme_settings) . ' logo') ?>" height="110" width="380" class="img-fluid" data-nexus-color-logo src="<?= escapeHtml($nexus_reset_logo) ?>">
         <?php } else { ?>
-            <span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml(nexusThemeBrandName($company_name_display, $nexus_theme_settings)) ?></span>
+            <span class="nexus-fallback-logo"><i class="fas fa-layer-group me-2" aria-hidden="true"></i><?= escapeHtml(nexusThemeBrandName($company_name_display, $nexus_theme_settings)) ?></span>
         <?php } ?>
     </div>
+    <?php } else { ?>
+    <div class="login-logo"><b><?= escapeHtml($company_name_display) ?></b> <br>Password Reset</div>
+    <?php } ?>
     <div class="card">
         <div class="card-body login-card-body">
 
+            <?php if ($nexus_theme_enabled) { ?>
             <span class="nexus-eyebrow">Secure account recovery</span>
             <h1 class="nexus-auth-title">Reset your password</h1>
             <p class="nexus-auth-copy">Enter your registered email address, or choose a new password when using a valid recovery link.</p>
+            <?php } ?>
 
             <form method="post">
 
@@ -238,21 +248,19 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                     // Sanity check
                     if (sha1($user_row['user_password_reset_token']) == sha1($token)) { ?>
 
-                        <label class="nexus-field-label" for="reset-password">New password</label>
+                        <?php if ($nexus_theme_enabled) { ?><label class="nexus-field-label" for="reset-password">New password</label><?php } ?>
                         <div class="input-group mb-3">
-                            <input type="password" class="form-control" id="reset-password" placeholder="At least 8 characters" name="new_password" autocomplete="new-password" required minlength="8">
-                            <div class="input-group-append">
+                            <input type="password" class="form-control" id="reset-password" placeholder="<?= $nexus_theme_enabled ? 'At least 8 characters' : 'New Password' ?>" name="new_password" autocomplete="new-password" required minlength="8">
                                 <div class="input-group-text">
-                                <span class="fas fa-lock" aria-hidden="true"></span>
+                                    <span class="fas fa-lock" aria-hidden="true"></span>
                                 </div>
-                            </div>
                         </div>
 
                         <input type="hidden" name="token" value="<?= $token ?>">
                         <input type="hidden" name="email" value="<?= $email ?>">
                         <input type="hidden" name="client" value="<?= $client ?>">
 
-                        <button type="submit" class="btn btn-success btn-block mb-3" name="password_reset_set_password">Reset password</button>
+                        <button type="submit" class="btn btn-success w-100 mb-3" name="password_reset_set_password">Reset password</button>
 
 
                     <?php } else {
@@ -267,17 +275,15 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                      */
                 } else { ?>
 
-                    <label class="nexus-field-label" for="reset-email">Registered email address</label>
+                    <?php if ($nexus_theme_enabled) { ?><label class="nexus-field-label" for="reset-email">Registered email address</label><?php } ?>
                     <div class="input-group mb-3">
-                        <input type="email" class="form-control" id="reset-email" placeholder="you@company.com" name="email" autocomplete="email" required autofocus>
-                        <div class="input-group-append">
+                        <input type="email" class="form-control" id="reset-email" placeholder="<?= $nexus_theme_enabled ? 'you@company.com' : 'Registered Client Email' ?>" name="email" autocomplete="email" required autofocus>
                             <div class="input-group-text">
                                 <span class="fas fa-envelope" aria-hidden="true"></span>
                             </div>
-                        </div>
                     </div>
 
-                    <button type="submit" class="btn btn-success btn-block mb-3" name="password_reset_email_request">Reset my password</button>
+                    <button type="submit" class="btn btn-success w-100 mb-3" name="password_reset_email_request">Reset my password</button>
 
                 <?php }
                 ?>
@@ -294,12 +300,14 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
                 ?>
             </p>
 
-            <a href="/login.php"><i class="fas fa-arrow-left mr-2" aria-hidden="true"></i>Back to login</a>
+            <a href="/login.php"><?php if ($nexus_theme_enabled) { ?><i class="fas fa-arrow-left me-2" aria-hidden="true"></i><?php } ?>Back to login</a>
 
+            <?php if ($nexus_theme_enabled) { ?>
             <div class="nexus-security-note">
                 <i class="fas fa-shield-alt" aria-hidden="true"></i>
                 <span>For your security, recovery links can expire and should not be shared.</span>
             </div>
+            <?php } ?>
 
 
         </div>
@@ -316,7 +324,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 <!-- /.login-box -->
 
 <!-- jQuery -->
-<script src="../libs/jquery/jquery.min.js"></script>
 
 <!-- Bootstrap 4 -->
 <script src="../libs/bootstrap/js/bootstrap.bundle.min.js"></script>

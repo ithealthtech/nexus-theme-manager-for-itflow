@@ -21,37 +21,36 @@ $sql_assets = mysqli_query($mysqli, "SELECT asset_id, asset_name, asset_type FRO
         <li class="breadcrumb-item active">New Ticket</li>
     </ol>
 
+    <?php if ($nexus_theme_enabled ?? false) { ?>
     <span class="nexus-eyebrow">Tell us what is happening</span>
     <h1 class="h2">Create a support request</h1>
     <p class="text-muted mb-4">Share the impact and relevant details so we can route your request quickly.</p>
+    <?php } else { ?>
+    <h3>Raise a new ticket</h3>
+    <?php } ?>
 
     <div class="col-md-8">
-        <div class="card">
-        <div class="card-body">
+        <?php if ($nexus_theme_enabled ?? false) { ?><div class="card"><div class="card-body"><?php } ?>
         <form action="post.php" method="post">
             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
 
-            <div class="form-group">
+            <div class="mb-3">
                 <label for="ticket-subject">Subject <strong class="text-danger">*</strong></label>
                 <div class="input-group">
-                    <div class="input-group-prepend">
                         <span class="input-group-text"><i class="fa fa-fw fa-tag"></i></span>
-                    </div>
                     <input type="text" class="form-control" id="ticket-subject" name="subject" placeholder="Briefly describe the issue" required>
                 </div>
             </div>
 
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="ticket-priority">Priority <strong class="text-danger">*</strong></label>
                         <div class="input-group">
-                            <div class="input-group-prepend">
                                 <span class="input-group-text"><i class="fa fa-fw fa-thermometer-half"></i></span>
-                            </div>
-                            <select class="form-control select2" id="ticket-priority" name="priority" required>
+                            <select class="form-select select2" id="ticket-priority" name="priority" required>
                                 <option>Low</option>
-                                <option>Medium</option>
+                                <option selected>Medium</option>
                                 <option>High</option>
                                 <option>Urgent</option>
                             </select>
@@ -60,13 +59,11 @@ $sql_assets = mysqli_query($mysqli, "SELECT asset_id, asset_name, asset_type FRO
                 </div>
 
                 <div class="col-md-6">
-                    <div class="form-group">
+                    <div class="mb-3">
                     <label for="ticket-category">Category</label>
                     <div class="input-group">
-                        <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa fa-fw fa-layer-group"></i></span>
-                        </div>
-                        <select class="form-control select2" id="ticket-category" name="category">
+                        <select class="form-select select2" id="ticket-category" name="category">
                             <option value="0">- No Category -</option>
                             <?php
                             $sql_categories = mysqli_query($mysqli, "SELECT category_id, category_name FROM categories WHERE category_type = 'Ticket' AND category_archived_at IS NULL");
@@ -85,13 +82,11 @@ $sql_assets = mysqli_query($mysqli, "SELECT asset_id, asset_name, asset_type FRO
             </div>
 
             <?php if (mysqli_num_rows($sql_assets) > 0) { ?>
-                <div class="form-group">
-                    <label for="ticket-asset">Affected device</label>
+                <div class="mb-3">
+                    <label for="ticket-asset"><?= ($nexus_theme_enabled ?? false) ? 'Affected device' : 'Asset' ?></label>
                     <div class="input-group">
-                        <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa fa-fw fa-desktop"></i></span>
-                        </div>
-                        <select class="form-control select2" id="ticket-asset" name="asset">
+                        <select class="form-select select2" id="ticket-asset" name="asset">
                             <option value="0">- None -</option>
                             <?php
 
@@ -110,18 +105,21 @@ $sql_assets = mysqli_query($mysqli, "SELECT asset_id, asset_name, asset_type FRO
             <?php } ?>
 
 
-            <div class="form-group">
+            <div class="mb-3">
                 <label for="ticket-details">Details <strong class="text-danger">*</strong></label>
-                <p class="form-text mt-0" id="ticket-details-help">Include what you expected, what happened, who is affected, and any error message.</p>
+                <?php if ($nexus_theme_enabled ?? false) { ?><p class="form-text mt-0" id="ticket-details-help">Include what you expected, what happened, who is affected, and any error message.</p><?php } ?>
                 <textarea class="form-control tinymce" id="ticket-details" name="details" aria-describedby="ticket-details-help"></textarea>
             </div>
 
-            <button class="btn btn-primary" name="add_ticket"><i class="fas fa-paper-plane mr-2" aria-hidden="true"></i>Submit support request</button>
-            <a class="btn btn-outline-secondary ml-2" href="tickets.php">Cancel</a>
+            <?php if ($nexus_theme_enabled ?? false) { ?>
+                <button class="btn btn-primary" name="add_ticket"><i class="fas fa-paper-plane me-2" aria-hidden="true"></i>Submit support request</button>
+                <a class="btn btn-outline-secondary ms-2" href="tickets.php">Cancel</a>
+            <?php } else { ?>
+                <button class="btn btn-primary" name="add_ticket">Raise ticket</button>
+            <?php } ?>
 
         </form>
-        </div>
-        </div>
+        <?php if ($nexus_theme_enabled ?? false) { ?></div></div><?php } ?>
     </div>
 
 <?php

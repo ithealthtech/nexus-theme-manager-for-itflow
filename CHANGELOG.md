@@ -2,6 +2,58 @@
 
 All notable changes to this project are documented here.
 
+## [4.0.0] - 2026-09-03
+
+Nexus now targets ITFlow 26.09. This is a clean break: 4.0.0 does not install on
+26.08, and 3.9.1 remains the last release for installations still on it.
+
+### Breaking
+
+- Supported ITFlow moves from release 26.08 (`89b080b4`) to release 26.09
+  (`5dcc99d8`). All sixteen baselined ITFlow templates changed upstream, so the
+  package refuses to install on 26.08 exactly as it refuses any unsupported tree.
+- Custom CSS written against the Nexus 3.x class surface needs revisiting. The
+  AdminLTE 3 layout names Nexus styled (`content-wrapper`, `main-sidebar`,
+  `main-header`, `nav-sidebar`) are now `app-content`, `app-sidebar`,
+  `app-header` and `sidebar-menu`.
+
+### Changed
+
+- Migrated the whole managed surface to AdminLTE 4.9 and Bootstrap 5.3, matching
+  ITFlow 26.09: renamed layout skeleton, `data-bs-*` toggles, `form-select`,
+  input groups without `input-group-append`/`-prepend` wrappers, `text-bg-*`
+  badges, and the `me-*`/`ms-*`/`float-end`/`text-start` utility spellings.
+- Replaced the select2 and daterangepicker styling with Tom Select and Flatpickr
+  selectors, and dropped the jQuery and toastr script tags ITFlow no longer ships.
+- Nexus dark mode now drives `data-bs-theme`, `data-color-scheme` and the
+  `color-scheme` meta itself. 26.09 disables AdminLTE 4's colour-mode manager
+  (`data-lte-color-mode="off"`), and Bootstrap 5.3 reads only that attribute, so
+  without this the framework components stayed light while the Nexus palette
+  went dark. `nexusThemeInitialDarkMode()` resolves the server-rendered first
+  paint and defers to ITFlow's per-user setting when the mode is `system`.
+- Nexus stylesheets load after `css/itflow_custom.css`, the AdminLTE 3
+  compatibility layer 26.09 introduced, so the managed theme still wins.
+- Re-authored `client/profile.php` against the page ITFlow rebuilt upstream; its
+  own labels and inputs are now correctly associated, so Nexus only supplies the
+  heading treatment.
+- Theme Studio's runtime previews render the AdminLTE 4 shell, so preview and
+  live surfaces agree again.
+
+### Fixed
+
+- Added the `.input-group > .form-control-color` width rule at matching
+  specificity. Bootstrap 5's `.input-group > .form-control` at (0,2,0) otherwise
+  outranks `.form-control-color`'s `width:3rem` at (0,1,0) and collapses colour
+  swatches.
+- Restored explicit foreground colours on `bg-dark` cards, modal headers and the
+  user menu header, which Bootstrap 5 split out into `.text-bg-*`.
+
+### Validation
+
+- Lifecycle 272 assertions, updater 38, upgrade 8 — all passing against the
+  migrated package. Test fixtures updated for the AdminLTE 4 selectors and the
+  4.x version line.
+
 ## [3.9.1] - 2026-08-25
 
 ### Fixed

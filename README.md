@@ -1,4 +1,7 @@
-# Nexus Theme Manager for ITFlow
+| Nexus manager | 4.0.0 |
+| Nexus theme | 26.09.1 |
+| ITFlow | 26.09 |
+| ITFlow commit | `5dcc99d8802ccb28970cd51a49d635e3e0a4908b` |# Nexus Theme Manager for ITFlow
 
 [![CI](https://github.com/ithealthtech/nexus-theme-manager-for-itflow/actions/workflows/ci.yml/badge.svg)](https://github.com/ithealthtech/nexus-theme-manager-for-itflow/actions/workflows/ci.yml)
 [![Latest release](https://img.shields.io/github/v/release/ithealthtech/nexus-theme-manager-for-itflow)](https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/latest)
@@ -42,10 +45,10 @@ For a guided installation path, interactive command builder, end-user playbooks,
 
 | Component | Supported version |
 |---|---|
-| Nexus manager | 3.9.1 |
-| Nexus theme | 26.08.24 |
-| ITFlow | 26.08 |
-| ITFlow commit | `89b080b430aaafba5d520c4e52c57b28a9559085` |
+| Nexus manager | 4.0.0 |
+| Nexus theme | 26.09.1 |
+| ITFlow | 26.09 |
+| ITFlow commit | `5dcc99d8802ccb28970cd51a49d635e3e0a4908b` |
 | PHP | 8.1 or newer |
 | Production host | Debian or Ubuntu with systemd |
 
@@ -72,9 +75,9 @@ Open Theme Studio after installation and confirm that the theme is active and th
 Use the versioned ZIP and checksum file from the [latest release](https://github.com/ithealthtech/nexus-theme-manager-for-itflow/releases/latest). Do not use GitHub's automatically generated source archive as the installation package.
 
 ```bash
-sha256sum --check Nexus-Theme-Manager-for-ITFlow-3.9.1.zip.sha256.txt
-sudo unzip Nexus-Theme-Manager-for-ITFlow-3.9.1.zip -d /opt
-cd /opt/Nexus-Theme-Manager-for-ITFlow-3.9.1
+sha256sum --check Nexus-Theme-Manager-for-ITFlow-4.0.0.zip.sha256.txt
+sudo unzip Nexus-Theme-Manager-for-ITFlow-4.0.0.zip -d /opt
+cd /opt/Nexus-Theme-Manager-for-ITFlow-4.0.0
 
 sudo php manager.php doctor --root /var/www/itflow.example.com
 sudo php manager.php install --root /var/www/itflow.example.com --yes
@@ -156,6 +159,7 @@ ITFlow currently has no native theme or plugin hook system, so Nexus manages a b
 ## Documentation
 
 - [Theme Manager beginner guide](docs/theme-manager-guide.md)
+- [v4.0.0 release notes](docs/release-v4.0.0.md)
 - [v3.9.1 release notes](docs/release-v3.9.1.md)
 - [v3.9.0 release notes](docs/release-v3.9.0.md)
 - [Architecture and privilege boundaries](docs/architecture.md)

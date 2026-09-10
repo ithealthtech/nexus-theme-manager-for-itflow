@@ -15,42 +15,63 @@ $nexus_guest_native_favicon = is_file($_SERVER['DOCUMENT_ROOT'] . '/uploads/favi
 $nexus_guest_favicon = $nexus_guest_enabled
     ? nexusThemeVersionedAssetUrl(nexusThemeFaviconUrl($nexus_guest_settings, $nexus_guest_native_favicon), $nexus_guest_settings)
     : $nexus_guest_native_favicon;
-if ($nexus_guest_enabled) {
-    $tab_title = nexusThemePageTitle($session_company_name, '', $nexus_guest_settings);
-}
+$nexus_guest_dark = $nexus_guest_enabled && nexusThemeInitialDarkMode($nexus_guest_settings, false);
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-lte-print="plain"<?php if ($nexus_guest_enabled) { ?> data-bs-theme="<?= $nexus_guest_dark ? 'dark' : 'light' ?>" data-lte-color-mode="off"<?php } ?>>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="robots" content="noindex">
+    <?php if ($nexus_guest_enabled) { ?><meta name="color-scheme" content="<?= $nexus_guest_dark ? 'dark' : 'light' ?>"><?php } ?>
 
     <title><?= escapeHtml($nexus_guest_enabled ? nexusThemePageTitle($session_company_name, $nexus_guest_is_invoice ? 'Invoice' : 'Guest Portal', $nexus_guest_settings) : $session_company_name) ?></title>
 
+    <!--
+    Favicon
+    If Fav Icon exists else use the default one
+    -->
     <?php if ($nexus_guest_favicon !== '') { ?>
         <link rel="icon" href="<?= escapeHtml($nexus_guest_favicon) ?>">
     <?php } ?>
 
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="/libs/fontawesome-free/css/all.min.css">
+    <!-- Theme style -->
     <link rel="stylesheet" href="/libs/adminlte/css/adminlte.min.css">
-    <link rel="stylesheet" href="/libs/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
-    <link rel="stylesheet" href="/libs/select2/css/select2.min.css">
-    <link rel="stylesheet" href="/libs/select2-bootstrap4-theme/select2-bootstrap4.min.css">
-    <link rel="stylesheet" href="/libs/daterangepicker/daterangepicker.css">
+    <?php /* Opt-in AdminLTE 3 palette, new in v4.5.0. Supplies the
+             --bs-<colour> tokens plus .text-bg-* / .card-* / .callout-*
+             / .bg-gradient-* families. Loads BEFORE itflow_custom.css so
+             our own .bg-<colour> box colours still win. */ ?>
+    <link rel="stylesheet" href="/libs/adminlte/css/adminlte-colors-v3.min.css">
+
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="/libs/flatpickr/css/flatpickr.min.css">
+    <link rel="stylesheet" href="/libs/tom-select/css/tom-select.bootstrap5.min.css">
+    <?php /* Required: includes/footer.php loads sweetalert2.min.js for the
+             confirm-link dialogs used by guest_approve_ticket_task.php and
+             guest_view_quote.php. Every bit of the dialog's positioning
+             (position:fixed, inset:0, the centering grid) lives in this
+             stylesheet, so without it the popup renders as a static block at
+             the foot of the document. */ ?>
+    <link rel="stylesheet" href="/libs/sweetalert2/css/sweetalert2.min.css">
+
+    <!-- ITFlow style: loaded last so it wins. See includes/header.php -->
+    <link rel="stylesheet" href="/css/itflow_custom.css">
+
     <?php if ($nexus_guest_enabled) { ?>
+        <!-- Nexus loads after itflow_custom.css so the managed theme wins -->
         <link rel="stylesheet" href="/css/nexus-theme.css?v=<?= escapeHtml(NEXUS_THEME_VERSION) ?>">
         <link rel="stylesheet" href="/css/nexus-theme-custom.php?v=<?= nexusThemeSettingsVersion() ?>">
     <?php } ?>
 
-    <script src="/libs/jquery/jquery.min.js"></script>
-    <script src="/libs/toastr/toastr.min.js"></script>
-
+    <!-- Scripts -->
     <?php if ($nexus_guest_enabled) { ?><script><?= nexusThemeColorModeScript($nexus_guest_settings) ?></script><?php } ?>
+
 </head>
-<body class="layout-top-nav <?= $nexus_guest_enabled ? 'nexus-theme nexus-guest ' . ($nexus_guest_is_invoice ? 'nexus-guest-invoice ' : '') . $nexus_guest_presentation['body_classes'] : '' ?>">
-    <div class="wrapper text-sm">
+<body class="layout-fixed bg-body-tertiary theme-<?= escapeHtml($config_theme) ?> <?= $nexus_guest_enabled ? 'nexus-theme nexus-guest ' . ($nexus_guest_is_invoice ? 'nexus-guest-invoice ' : '') . $nexus_guest_presentation['body_classes'] : '' ?>" data-lte-primary="<?= escapeHtml($config_theme) ?>">
+    <div class="app-wrapper text-sm">
         <?php if ($nexus_guest_enabled) { ?>
             <header class="nexus-guest-masthead d-print-none">
                 <div class="container nexus-guest-masthead-inner">

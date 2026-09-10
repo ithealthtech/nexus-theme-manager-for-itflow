@@ -42,21 +42,28 @@ $total_tickets = intval($row['total_tickets']);
 
 ?>
 
+<?php if ($nexus_theme_enabled ?? false) { ?>
 <div class="nexus-ticket-title">
     <div>
         <span class="nexus-eyebrow">Support history</span>
         <h1 class="h2 mb-1">Your support requests</h1>
         <p class="text-muted mb-0">Review open requests and recent updates from our team.</p>
     </div>
-    <a href="ticket_add.php" class="btn nexus-portal-cta"><i class="fas fa-plus mr-2" aria-hidden="true"></i>Create support request</a>
+    <a href="ticket_add.php" class="btn nexus-portal-cta"><i class="fas fa-plus me-2" aria-hidden="true"></i>Create support request</a>
 </div>
+<?php } else { ?>
+<h3>Tickets</h3>
+<?php } ?>
 <div class="row">
 
     <div class="col-md-10">
 
-        <div class="table-responsive">
-        <table class="table table-bordered table-hover mb-0">
-            <thead class="thead-dark">
+        <?php if (mysqli_num_rows($contact_tickets) == 0) { ?>
+            <?= portalEmptyState($status === '%' ? 'You have no tickets.' : 'You have no ' . strtolower($status) . ' tickets.') ?>
+        <?php } else { ?>
+        <div class="<?= ($nexus_theme_enabled ?? false) ? 'table-responsive' : '' ?>">
+        <table class="table table-bordered border border-dark <?= ($nexus_theme_enabled ?? false) ? 'table-hover mb-0' : '' ?>">
+            <thead class="table-dark">
                 <tr>
                     <th>#</th>
                     <th>Subject</th>
@@ -81,7 +88,7 @@ $total_tickets = intval($row['total_tickets']);
                     <td>
                         <a href="ticket.php?id=<?= $ticket_id ?>"><?= $ticket_subject ?></a>
                     </td>
-                    <td><span class="badge badge-light px-2 py-1"><?= $ticket_status ?></span></td>
+                    <td><?php if ($nexus_theme_enabled ?? false) { ?><span class="badge text-bg-light px-2 py-1"><?= $ticket_status ?></span><?php } else { ?><?= $ticket_status ?><?php } ?></td>
                 </tr>
             <?php
             }
@@ -89,23 +96,32 @@ $total_tickets = intval($row['total_tickets']);
             </tbody>
         </table>
         </div>
+        <?php } ?>
 
     </div>
 
     <div class="col-md-2">
 
-        <a href="?status=Open" class="btn btn-danger btn-block p-3 mb-3 text-left">My Open tickets | <strong><?= $total_tickets_open ?></strong></a>
+        <?php /* Nexus moves the create action into the page hero above, so the
+                 sidebar starts on the status filters. */ ?>
+        <?php if (!($nexus_theme_enabled ?? false)) { ?>
+        <a href="ticket_add.php" class="btn btn-primary w-100">New ticket</a>
 
-        <a href="?status=Closed" class="btn btn-success btn-block p-3 mb-3 text-left">Closed tickets | <strong><?= $total_tickets_closed ?></strong></a>
+        <hr>
+        <?php } ?>
 
-        <a href="?status=%" class="btn btn-secondary btn-block p-3 mb-3 text-left">All my tickets | <strong><?= $total_tickets ?></strong></a>
+        <a href="?status=Open" class="btn btn-danger w-100 p-3 mb-3 text-start">My Open tickets | <strong><?= $total_tickets_open ?></strong></a>
+
+        <a href="?status=Closed" class="btn btn-success w-100 p-3 mb-3 text-start">Closed tickets | <strong><?= $total_tickets_closed ?></strong></a>
+
+        <a href="?status=%" class="btn btn-secondary w-100 p-3 mb-3 text-start">All my tickets | <strong><?= $total_tickets ?></strong></a>
         <?php
         if ($session_contact_primary == 1 || $session_contact_is_technical_contact) {
         ?>
 
         <hr>
 
-        <a href="ticket_view_all.php" class="btn btn-dark btn-block p-2 mb-3">All Tickets</a>
+        <a href="ticket_view_all.php" class="btn btn-dark w-100 p-2 mb-3">All Tickets</a>
 
         <?php
         }

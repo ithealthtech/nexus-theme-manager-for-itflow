@@ -1,33 +1,28 @@
 <!-- Navbar -->
-<nav class="main-header navbar navbar-expand navbar-<?= escapeHtml($config_theme) ?> navbar-dark">
+<nav class="app-header navbar navbar-expand d-print-none" data-bs-theme="dark">
 
     <!-- Left navbar links -->
     <ul class="navbar-nav">
         <li class="nav-item">
-            <a class="nav-link" data-widget="pushmenu" data-enable-remember="TRUE" href="#" aria-label="Toggle navigation"><i class="fas fa-bars" aria-hidden="true"></i></a>
+            <a class="nav-link" data-lte-toggle="sidebar" data-enable-remember="TRUE" href="#" aria-label="Toggle navigation"><i class="fas fa-bars" aria-hidden="true"></i></a>
         </li>
     </ul>
 
-    <!-- Center navbar links -->
-    <ul class="navbar-nav ml-auto">
-
-        <!-- SEARCH FORM -->
-        <form class="form-inline" action="/agent/global_search.php">
-            <div class="input-group input-group-sm">
-                <label class="sr-only" for="nexus-global-search">Search everywhere</label>
-                <input class="form-control form-control-navbar" id="nexus-global-search" type="search" placeholder="Search everywhere" name="query"
-                    value="<?php if (isset($_GET['query'])) { echo escapeHtml($_GET['query']); } ?>">
-                <div class="input-group-append">
-                    <button class="btn btn-navbar" type="submit" aria-label="Submit global search">
-                        <i class="fas fa-search" aria-hidden="true"></i>
-                    </button>
-                </div>
-            </div>
-        </form>
-    </ul>
+    <!-- SEARCH FORM -->
+    <form class="navbar-search ms-auto" role="search" action="/agent/global_search.php">
+        <label for="navbar-search-input" class="visually-hidden">Search everywhere</label>
+        <div class="navbar-search-field">
+            <input class="form-control" type="search" id="navbar-search-input" name="query"
+                placeholder="Search everywhere" autocomplete="off"
+                value="<?php if (isset($_GET['query'])) { echo escapeHtml($_GET['query']); } ?>">
+            <button class="navbar-search-submit" type="submit" aria-label="Submit search">
+                <i class="fas fa-search" aria-hidden="true"></i>
+            </button>
+        </div>
+    </form>
 
     <!-- Right navbar links -->
-    <ul class="navbar-nav ml-auto">
+    <ul class="navbar-nav ms-auto">
 
         <!--Custom Nav Link -->
         <?php
@@ -59,8 +54,13 @@
 
         <?php if (!empty($nexus_theme_enabled) && !empty($nexus_theme_settings['dark_mode']['user_selectable'])) { ?>
         <li class="nav-item dropdown nexus-color-mode-menu">
-            <a class="nav-link" href="#" data-toggle="dropdown" aria-label="Choose color mode"><i class="fas fa-adjust" aria-hidden="true"></i></a>
-            <div class="dropdown-menu dropdown-menu-right"><span class="dropdown-header">Appearance</span><button type="button" class="dropdown-item" onclick="window.nexusSetColorMode('light')"><i class="fas fa-sun fa-fw mr-2"></i>Light</button><button type="button" class="dropdown-item" onclick="window.nexusSetColorMode('dark')"><i class="fas fa-moon fa-fw mr-2"></i>Dark</button><button type="button" class="dropdown-item" onclick="window.nexusSetColorMode('system')"><i class="fas fa-laptop fa-fw mr-2"></i>System</button></div>
+            <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Choose color mode"><i class="fas fa-adjust" aria-hidden="true"></i></a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><h6 class="dropdown-header">Appearance</h6></li>
+                <li><button type="button" class="dropdown-item" onclick="window.nexusSetColorMode('light')"><i class="fas fa-sun fa-fw me-2" aria-hidden="true"></i>Light</button></li>
+                <li><button type="button" class="dropdown-item" onclick="window.nexusSetColorMode('dark')"><i class="fas fa-moon fa-fw me-2" aria-hidden="true"></i>Dark</button></li>
+                <li><button type="button" class="dropdown-item" onclick="window.nexusSetColorMode('system')"><i class="fas fa-laptop fa-fw me-2" aria-hidden="true"></i>System</button></li>
+            </ul>
         </li>
         <?php } ?>
 
@@ -75,7 +75,7 @@
             <a class="nav-link ajax-modal" href="#" data-modal-url="/modals/notifications.php" aria-label="Notifications<?= $num_notifications ? ': ' . $num_notifications . ' unread' : '' ?>">
                 <i class="fas fa-bell" aria-hidden="true"></i>
                 <?php if ($num_notifications) { ?>
-                <span class="badge badge-light badge-pill navbar-badge position-absolute" style="top: 1px; right: 3px;">
+                <span class="badge bg-light text-dark rounded-pill navbar-badge">
                     <?= $num_notifications ?>
                 </span>
                 <?php } ?>
@@ -83,24 +83,23 @@
         </li>
 
         <li class="nav-item dropdown user-menu">
-            <a href="#" class="nav-link" data-toggle="dropdown">
+            <a href="#" class="nav-link" data-bs-toggle="dropdown">
                 <?php if (empty($session_avatar)) { ?>
-                <i class="fas fa-user-circle mr-1"></i>
+                <i class="fas fa-user-circle me-1"></i>
                 <?php }else{ ?>
                 <img src="<?= "/uploads/users/$session_user_id/$session_avatar" ?>"
-                    class="user-image img-circle" alt="<?= escapeHtml($session_name) ?> profile photo">
+                    class="user-image rounded-circle" alt="<?= escapeHtml($session_name) ?> profile photo">
                 <?php } ?>
-                <span
-                    class="d-none d-md-inline dropdown-toggle"><?= stripslashes(escapeHtml($session_name)) ?></span>
+                <span class="d-none d-md-inline dropdown-toggle"><?= stripslashes(escapeHtml($session_name)) ?></span>
             </a>
-            <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+            <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
                 <!-- User image -->
-                <li class="user-header bg-gray-dark">
+                <li class="user-header bg-dark">
                     <?php if (empty($session_avatar)) { ?>
                     <i class="fas fa-user-circle fa-6x"></i>
                     <?php }else{ ?>
 
-                    <img src="<?= "/uploads/users/$session_user_id/$session_avatar" ?>" class="img-circle" alt="<?= escapeHtml($session_name) ?> profile photo">
+                    <img src="<?= "/uploads/users/$session_user_id/$session_avatar" ?>" class="rounded-circle" alt="<?= escapeHtml($session_name) ?> profile photo">
                     <?php } ?>
                     <p>
                         <?= stripslashes(escapeHtml($session_name)) ?>
@@ -108,12 +107,12 @@
                     </p>
                 </li>
                 <!-- Menu Footer-->
-                <li class="user-footer">
+                <li class="user-footer bg-light">
                     <?php if ($session_is_admin) { ?>
-                        <a href="/admin" class="btn btn-default btn-block btn-flat mb-2"><i class="fas fa-user-shield mr-2"></i>Administration</a>
+                        <a href="/admin" class="btn btn-default w-100 btn-flat mb-2"><i class="fas fa-user-shield me-2"></i>Administration</a>
                     <?php } ?>
-                    <a href="/agent/user/user_details.php" class="btn btn-default btn-flat"><i class="fas fa-user-cog mr-2"></i>Account</a>
-                    <a href="/agent/post.php?logout" class="btn btn-default btn-flat float-right"><i class="fas fa-sign-out-alt mr-2"></i>Logout</a>
+                    <a href="/agent/user/user_details.php" class="btn btn-default btn-flat"><i class="fas fa-user-cog me-2"></i>Account</a>
+                    <a href="/agent/post.php?logout" class="btn btn-default btn-flat float-end"><i class="fas fa-sign-out-alt me-2"></i>Logout</a>
                 </li>
             </ul>
         </li>

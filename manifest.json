@@ -1,152 +1,152 @@
 {
-  "schema": 1,
-  "package_id": "org.nexus-theme-manager.itflow",
-  "package_version": "3.9.1",
-  "theme_version": "26.08.24",
-  "name": "Nexus Theme Manager for IT Flow",
-  "vendor": "Nexus Theme Manager contributors",
-  "compatible_itflow": {
-    "release": "26.08",
-    "commit": "89b080b430aaafba5d520c4e52c57b28a9559085"
-  },
-  "files": [
-    {
-      "path": "includes/nexus_theme.php",
-      "payload_sha256": "bdae7984ea514e4b645e8f77168c5f962327d5f1ccba5fa24f0d22ed9ba77aca",
-      "baseline_sha256": null,
-      "php": true
+    "schema": 1,
+    "package_id": "org.nexus-theme-manager.itflow",
+    "package_version": "4.0.0",
+    "theme_version": "26.09.1",
+    "name": "Nexus Theme Manager for IT Flow",
+    "vendor": "Nexus Theme Manager contributors",
+    "compatible_itflow": {
+        "release": "26.09",
+        "commit": "5dcc99d8802ccb28970cd51a49d635e3e0a4908b"
     },
-    {
-      "path": "includes/nexus_invoice_pdf.php",
-      "payload_sha256": "d942c176b423822f307c0fff8a74b8cb19658381818a692535a09db9123fdeb6",
-      "baseline_sha256": null,
-      "php": true
-    },
-    {
-      "path": "css/nexus-theme.css",
-      "payload_sha256": "dadae3a4e47d170dd4c6fc3166f7c3fafe0064404031f5ff8251be2f6d874472",
-      "baseline_sha256": null,
-      "php": false
-    },
-    {
-      "path": "css/nexus-theme-custom.php",
-      "payload_sha256": "e7f02a634616e35fab616b5e96784f86bd6248062bff41f956d1418100186be1",
-      "baseline_sha256": null,
-      "php": true
-    },
-    {
-      "path": "admin/nexus.php",
-      "payload_sha256": "e25bb82b934bdaaefe04909db7adbba7bb1da20f697e799a81208a7d7eafde2b",
-      "baseline_sha256": null,
-      "php": true
-    },
-    {
-      "path": "admin/post/nexus.php",
-      "payload_sha256": "6b1ff29db069157a1228b0f8272cae9e946f5aec7a9805e592c0f1fd218e36f2",
-      "baseline_sha256": null,
-      "php": true
-    },
-    {
-      "path": "agent/user/mfa_enforcement.php",
-      "payload_sha256": "43c0433f7dcde51894878d7940d6cbe28caa4ba8bfed1923f88e2177f9d5f5df",
-      "baseline_sha256": "3e05780ead5a74897ab1dcc7df3160faf82efeb35284100c10c521ee3b5ce948",
-      "php": true
-    },
-    {
-      "path": "agent/tickets.php",
-      "payload_sha256": "0f77e9d0f3c71d85f74f8d3143464053c0baf75f18fce755d20bee23f3aea13b",
-      "baseline_sha256": "b6239a7afcd8d01af6a3f37daa1e149f4b00becb1ba38a8a1c221fc473d7f366",
-      "php": true
-    },
-    {
-      "path": "client/includes/footer.php",
-      "payload_sha256": "3c2b0ccfec3a4eb5f56b38910c5794013837629de145ff28f5523e8cec173bba",
-      "baseline_sha256": "0f746a504fb224e2e7902f498713d57c1200d970bc9bfee94cc4812f12acb9fc",
-      "php": true
-    },
-    {
-      "path": "client/includes/header.php",
-      "payload_sha256": "7707ce3398598027dff375dcbf6557148a1fd38c27282d5151f150b2ddbd5609",
-      "baseline_sha256": "3c9c34d1e0f2fd6683cc2ffc992f988b4c7641ae91f066c9aa7cb0d6aa6b3317",
-      "php": true
-    },
-    {
-      "path": "client/index.php",
-      "payload_sha256": "471e7cbabff19476c0e80e5c6c7c1bd46e2c77185d0f7d77df390f211554cd5e",
-      "baseline_sha256": "548360476ce9ccd722a7488cb0642facb7d01e0c57b46ff98ff0affa2fe3f846",
-      "php": true
-    },
-    {
-      "path": "client/login_reset.php",
-      "payload_sha256": "12fbbad2c639cd5c4905a5a7987f62692232648b10f8f2efd8c2a2a798e463c9",
-      "baseline_sha256": "a2c2447f1d5300df35be840dda5a72b57628bc02d918a1d4f34765d6a026ae94",
-      "php": true
-    },
-    {
-      "path": "client/profile.php",
-      "payload_sha256": "48e5581163f4799e1419dbeb11e370176e22ed0f16acb1f9f9a7d1887e7706a5",
-      "baseline_sha256": "26652b3f09792aa6ba49d6a41d6e187079700b26f9d4e13dd9bbff846c5ebd69",
-      "php": true
-    },
-    {
-      "path": "client/ticket.php",
-      "payload_sha256": "1783f58f3e6a60a947e27b6de3e37e7d99700286800994015549424c6c04a3ec",
-      "baseline_sha256": "81e02e7721e2957e5337f6213effde1bffc42ce4014337f9ac17af56d241d061",
-      "php": true
-    },
-    {
-      "path": "client/ticket_add.php",
-      "payload_sha256": "5514a56036b814640cd59ae3d56a0402c91a98dcc85448365cc562a56b962293",
-      "baseline_sha256": "8a35dc8e63f56164a3d3a6538a566f2be9788e9553c02048f53933987a8bccce",
-      "php": true
-    },
-    {
-      "path": "client/tickets.php",
-      "payload_sha256": "4995258e3b1387775f54419e814d804ecf51db1a7732480b560c8edecba99c34",
-      "baseline_sha256": "eca89a419976c96f0b93e554d8220453cf54fd84c4468f2f5e1e9dcd07355841",
-      "php": true
-    },
-    {
-      "path": "includes/header.php",
-      "payload_sha256": "fd9820502328a6f8331af94ac33b751d7813994f5bfb0687e7e1780af4c250db",
-      "baseline_sha256": "5e756504c451b78f4d537cf1496ddf88f3156c1af5d44272d1125f9ee9af8f4b",
-      "php": true
-    },
-    {
-      "path": "includes/top_nav.php",
-      "payload_sha256": "4d59e9663f0b400de7bd44d7eb7e38e7ef210dc7d9a73e3a28a422f851b1db4f",
-      "baseline_sha256": "40a01e637f98edc8acf5fe1343d4f6ced765aac42a6ed503d85d737a63701973",
-      "php": true
-    },
-    {
-      "path": "login.php",
-      "payload_sha256": "6cdd6efd708d789a0f20b08cb3cb1ebbadbe2c7ea72e1f4d4e7138691ec03e99",
-      "baseline_sha256": "ca09fdb5b8da8355799a9821b59ce9d32adb8c214199720353a8fe68792d3a2e",
-      "php": true
-    },
-    {
-      "path": "guest/includes/guest_header.php",
-      "payload_sha256": "a4bf22a38f8ff64b3a70abf1d31bdfeb21bb814c84f20d32f96d053bdae63c10",
-      "baseline_sha256": "9008dd8ad322a20b9d71a1b7a86b9c8f2b938b630424ccbc441839b27ae7ceb6",
-      "php": true
-    },
-    {
-      "path": "guest/guest_view_invoice.php",
-      "payload_sha256": "f5bc972feb03fd7b56204cbfd8af38a4d4b87075a0751e9047eef9b575d3ab33",
-      "baseline_sha256": "32407574819e08f5f90bfd9a426d9fe9ba4b9634ee0b555ea721366c526e2427",
-      "php": true
-    },
-    {
-      "path": "guest/nexus_invoice_pdf.php",
-      "payload_sha256": "7deffb822eabff1d5f4ae77edbb6ffe2f56e6188856a6d0750203cd100042d24",
-      "baseline_sha256": null,
-      "php": true
-    },
-    {
-      "path": "admin/includes/side_nav.php",
-      "payload_sha256": "ebdaa78b5f54df744dcab07da932bc5997c8bc8b375a39ec21802bce825367c0",
-      "baseline_sha256": "3ceeab1cb75fd67610b4840ffa48f32d2c1b7c30df69068075dd1fda723e99ce",
-      "php": true
-    }
-  ]
+    "files": [
+        {
+            "path": "includes/nexus_theme.php",
+            "payload_sha256": "9c32b7ee5705e437d3ea16bd5ffcf4ae7a05726abc765ca16a4a7c14b48216da",
+            "baseline_sha256": null,
+            "php": true
+        },
+        {
+            "path": "includes/nexus_invoice_pdf.php",
+            "payload_sha256": "d942c176b423822f307c0fff8a74b8cb19658381818a692535a09db9123fdeb6",
+            "baseline_sha256": null,
+            "php": true
+        },
+        {
+            "path": "css/nexus-theme.css",
+            "payload_sha256": "313bf762b6d714e9eaa5ee8c4dff1e15cfe05e36305441d92b1c8b6655f3b98c",
+            "baseline_sha256": null,
+            "php": false
+        },
+        {
+            "path": "css/nexus-theme-custom.php",
+            "payload_sha256": "e7f02a634616e35fab616b5e96784f86bd6248062bff41f956d1418100186be1",
+            "baseline_sha256": null,
+            "php": true
+        },
+        {
+            "path": "admin/nexus.php",
+            "payload_sha256": "27dfbf52de1a137eab783d8a6f53664f7ba05dddebe96bde7ad2e66ab3bca472",
+            "baseline_sha256": null,
+            "php": true
+        },
+        {
+            "path": "admin/post/nexus.php",
+            "payload_sha256": "6b1ff29db069157a1228b0f8272cae9e946f5aec7a9805e592c0f1fd218e36f2",
+            "baseline_sha256": null,
+            "php": true
+        },
+        {
+            "path": "agent/user/mfa_enforcement.php",
+            "payload_sha256": "c2138ae253326db2579394438bf8139c685c6dfc49175facc61bfd43386dc1b7",
+            "baseline_sha256": "698047874e346277e5b4be0beafe8e4fcc9e02eb3d6e7d4490c7c6c0dffae1c4",
+            "php": true
+        },
+        {
+            "path": "agent/tickets.php",
+            "payload_sha256": "b16f7928b15a8e26fd9842eec044fae0de1c27b766be0b74b3754bb95337a880",
+            "baseline_sha256": "e85842d99225c3f0db1d9295b2b799cd9fb3320ca870e694115b4fec0462b43f",
+            "php": true
+        },
+        {
+            "path": "client/includes/footer.php",
+            "payload_sha256": "d0e4e70c882afbd508667595f1f5e23d4d3219bb4c6ab8534bcab746f64cde8d",
+            "baseline_sha256": "2bcc6c47972727fd75a2864c527fe98af3fe37325c722e9035ac23d258755f9f",
+            "php": true
+        },
+        {
+            "path": "client/includes/header.php",
+            "payload_sha256": "c771c782e9a4048b9e438ed732d9c07deed62ae6259bb00bfa015858409180a3",
+            "baseline_sha256": "2b03a8a9da24e7eecfb2484f15b9d10402acd30ab9cc7df9867d9241cc2e72d7",
+            "php": true
+        },
+        {
+            "path": "client/index.php",
+            "payload_sha256": "8f4a25a810403cb1b4501492ebaa28c763cdcfe2b8363362070313319905883a",
+            "baseline_sha256": "6f1c1a38c5dfaf9444de75d2afa494ab9ba80a3e3f92877019551e5502a39398",
+            "php": true
+        },
+        {
+            "path": "client/login_reset.php",
+            "payload_sha256": "7bf20eb9e4da50d64073aa2c88c5d2dab1184d648539810627c33ad1e2085862",
+            "baseline_sha256": "73d3ca7dba8d28b46d902bf0362c0da0fc8c91a9532ffba24830738a4ebc49e5",
+            "php": true
+        },
+        {
+            "path": "client/profile.php",
+            "payload_sha256": "b761f2742742497bfa64f1eac34652bc151c17d7a10a94b44e38d26a712ec65e",
+            "baseline_sha256": "ef594a0394150ca7ae6a4e04e99cec6d89a886c08c71aa91ecfe1ab7fe7bd86c",
+            "php": true
+        },
+        {
+            "path": "client/ticket.php",
+            "payload_sha256": "cc1b2652aa62041e9738e6dd3a0d54199bb67f266cfd5b0d5f69f9e0ab88b579",
+            "baseline_sha256": "6dd3a7486ded27ba7d239c69359936ab4ac654033d5e0103773a0f06fc119027",
+            "php": true
+        },
+        {
+            "path": "client/ticket_add.php",
+            "payload_sha256": "519e19c111b3758075e0d537780de5f1c0621c633b1ffbaea69221496bc2d946",
+            "baseline_sha256": "5d9de6445503e424b8a6b78a2929b56efd8e82b8c9cc1ee74f2443bc14d08a29",
+            "php": true
+        },
+        {
+            "path": "client/tickets.php",
+            "payload_sha256": "dfaaa5e1f542c9098facba76f4208ccb4eee5527bceb1eb0b8e9305804b19f16",
+            "baseline_sha256": "6dc9a6066a91c9e9d5ab74f7b11f665f3b6a129259290a7a505ba10749837cda",
+            "php": true
+        },
+        {
+            "path": "includes/header.php",
+            "payload_sha256": "45b5ae70d5279594eff45bb713465eb70fcd947ef24c17b1a6822a8ae3fc92c6",
+            "baseline_sha256": "3266b86de6486c6e3a71ba01b124f90ad908e2282b15dabd617617f7370c0d9c",
+            "php": true
+        },
+        {
+            "path": "includes/top_nav.php",
+            "payload_sha256": "cc2a4f948c0187cb3160c3f79518c793b17c38a82027c04231c11b880fc703f1",
+            "baseline_sha256": "e44a1dcae68510092e927ae5ac7ab8b302efb88df2f1589cb12ce370ac5778a6",
+            "php": true
+        },
+        {
+            "path": "login.php",
+            "payload_sha256": "f51cc6d162fbe1b3abdb99bb32aab28e6542571307d9c93d87405a5ba9f4d105",
+            "baseline_sha256": "22a6f11a4f6d4c8ce3e0a9531692937525e692ac3fbac83bd9a5cad189bf9fb1",
+            "php": true
+        },
+        {
+            "path": "guest/includes/guest_header.php",
+            "payload_sha256": "2c538736410c02b556547c4642d61f1ce98c180e34e2c51bc4eadd8fc78063d8",
+            "baseline_sha256": "949384ca52325e1f6c7d3cdd92e764428e018edd8a4e86901dc9e8591332a20a",
+            "php": true
+        },
+        {
+            "path": "guest/guest_view_invoice.php",
+            "payload_sha256": "dc1cc2659276c37b0dfe5d2f7a7c4d7fa2c416feb9f0599da877872c1c35bc25",
+            "baseline_sha256": "c58a060f075b6c809837897509102a7c04c700b323e5496d3499d25419d486bf",
+            "php": true
+        },
+        {
+            "path": "guest/nexus_invoice_pdf.php",
+            "payload_sha256": "7deffb822eabff1d5f4ae77edbb6ffe2f56e6188856a6d0750203cd100042d24",
+            "baseline_sha256": null,
+            "php": true
+        },
+        {
+            "path": "admin/includes/side_nav.php",
+            "payload_sha256": "2b6fc7b1abc55be0428b18a398849184815aec096c061923eea5021878577230",
+            "baseline_sha256": "3fc122c5c229c661b5898eed33897f6ca1a88f51b0fc142b553596c2ed219035",
+            "php": true
+        }
+    ]
 }

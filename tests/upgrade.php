@@ -118,7 +118,7 @@ try {
     mkdir($testRoot, 0777, true);
     $currentPackage = $testRoot . DIRECTORY_SEPARATOR . 'current-package';
     upgradeCopyTree($packageRoot, $currentPackage);
-    upgradeWritePackageVersion($currentPackage, '3.9.0');
+    upgradeWritePackageVersion($currentPackage, '3.9.1');
 
     $fixture = $testRoot . DIRECTORY_SEPARATOR . 'itflow';
     $stateRoot = $testRoot . DIRECTORY_SEPARATOR . 'state';
@@ -148,7 +148,7 @@ try {
     upgradeRun(array_merge([PHP_BINARY, $packageRoot . DIRECTORY_SEPARATOR . 'manager.php', 'disable'], $common, ['--yes']), 0);
     $failedPackage = $testRoot . DIRECTORY_SEPARATOR . 'failed-package';
     upgradeCopyTree($packageRoot, $failedPackage);
-    upgradeWritePackageVersion($failedPackage, '3.9.2');
+    upgradeWritePackageVersion($failedPackage, '4.0.1');
     file_put_contents($failedPackage . DIRECTORY_SEPARATOR . 'baseline' . DIRECTORY_SEPARATOR . 'login.php', "<?php\n// Deliberate package-integrity failure.\n");
 
     [, $rollbackError] = upgradeRun([
