@@ -2,6 +2,43 @@
 
 All notable changes to this project are documented here.
 
+## [4.1.0] - 2026-09-03
+
+Closes the known issue 4.0.0 shipped with: ITFlow 26.09 updates silently revert
+the Nexus overlay, and nothing told you.
+
+### Added
+
+- `manager.php reapply` restores managed files an ITFlow update reverted, then
+  verifies. It refuses when any managed file was changed to something that is
+  neither this package nor the supported ITFlow baseline — that is somebody's own
+  edit, and it is named rather than overwritten. `--force` overwrites anyway.
+- `manager.php status` now classifies drift three ways — reverted by an ITFlow
+  update, missing, or modified outside the manager — and says which action fits.
+  It also reports the detected ITFlow version and whether it is supported. The
+  JSON output carries `drift`, `drift_counts` and `reapply_recommended`.
+- Theme Studio's Updates & system workspace reports reverted surfaces by name,
+  with the command that restores them. The existing health card cannot see this:
+  every Nexus-owned file is still present after an ITFlow update, so it reported
+  perfect health while the login page and client portal had gone back to stock.
+- `nexusThemeOverlayDrift()` backs that check. It is a marker test rather than a
+  hash comparison because `manifest.json` ships with the package and is never
+  installed into the ITFlow tree, so the web layer has no hashes to compare
+  against. `manager.php verify` remains the exact check.
+
+### Changed
+
+- A compatibility failure caused by the wrong ITFlow release now leads with the
+  versions — "this installation is 26.08.9, this package supports 26.09" — instead
+  of sixteen identical hash-mismatch lines. A tampered tree at the supported
+  release keeps the original message.
+
+### Validation
+
+- New `tests/drift.php`: 23 assertions covering detection, restore, idempotence,
+  refusal, `--force`, the disabled-mode refusal, and both compatibility-gate
+  paths. Wired into CI. Lifecycle grows to 275.
+
 ## [4.0.0] - 2026-09-03
 
 Nexus now targets ITFlow 26.09. This is a clean break: 4.0.0 does not install on

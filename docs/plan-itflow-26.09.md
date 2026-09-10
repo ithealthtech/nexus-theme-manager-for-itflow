@@ -1,8 +1,9 @@
 # Migration plan — Nexus Theme Manager to ITFlow 26.09
 
-Status: Stages B, C, D and the housekeeping in §4 are done and shipped as 4.0.0
-(`docs/release-v4.0.0.md`). Stage A (drift detection, §2.4) and Stage E (the new
-26.09 surfaces, §2.5) are outstanding — Stage A is the higher priority of the two.
+Status: Stages B, C and D plus the §4 housekeeping shipped as 4.0.0
+(`docs/release-v4.0.0.md`). Stage A (drift detection and re-apply, §2.4) shipped as
+4.1.0 (`docs/release-v4.1.0.md`). Stage E (the new 26.09 surfaces, §2.5) is the
+only one still outstanding.
 
 **Decisions taken (2026-09-03):**
 

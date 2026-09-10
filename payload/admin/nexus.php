@@ -33,6 +33,7 @@ $nexusDarkLogoMeta = nexusThemeAssetMetadata($nexusSettings['branding']['logo_da
 $nexusFaviconMeta = nexusThemeAssetMetadata($nexusSettings['branding']['favicon_path']);
 $nexusBackgroundMeta = nexusThemeAssetMetadata($nexusSettings['branding']['login_background_path']);
 $nexusHealth = nexusThemeHealthReport();
+$nexusOverlayDrift = nexusThemeOverlayDrift();
 $nexusSavedPresets = nexusThemeSavedPresets();
 $nexusSavedPresetsJson = nexusThemeExportPresets();
 $nexusSchedule = nexusThemeSchedule();
@@ -392,6 +393,32 @@ $nexusUpdaterSetupCommand = 'sudo php /opt/Nexus-Theme-Manager-for-ITFlow-' . NE
                         </div>
                         <div class="card-footer bg-transparent border-0 pt-0"><span class="small text-muted"><i class="fas fa-lock me-1 text-success"></i>Fixed repository · SHA-256 verification · rollback protection</span></div>
                     </section>
+
+                    <?php /* ITFlow 26.09 forces its file update and discards edits to shipped
+                             files, so an ordinary ITFlow update reverts the overlay without
+                             warning. The health card above cannot see it - every Nexus-owned
+                             file is still present - so it is called out separately, in the
+                             workspace where an administrator already goes after an update.
+                             Re-applying is a filesystem operation over the installed package,
+                             which the web layer deliberately cannot perform, so this reports
+                             and instructs rather than offering a button that would have to
+                             shell out. */ ?>
+                    <?php if ($nexusOverlayDrift['drifted']) { ?>
+                    <section class="card nexus-workspace-panel" data-workspace-panel="system">
+                        <div class="card-header border-0"><div><span class="nexus-manager-kicker">After an ITFlow update</span><h2 class="h5 mb-0">Managed files were reverted</h2></div><span class="badge text-bg-warning"><?= count($nexusOverlayDrift['reverted']) ?> of <?= (int)$nexusOverlayDrift['surface_count'] ?></span></div>
+                        <div class="card-body pt-0">
+                            <p class="text-muted">These ITFlow templates no longer contain their Nexus presentation. Updating ITFlow rewrites the files it ships and discards local changes, so this is the expected result of an ITFlow update rather than a fault in the theme. The surfaces below are currently rendering ITFlow's own design.</p>
+                            <ul class="nexus-drift-list">
+                                <?php foreach ($nexusOverlayDrift['reverted'] as $nexusDriftItem) { ?>
+                                    <li><strong><?= escapeHtml($nexusDriftItem['label']) ?></strong> <code><?= escapeHtml($nexusDriftItem['path']) ?></code></li>
+                                <?php } ?>
+                            </ul>
+                            <p class="mb-1">Restore them from the installed package on the server:</p>
+                            <pre class="nexus-drift-command"><code>php manager.php reapply --root <?= escapeHtml($_SERVER['DOCUMENT_ROOT'] ?? '/var/www/itflow') ?></code></pre>
+                            <small class="form-text">The command refuses to overwrite any managed file that was edited outside the theme manager, and names it instead. Run <code>manager.php status</code> first to see the full classification.</small>
+                        </div>
+                    </section>
+                    <?php } ?>
 
                     <section class="card nexus-workspace-panel nexus-recovery-card" data-workspace-panel="system">
                         <div class="card-header border-0"><div><span class="nexus-manager-kicker">Always-available safety</span><h2 class="h5 mb-0">Recovery mode</h2></div><span class="badge badge-<?= $nexusHealth['healthy'] ? 'success' : 'danger' ?>"><?= $nexusHealth['healthy'] ? 'Healthy' : count($nexusHealth['failed']) . ' failed' ?></span></div>

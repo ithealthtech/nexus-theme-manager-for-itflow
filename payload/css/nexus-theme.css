@@ -2417,3 +2417,43 @@ body.nexus-client {
 .nexus-theme.nexus-color-mode-dark {
     color-scheme: dark;
 }
+
+/* Reverted-overlay notice (Updates & system workspace). Only rendered after an
+   ITFlow update has rewritten managed templates, so it is styled to read as a
+   standing condition to act on rather than an error. */
+.nexus-studio .nexus-drift-list {
+    list-style: none;
+    margin: 0 0 1rem;
+    padding: 0;
+    display: grid;
+    gap: 0.35rem;
+}
+
+.nexus-studio .nexus-drift-list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: var(--nexus-radius);
+    background: var(--nexus-surface-2);
+}
+
+.nexus-studio .nexus-drift-list code {
+    color: var(--nexus-muted);
+    font-size: 0.85em;
+}
+
+.nexus-studio .nexus-drift-command {
+    margin: 0 0 0.5rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--nexus-border);
+    border-radius: var(--nexus-radius);
+    background: var(--nexus-surface-2);
+    overflow-x: auto;
+}
+
+.nexus-studio .nexus-drift-command code {
+    color: var(--nexus-text);
+    white-space: pre;
+}

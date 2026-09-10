@@ -190,17 +190,124 @@ final class ThemeManager
 
         $state = $this->loadState();
         $issues = $this->stateIssues($state);
+        $drift = $this->driftReport($state);
+        $counts = $this->driftCounts($drift);
+        $detected = $this->detectITFlowVersion();
+
+        /* Say what to do, not just that something is wrong. Drift that is purely
+           reverted files is the ITFlow-update case and reapply fixes it
+           unattended; anything modified needs a human first. */
+        if ($drift === []) {
+            $message = $issues === [] ? 'Managed files match the recorded state.' : 'Managed files have conflicts.';
+        } elseif ($counts['modified'] === 0) {
+            $message = sprintf(
+                '%d managed file(s) were reverted, which is what an ITFlow update does. Run reapply to restore them.',
+                count($drift)
+            );
+        } else {
+            $message = sprintf(
+                '%d managed file(s) drifted, %d of them changed outside the theme manager. Review those before running reapply.',
+                count($drift),
+                $counts['modified']
+            );
+        }
+
         $this->emit([
             'status' => $issues === [] ? 'healthy' : 'conflict',
             'mode' => $state['mode'] ?? 'unknown',
-            'message' => $issues === [] ? 'Managed files match the recorded state.' : 'Managed files have conflicts.',
+            'message' => $message,
             'issues' => $issues,
+            'drift' => $drift,
+            'drift_counts' => $counts,
+            'reapply_recommended' => $drift !== [] && $counts['modified'] === 0,
+            'itflow_version' => $detected,
+            'itflow_version_supported' => $this->itflowVersionMatchesPin($detected),
             'root' => $this->root,
             'state_directory' => $this->stateDir,
             'package_version' => $state['package_version'] ?? null,
             'installed_at' => $state['installed_at'] ?? null,
             'updated_at' => $state['updated_at'] ?? null,
+            'reapplied_at' => $state['reapplied_at'] ?? null,
         ]);
+    }
+
+    /*
+     * Re-install the payload over files an ITFlow update reverted.
+     *
+     * Refuses by default when any managed file was changed to something that is
+     * neither this package nor the supported baseline: that is somebody's own
+     * edit, and silently overwriting it is worse than stopping. --force says to
+     * overwrite it anyway.
+     */
+    public function reapply(bool $yes, bool $force): void
+    {
+        $this->withLock(function () use ($yes, $force): void {
+            $this->assertPackageIntegrity();
+            $this->assertITFlowRoot();
+            $state = $this->loadState();
+
+            if (($state['mode'] ?? null) !== 'enabled') {
+                throw new ThemeManagerException(
+                    'The theme is disabled, so there is nothing to re-apply. Use enable to turn it back on.',
+                    NEXUS_EXIT_CONFLICT
+                );
+            }
+
+            $drift = $this->driftReport($state);
+            if ($drift === []) {
+                $this->emit([
+                    'status' => 'healthy',
+                    'mode' => 'enabled',
+                    'message' => 'Every managed file already matches this package. Nothing to re-apply.',
+                    'root' => $this->root,
+                ]);
+                return;
+            }
+
+            $counts = $this->driftCounts($drift);
+            $blocked = array_values(array_filter($drift, static fn(array $i): bool => $i['kind'] === 'modified'));
+
+            if ($blocked !== [] && !$force) {
+                $detected = $this->detectITFlowVersion();
+                $note = $this->itflowVersionMatchesPin($detected)
+                    ? 'These files were changed outside the theme manager.'
+                    : sprintf(
+                        'This ITFlow installation is %s but the package supports %s, so these files are most likely a newer ITFlow rather than local edits. Install the Nexus release for %s instead of forcing.',
+                        $detected,
+                        $this->manifest['compatible_itflow']['release'],
+                        $detected
+                    );
+                throw new ThemeManagerException(
+                    "Refusing to re-apply. $note Review them, then re-run with --force to overwrite:\n- " .
+                    implode("\n- ", array_column($blocked, 'path')),
+                    NEXUS_EXIT_CONFLICT
+                );
+            }
+
+            $summary = sprintf(
+                '%d reverted, %d missing, %d externally modified',
+                $counts['reverted'],
+                $counts['missing'],
+                $counts['modified']
+            );
+            $this->confirm("Re-apply the Nexus theme payload to " . $this->root . " ($summary)?", $yes);
+
+            $this->applyPayload($state);
+            $state['updated_at'] = gmdate('c');
+            $state['reapplied_at'] = gmdate('c');
+            $this->writeState($state);
+            $this->verifyState($state, true);
+
+            $this->emit([
+                'status' => 'reapplied',
+                'mode' => 'enabled',
+                'message' => 'Managed files were restored from this package and verified. Reload the web/PHP service to clear opcode caches.',
+                'restored' => count($drift),
+                'drift_counts' => $counts,
+                'drift' => $drift,
+                'root' => $this->root,
+            ]);
+        });
     }
 
     public function verify(): void
@@ -547,6 +654,112 @@ final class ThemeManager
         return $issues;
     }
 
+    /*
+     * Classify every managed file against what it is supposed to be.
+     *
+     * ITFlow 26.09 changed how it updates itself: `php scripts/update_cli.php`
+     * forces the file update and discards local edits to shipped files, and
+     * Maintenance > Update hands that same job to cron. Nexus overlays shipped
+     * files, so a routine ITFlow update silently reverts the whole overlay.
+     *
+     * A plain hash mismatch cannot tell that apart from an administrator editing
+     * a managed file by hand, and the two want opposite responses: the first is
+     * safe to re-apply unattended, the second must not be overwritten without
+     * someone looking at it. So the comparison is three-way - payload, the
+     * recorded ITFlow baseline, or neither.
+     *
+     * Returns one entry per drifted file; an empty array means no drift.
+     */
+    private function driftReport(array $state): array
+    {
+        if (($state['mode'] ?? null) !== 'enabled') {
+            return [];
+        }
+
+        $drift = [];
+        foreach ($this->manifest['files'] as $entry) {
+            $relative = $entry['path'];
+            $target = $this->targetPath($relative);
+            $ownedByPackage = $entry['baseline_sha256'] === null;
+
+            if (!is_file($target)) {
+                /* A theme-owned file has no upstream counterpart, so ITFlow
+                   cannot have rewritten it - only a wholesale file replace
+                   removes one. Either way re-applying restores it safely. */
+                $drift[] = [
+                    'path' => $relative,
+                    'kind' => $ownedByPackage ? 'reverted' : 'missing',
+                    'detail' => $ownedByPackage
+                        ? 'Theme-owned file was removed, which an ITFlow file update does.'
+                        : 'Managed file is missing from the ITFlow tree.',
+                ];
+                continue;
+            }
+
+            $hash = $this->hashFile($target);
+            if ($hash === $entry['payload_sha256']) {
+                continue;
+            }
+
+            if (!$ownedByPackage && $hash === $entry['baseline_sha256']) {
+                $drift[] = [
+                    'path' => $relative,
+                    'kind' => 'reverted',
+                    'detail' => 'File matches the supported ITFlow baseline, so an ITFlow update replaced it.',
+                ];
+                continue;
+            }
+
+            $drift[] = [
+                'path' => $relative,
+                'kind' => 'modified',
+                'detail' => 'File matches neither this package nor the supported ITFlow baseline.',
+            ];
+        }
+        return $drift;
+    }
+
+    private function driftCounts(array $drift): array
+    {
+        $counts = ['reverted' => 0, 'modified' => 0, 'missing' => 0];
+        foreach ($drift as $item) {
+            $counts[$item['kind']] = ($counts[$item['kind']] ?? 0) + 1;
+        }
+        return $counts;
+    }
+
+    /*
+     * ITFlow's own version string, for explaining a compatibility failure in the
+     * terms an administrator can act on. Best effort: a tree without the file,
+     * or with an unreadable one, simply yields null and the caller falls back to
+     * the hash-level detail.
+     */
+    private function detectITFlowVersion(): ?string
+    {
+        $path = $this->root . DIRECTORY_SEPARATOR . 'includes' . DIRECTORY_SEPARATOR . 'app_version.php';
+        if (!is_file($path) || is_link($path) || filesize($path) > 65536) {
+            return null;
+        }
+        $source = @file_get_contents($path);
+        if ($source === false) {
+            return null;
+        }
+        return preg_match('/APP_VERSION"?\s*,\s*"([0-9][0-9A-Za-z.\-]{0,31})"/', $source, $match) === 1
+            ? $match[1]
+            : null;
+    }
+
+    /* The pinned release as it appears in an ITFlow version string: "26.09"
+       matches 26.09, 26.09.1, 26.09.2 and so on, but not 26.08 or 26.10. */
+    private function itflowVersionMatchesPin(?string $version): bool
+    {
+        if ($version === null) {
+            return true;
+        }
+        $release = (string)$this->manifest['compatible_itflow']['release'];
+        return $version === $release || str_starts_with($version, $release . '.');
+    }
+
     private function assertBaselineCompatible(): void
     {
         $issues = [];
@@ -570,8 +783,25 @@ final class ThemeManager
         }
 
         if ($issues !== []) {
+            /* Lead with the version when that is the actual reason. Sixteen
+               "does not match the supported ITFlow baseline" lines tell an
+               administrator nothing they can act on; "this is 26.08, the package
+               is for 26.09" tells them exactly what to do. */
+            $detected = $this->detectITFlowVersion();
+            $preamble = 'Compatibility check failed. No files were changed:';
+            if (!$this->itflowVersionMatchesPin($detected)) {
+                $preamble = sprintf(
+                    "This ITFlow installation is %s, but this package supports ITFlow %s.\n" .
+                    "Update ITFlow to %s first, or install the Nexus release that targets %s.\n" .
+                    'No files were changed. Underlying detail:',
+                    $detected,
+                    $this->manifest['compatible_itflow']['release'],
+                    $this->manifest['compatible_itflow']['release'],
+                    $detected
+                );
+            }
             throw new ThemeManagerException(
-                "Compatibility check failed. No files were changed:\n- " . implode("\n- ", $issues),
+                $preamble . "\n- " . implode("\n- ", $issues),
                 NEXUS_EXIT_CONFLICT
             );
         }
@@ -930,7 +1160,7 @@ final class ThemeManager
 function nexusUsage(): void
 {
     $usage = <<<'TEXT'
-Nexus Theme Manager for IT Flow 4.0.0
+Nexus Theme Manager for IT Flow 4.1.0
 
 Usage:
   php manager.php <command> --root /path/to/itflow [options]
@@ -939,7 +1169,8 @@ Commands:
   doctor      Validate the package and target without changing files
   install     Back up originals, install the theme, and verify it
   adopt       Manage an existing exact manual installation without rewriting it
-  status      Show installed mode and managed-file conflicts
+  status      Show installed mode, managed-file conflicts, and ITFlow-update drift
+  reapply     Restore managed files an ITFlow update reverted
   verify      Verify package checksums, installed files, and PHP syntax
   disable     Restore original templates while retaining manager state
   enable      Reapply the managed theme after a disable
@@ -951,6 +1182,7 @@ Options:
   --state-root PATH  Override state storage (default: /var/lib/nexus-itflow-theme)
   --yes              Approve a mutating command without an interactive prompt
   --purge            With uninstall, delete recovery state instead of archiving it
+  --force            With reapply, overwrite managed files changed outside the manager
   --json             Emit machine-readable JSON
 
 Exit codes: 0 success, 2 usage/cancelled, 3 conflict/incompatible, 4 verification, 5 operation failure.
@@ -966,6 +1198,7 @@ function nexusParseArguments(array $argv): array
         'state_root' => null,
         'yes' => false,
         'purge' => false,
+        'force' => false,
         'json' => false,
     ];
 
@@ -975,6 +1208,8 @@ function nexusParseArguments(array $argv): array
             $options['yes'] = true;
         } elseif ($argument === '--purge') {
             $options['purge'] = true;
+        } elseif ($argument === '--force') {
+            $options['force'] = true;
         } elseif ($argument === '--json') {
             $options['json'] = true;
         } elseif (in_array($argument, ['--root', '--state-root'], true)) {
@@ -1006,6 +1241,7 @@ try {
         'install' => $manager->install($options['yes']),
         'adopt' => $manager->adopt($options['yes']),
         'status' => $manager->status(),
+        'reapply' => $manager->reapply($options['yes'], $options['force']),
         'verify' => $manager->verify(),
         'disable' => $manager->disable($options['yes']),
         'enable' => $manager->enable($options['yes']),

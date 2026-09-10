@@ -133,6 +133,9 @@ try {
     expect(str_contains($adminPageSource, "isset(\$_GET['nexus_update_status'])") && str_contains($adminPageSource, "fetch('/admin/nexus.php?nexus_update_status=1'") && !str_contains($adminPageSource, 'window.location.reload()'), 'Theme Studio polls protected updater status without disruptive page reloads');
     expect(str_contains($adminPageSource, 'id="nexus-update-timeline"') && str_contains($adminPageSource, 'id="nexus-update-retry-button"') && str_contains($themeCssSource, '.nexus-update-timeline li.is-active'), 'updater UI exposes stage progress, recovery guidance, and safe retry controls');
     expect(str_contains($adminNavSource, '/admin/nexus.php'), 'administration navigation exposes the Nexus Theme Manager');
+    expect(str_contains($themeHelperSource, 'function nexusThemeOverlayDrift(') && substr_count($themeHelperSource, "=> 'Client portal header'") === 1, 'runtime detects ITFlow updates that reverted managed templates');
+    expect(str_contains($adminPageSource, '$nexusOverlayDrift = nexusThemeOverlayDrift();') && str_contains($adminPageSource, 'manager.php reapply --root'), 'Theme Studio reports reverted managed files and the command that restores them');
+    expect(!str_contains($adminPostSource, 'reapply'), 'the web layer reports drift without attempting a privileged re-apply');
     expect(str_contains($adminNavSource, 'brand-link nexus-admin-back') && str_contains($themeCssSource, '.nexus-agent .app-sidebar .nexus-admin-back'), 'administration return navigation uses the compact Nexus treatment');
     expect(str_contains($adminNavSource, 'NEXUS_MANAGER_VERSION'), 'administration navigation reports the installed manager version');
     foreach ([$loginSource, $resetSource, $mfaSource] as $authSource) {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-const NEXUS_MANAGER_VERSION = '4.0.0';
+const NEXUS_MANAGER_VERSION = '4.1.0';
 const NEXUS_THEME_VERSION = '26.09.1';
 const NEXUS_ITFLOW_COMMIT = '89b080b430aaafba5d520c4e52c57b28a9559085';
 const NEXUS_THEME_DISABLED_MARKER = '.nexus-theme-disabled';
@@ -1743,6 +1743,64 @@ function nexusThemeHealthReport(?string $root = null): array
     }
     $failed = array_keys(array_filter($checks, static fn(bool $passed): bool => !$passed));
     return $cache[$documentRoot] = ['healthy' => $failed === [], 'checks' => $checks, 'failed' => $failed, 'checked_at' => gmdate('c')];
+}
+
+/*
+ * Which overlaid ITFlow surfaces have lost their Nexus content.
+ *
+ * nexusThemeHealthReport() only asks whether the theme's own files are present,
+ * which an ITFlow update never removes - it rewrites the *shipped* templates
+ * Nexus overlays and leaves everything else alone. The result is the failure
+ * this exists to catch: Theme Studio reports perfect health while the login page,
+ * the client portal and the agent shell have quietly gone back to stock.
+ *
+ * The check is a marker test rather than a hash comparison, because the web
+ * layer has no copy of the package manifest to compare against - manifest.json
+ * ships with the package and is never installed into the ITFlow tree. Every
+ * payload template mentions "nexus" and no upstream template does, so the marker
+ * separates the two cleanly. manager.php verify remains the exact check.
+ */
+function nexusThemeOverlayDrift(?string $root = null): array
+{
+    $documentRoot = nexusThemeDocumentRoot($root);
+    $surfaces = [
+        'login.php' => 'Agent and client login',
+        'includes/header.php' => 'Agent shell header',
+        'includes/top_nav.php' => 'Agent top navigation',
+        'admin/includes/side_nav.php' => 'Administration navigation',
+        'agent/tickets.php' => 'Agent ticket queue',
+        'agent/user/mfa_enforcement.php' => 'Multi-factor enrolment',
+        'client/includes/header.php' => 'Client portal header',
+        'client/includes/footer.php' => 'Client portal footer',
+        'client/index.php' => 'Client portal home',
+        'client/tickets.php' => 'Client portal ticket list',
+        'client/ticket.php' => 'Client portal ticket',
+        'client/ticket_add.php' => 'Client portal new request',
+        'client/profile.php' => 'Client portal profile',
+        'client/login_reset.php' => 'Client password reset',
+        'guest/includes/guest_header.php' => 'Guest header',
+        'guest/guest_view_invoice.php' => 'Guest invoice',
+    ];
+
+    $reverted = [];
+    foreach ($surfaces as $relative => $label) {
+        $path = $documentRoot . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relative);
+        if (!is_file($path) || is_link($path)) {
+            continue;
+        }
+        $contents = @file_get_contents($path);
+        if ($contents === false || stripos($contents, 'nexus') !== false) {
+            continue;
+        }
+        $reverted[] = ['path' => $relative, 'label' => $label];
+    }
+
+    return [
+        'drifted' => $reverted !== [],
+        'reverted' => $reverted,
+        'surface_count' => count($surfaces),
+        'checked_at' => gmdate('c'),
+    ];
 }
 
 function nexusThemeRuntimeEnabled(?string $root = null): bool

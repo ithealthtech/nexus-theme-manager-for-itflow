@@ -55,6 +55,9 @@ schedule overrides ITFlow's boolean outright.
 
 ## Known issue — ITFlow updates revert the overlay
 
+**Fixed in 4.1.0** by `manager.php reapply` and drift reporting. The description
+below is retained because the underlying ITFlow behaviour has not changed.
+
 26.09 changed how ITFlow updates itself. `php scripts/update_cli.php` with no
 arguments forces the file update and **discards local edits to shipped files**,
 and Maintenance > Update now hands the same job to cron. Nexus overlays sixteen

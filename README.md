@@ -45,7 +45,7 @@ For a guided installation path, interactive command builder, end-user playbooks,
 
 | Component | Supported version |
 |---|---|
-| Nexus manager | 4.0.0 |
+| Nexus manager | 4.1.0 |
 | Nexus theme | 26.09.1 |
 | ITFlow | 26.09 |
 | ITFlow commit | `5dcc99d8802ccb28970cd51a49d635e3e0a4908b` |
@@ -159,6 +159,7 @@ ITFlow currently has no native theme or plugin hook system, so Nexus manages a b
 ## Documentation
 
 - [Theme Manager beginner guide](docs/theme-manager-guide.md)
+- [v4.1.0 release notes](docs/release-v4.1.0.md)
 - [v4.0.0 release notes](docs/release-v4.0.0.md)
 - [v3.9.1 release notes](docs/release-v3.9.1.md)
 - [v3.9.0 release notes](docs/release-v3.9.0.md)
