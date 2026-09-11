@@ -2,6 +2,43 @@
 
 All notable changes to this project are documented here.
 
+## [4.2.0] - 2026-09-10
+
+Styles the surfaces ITFlow 26.09 added, and fixes two 4.0.0 gaps that affected
+every page. See docs/release-v4.2.0.md.
+
+### Added
+
+- Component-level coverage for the new 26.09 surfaces, rather than per-page
+  overlays: `thead.table-dark` (statements, portal activity), SweetAlert2 dialogs
+  (Quick Send, Mark Sent, guest approve and decline), intl-tel-input (every phone
+  field), monospace and tabular figures (IP section, statement money columns),
+  pagination, statement-modal tabs, the SLA holiday list group, Quick Send's bolt,
+  and the guest approval action and confirmation screens. No new ITFlow template
+  is overlaid.
+
+### Fixed
+
+- Page titles were unreadable in light mode since 4.0.0: titles and headings inside
+  dark header surfaces (`card-dark`, `bg-dark`, the user-menu header) kept their
+  own dark colour against the dark bar, measuring 1.39:1 against WCAG's 4.5:1.
+  ITFlow uses these headers in 115 files, including the ticket, client, invoice
+  and user lists. Titles, headings and bare icons now inherit the header's
+  foreground.
+- Row striping and hover tints were invisible on every table since 4.0.0: Bootstrap
+  5 paints each cell with `--bs-table-bg` above the row, hiding the `<tr>` tint.
+  Nexus now drives the Bootstrap table variables instead.
+- The Nexus page colour never reached the page since 4.0.0: ITFlow's
+  `bg-body-tertiary` on `<body>` is `!important`, so the page painted Bootstrap's
+  tertiary grey under Nexus cards on the agent, client and guest surfaces. Matched
+  at higher specificity so the ground follows the live palette and mode.
+
+### Validation
+
+- Rendered against a live ITFlow 26.09.3 with the real stylesheet stack and
+  colour-mode script; every rule confirmed by computed style on the agent, client
+  and guest surfaces.
+
 ## [4.1.0] - 2026-09-03
 
 Closes the known issue 4.0.0 shipped with: ITFlow 26.09 updates silently revert

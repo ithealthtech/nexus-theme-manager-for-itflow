@@ -1,7 +1,7 @@
 {
     "schema": 1,
     "package_id": "org.nexus-theme-manager.itflow",
-    "package_version": "4.1.0",
+    "package_version": "4.2.0",
     "theme_version": "26.09.1",
     "name": "Nexus Theme Manager for IT Flow",
     "vendor": "Nexus Theme Manager contributors",
@@ -12,7 +12,7 @@
     "files": [
         {
             "path": "includes/nexus_theme.php",
-            "payload_sha256": "b8072808895db99bee292be4ecff01ded82b8160576f866ac25e49007ed95703",
+            "payload_sha256": "ecf1a61b28fb95df7d4fb720b779699c5ebe916f917f6360961b36636e5672f1",
             "baseline_sha256": null,
             "php": true
         },
@@ -24,7 +24,7 @@
         },
         {
             "path": "css/nexus-theme.css",
-            "payload_sha256": "811fe4419edd4ede95ebe2b4e9128ff7047b0699ff62715eeb1bd58dc85c6e5d",
+            "payload_sha256": "96c415cb73ebb71c1ff7f3629c4f01aede97b56919089a82818a4e53e455fad0",
             "baseline_sha256": null,
             "php": false
         },

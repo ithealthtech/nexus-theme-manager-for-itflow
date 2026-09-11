@@ -2457,3 +2457,222 @@ body.nexus-client {
     color: var(--nexus-text);
     white-space: pre;
 }
+
+/* ---------------------------------------------------------------------------
+   ITFlow 26.09 surfaces
+   ---------------------------------------------------------------------------
+   Canned responses, SLA holidays, the subnet IP section, account statements,
+   Quick Send and Mark Sent, the rebuilt guest approval page and the portal
+   activity page are all assembled from stock Bootstrap 5 and AdminLTE 4 parts
+   rather than bespoke markup. They are covered here at component level instead
+   of with per-page overlays: no new ITFlow template to rebase each release, and
+   the next surface built from the same parts is themed on arrival. */
+
+/* Page ground. ITFlow 26.09 puts bg-body-tertiary on <body> in the agent, client
+   and guest headers - a Bootstrap utility declared !important - so the Nexus page
+   colour never reached the page: measured on a live install, the body painted
+   Bootstrap's dark tertiary #2b3035 under Nexus navy cards on all three surfaces.
+   Only .app-content in the agent shell was ever covered, and body.nexus-guest lost
+   to the utility.
+
+   Bootstrap's own lever is --bs-tertiary-bg-rgb, an RGB triplet, and cannot be
+   used: --nexus-page is a hex colour Theme Studio sets at runtime, and CSS has no
+   way to split one into the other. Matching the utility's !important at higher
+   specificity follows whatever palette and mode are live instead. */
+.nexus-theme.bg-body-tertiary {
+    background-color: var(--nexus-page) !important;
+}
+
+/* Bootstrap 5 tables paint every cell with --bs-table-bg, which sits above the
+   row. Tinting the <tr> - as the striped and hover rules further up do - is
+   therefore invisible under 26.09, and a thead.table-dark sets its own palette
+   through the same variables. Drive the variables instead of the elements. */
+.nexus-theme .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--nexus-text);
+    --bs-table-border-color: var(--nexus-border);
+    --bs-table-striped-bg: rgba(120, 136, 255, 0.055);
+    --bs-table-striped-color: var(--nexus-text);
+    --bs-table-hover-bg: rgba(120, 136, 255, 0.09);
+    --bs-table-hover-color: var(--nexus-text);
+    --bs-table-active-bg: rgba(105, 191, 245, 0.14);
+}
+
+.nexus-theme .table-dark,
+.nexus-theme .table > thead.table-dark {
+    --bs-table-bg: var(--nexus-elevated);
+    --bs-table-color: var(--nexus-white);
+    --bs-table-border-color: var(--nexus-border);
+    --bs-table-striped-bg: var(--nexus-elevated);
+    --bs-table-hover-bg: var(--nexus-elevated);
+}
+
+.nexus-theme .table > thead.table-dark th {
+    color: var(--nexus-white);
+}
+
+/* Money and account columns on statements, IP addresses and hostnames on the
+   subnet view, and the portal activity log all lean on these utilities. */
+.nexus-theme .font-monospace {
+    font-family: var(--nexus-font-data) !important;
+    font-size: 0.92em;
+    font-variant-numeric: tabular-nums;
+}
+
+.nexus-theme .table .text-end {
+    font-variant-numeric: tabular-nums;
+}
+
+/* SweetAlert2 now backs every confirm-link dialog: Quick Send, Mark Sent,
+   payment deletion and the guest approve/decline actions. ITFlow already passes
+   the light or dark mode through and styles the buttons with Bootstrap classes,
+   so only the popup surface itself needs the Nexus treatment. */
+.nexus-theme .swal2-popup {
+    background: var(--nexus-surface);
+    border: 1px solid var(--nexus-border);
+    border-radius: var(--nexus-radius-lg);
+    box-shadow: var(--nexus-shadow);
+    color: var(--nexus-copy);
+    font-family: var(--nexus-font-interface);
+}
+
+.nexus-theme .swal2-title {
+    color: var(--nexus-text);
+    font-family: var(--nexus-font-display);
+    font-weight: 750;
+}
+
+.nexus-theme .swal2-html-container {
+    color: var(--nexus-copy);
+}
+
+.nexus-theme .swal2-icon.swal2-question,
+.nexus-theme .swal2-icon.swal2-info {
+    border-color: var(--nexus-cyan);
+    color: var(--nexus-cyan);
+}
+
+.nexus-theme .swal2-icon.swal2-warning {
+    border-color: var(--nexus-warning);
+    color: var(--nexus-warning);
+}
+
+.nexus-theme .swal2-container.swal2-backdrop-show {
+    background: rgba(11, 10, 23, 0.55);
+}
+
+.nexus-theme .swal2-show {
+    animation: nexus-popover-in var(--nexus-motion-duration) var(--nexus-motion-ease) both;
+}
+
+/* intl-tel-input: 26.09 puts it on every phone field, agent and portal alike. */
+.nexus-theme .iti {
+    width: 100%;
+}
+
+.nexus-theme .iti__dropdown-content,
+.nexus-theme .iti__country-list {
+    background: var(--nexus-surface);
+    border: 1px solid var(--nexus-border);
+    border-radius: var(--nexus-radius);
+    box-shadow: var(--nexus-shadow);
+    color: var(--nexus-text);
+}
+
+.nexus-theme .iti__search-input {
+    background: var(--nexus-surface-2);
+    border-bottom: 1px solid var(--nexus-border);
+    color: var(--nexus-text);
+}
+
+.nexus-theme .iti__country.iti__highlight {
+    background: rgba(105, 191, 245, 0.14);
+}
+
+.nexus-theme .iti__dial-code {
+    color: var(--nexus-muted);
+}
+
+/* Paginated lists (filter_footer.php), the statement modal's tabs, and
+   list groups. */
+.nexus-theme .pagination {
+    --bs-pagination-bg: var(--nexus-surface);
+    --bs-pagination-color: var(--nexus-copy);
+    --bs-pagination-border-color: var(--nexus-border);
+    --bs-pagination-hover-bg: var(--nexus-surface-2);
+    --bs-pagination-hover-color: var(--nexus-text);
+    --bs-pagination-hover-border-color: var(--nexus-border);
+    --bs-pagination-focus-box-shadow: var(--nexus-focus);
+    --bs-pagination-active-bg: var(--nexus-cyan);
+    --bs-pagination-active-border-color: var(--nexus-cyan);
+    --bs-pagination-active-color: var(--nexus-primary-contrast);
+    --bs-pagination-disabled-bg: var(--nexus-surface-2);
+    --bs-pagination-disabled-color: var(--nexus-muted);
+    --bs-pagination-disabled-border-color: var(--nexus-border);
+}
+
+.nexus-theme .nav-tabs {
+    --bs-nav-tabs-border-color: var(--nexus-border);
+    --bs-nav-tabs-link-hover-border-color: var(--nexus-border) var(--nexus-border) transparent;
+    --bs-nav-tabs-link-active-bg: var(--nexus-surface);
+    --bs-nav-tabs-link-active-color: var(--nexus-text);
+    --bs-nav-tabs-link-active-border-color: var(--nexus-border) var(--nexus-border) var(--nexus-surface);
+}
+
+.nexus-theme .nav-tabs .nav-link {
+    color: var(--nexus-copy);
+}
+
+.nexus-theme .nav-tabs .nav-link.active {
+    box-shadow: inset 0 2px 0 var(--nexus-cyan);
+}
+
+.nexus-theme .list-group {
+    --bs-list-group-bg: var(--nexus-surface);
+    --bs-list-group-color: var(--nexus-copy);
+    --bs-list-group-border-color: var(--nexus-border);
+    --bs-list-group-action-hover-bg: var(--nexus-surface-2);
+    --bs-list-group-action-hover-color: var(--nexus-text);
+    --bs-list-group-active-bg: var(--nexus-cyan);
+    --bs-list-group-active-border-color: var(--nexus-cyan);
+    --bs-list-group-active-color: var(--nexus-primary-contrast);
+}
+
+/* Quick Send leads the invoice and quote action menus with a bolt; give it the
+   accent so it reads as the one-click path rather than just another item. */
+.nexus-theme .dropdown-item .fa-bolt {
+    color: var(--nexus-warning) !important;
+}
+
+/* Dark header surfaces - a card-dark header, anything bg-dark, the user-menu
+   header - set a white foreground on the header element, but the titles inside
+   carry colours of their own: .card-title takes --nexus-text and headings take
+   Bootstrap's heading colour. Both are dark in light mode, so the title went dark
+   on the dark bar. Measured on a live install in light mode: 1.39:1 against a
+   4.5:1 requirement, on every such header - the agent ticket queue among them,
+   not only the 26.09 surfaces. Dark mode hid it because the text token is light
+   there. Titles, headings and bare icons now inherit the header's foreground;
+   buttons, badges and explicit colour utilities keep their own. */
+.nexus-theme .card-dark > .card-header :is(.card-title, h1, h2, h3, h4, h5, h6, .modal-title),
+.nexus-theme .card-dark > .card-header > :is(i, .fa, .fas, .far, .fab),
+.nexus-theme :is(.card-header, .modal-header, .user-header).bg-dark :is(.card-title, h1, h2, h3, h4, h5, h6, .modal-title),
+.nexus-theme :is(.card-header, .modal-header, .user-header).bg-dark :is(.card-title, h1, h2, h3, h4, h5, h6) > :is(i, .fa, .fas, .far, .fab):not([class*="text-"]) {
+    color: inherit;
+}
+
+/* The rebuilt guest approval page leads with a dark card header and a large
+   approve action; its confirmation screens are bare alerts. */
+.nexus-theme.nexus-guest .card-header.bg-dark :is(.card-title, h3, h4) {
+    font-family: var(--nexus-font-display);
+}
+
+.nexus-theme .alert.d-inline-block {
+    border-radius: var(--nexus-radius-lg);
+    padding: 0.85rem 1.25rem;
+}
+
+.nexus-theme .btn-lg {
+    border-radius: var(--nexus-radius-lg);
+    font-weight: 750;
+    padding: 0.7rem 1.6rem;
+}

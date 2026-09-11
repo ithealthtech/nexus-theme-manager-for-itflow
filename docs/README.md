@@ -26,6 +26,7 @@ your target version before installing.
 
 | Version | Notes |
 | --- | --- |
+| 4.2.0 | [release-v4.2.0.md](release-v4.2.0.md) |
 | 4.1.0 | [release-v4.1.0.md](release-v4.1.0.md) |
 | 4.0.0 | [release-v4.0.0.md](release-v4.0.0.md) |
 | 3.9.1 | [release-v3.9.1.md](release-v3.9.1.md) |
