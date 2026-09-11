@@ -168,14 +168,22 @@ $sql_assigned_assets = mysqli_query(
 );
 
 ?>
+<?php if ($nexus_theme_enabled ?? false) { ?>
 <div class="nexus-ticket-title">
     <div>
         <span class="nexus-eyebrow">Support overview</span>
         <h1 class="h2 mb-1">How can we help?</h1>
         <p class="text-muted mb-0">Start a request or review your account and technology information.</p>
     </div>
-    <a href="ticket_add.php" class="btn nexus-portal-cta"><i class="fas fa-plus mr-2" aria-hidden="true"></i>Create support request</a>
+    <a href="ticket_add.php" class="btn nexus-portal-cta"><i class="fas fa-plus me-2" aria-hidden="true"></i>Create support request</a>
 </div>
+<?php } else { ?>
+<div class="row">
+    <div class="col-md-2">
+        <a href="ticket_add.php" class="btn btn-primary w-100 mb-3">New ticket</a>
+    </div>
+</div>
+<?php } ?>
 <?php
 // Billing Cards
 if (contactCan('accounting')) { ?>
@@ -224,7 +232,7 @@ if (contactCan('itdoc')) {
         <a href="domains.php">
             <div  class="card text-dark">
                 <div class="card-header">
-                    <h3 class="card-title text-bold"><i class="fas fa-fw fa-globe mr-2"></i>Domains Expiring</h3>
+                    <h3 class="card-title text-bold"><i class="fas fa-fw fa-globe me-2"></i>Domains Expiring</h3>
                 </div>
                 <div class="card-body">
                     <?php
@@ -262,7 +270,7 @@ if (contactCan('itdoc')) {
     <div class="col-sm-3">
         <a href="assets.php" class="card text-dark">
             <div class="card-header">
-                <h3 class="card-title"><i class="fas fa-fw fa-desktop mr-2"></i>Your Assigned Assets</h3>
+                <h3 class="card-title"><i class="fas fa-fw fa-desktop me-2"></i>Your Assigned Assets</h3>
             </div>
             <div class="card-body">
                 <table>
@@ -276,7 +284,7 @@ if (contactCan('itdoc')) {
 
                     ?>
                     <tr>
-                        <td><i class=" text-secondary mr-2"></i><?php if ($asset_uri_client) { ?><a href="<?= $asset_uri_client ?>" target="_blank"><i class='fas fa-external-link-alt mr-2'></i></a><?php } ?><?= $asset_name ?></td>
+                        <td><i class=" text-secondary me-2"></i><?php if ($asset_uri_client) { ?><a href="<?= $asset_uri_client ?>" target="_blank"><i class='fas fa-external-link-alt me-2'></i></a><?php } ?><?= $asset_name ?></td>
                         <td class="text-secondary">(<?= $asset_type ?>)</td>
                     </tr>
                     <?php

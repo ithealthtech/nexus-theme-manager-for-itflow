@@ -2,6 +2,132 @@
 
 All notable changes to this project are documented here.
 
+## [4.2.0] - 2026-09-10
+
+Styles the surfaces ITFlow 26.09 added, and fixes two 4.0.0 gaps that affected
+every page. See docs/release-v4.2.0.md.
+
+### Added
+
+- Component-level coverage for the new 26.09 surfaces, rather than per-page
+  overlays: `thead.table-dark` (statements, portal activity), SweetAlert2 dialogs
+  (Quick Send, Mark Sent, guest approve and decline), intl-tel-input (every phone
+  field), monospace and tabular figures (IP section, statement money columns),
+  pagination, statement-modal tabs, the SLA holiday list group, Quick Send's bolt,
+  and the guest approval action and confirmation screens. No new ITFlow template
+  is overlaid.
+
+### Fixed
+
+- Page titles were unreadable in light mode since 4.0.0: titles and headings inside
+  dark header surfaces (`card-dark`, `bg-dark`, the user-menu header) kept their
+  own dark colour against the dark bar, measuring 1.39:1 against WCAG's 4.5:1.
+  ITFlow uses these headers in 115 files, including the ticket, client, invoice
+  and user lists. Titles, headings and bare icons now inherit the header's
+  foreground.
+- Row striping and hover tints were invisible on every table since 4.0.0: Bootstrap
+  5 paints each cell with `--bs-table-bg` above the row, hiding the `<tr>` tint.
+  Nexus now drives the Bootstrap table variables instead.
+- The Nexus page colour never reached the page since 4.0.0: ITFlow's
+  `bg-body-tertiary` on `<body>` is `!important`, so the page painted Bootstrap's
+  tertiary grey under Nexus cards on the agent, client and guest surfaces. Matched
+  at higher specificity so the ground follows the live palette and mode.
+
+### Validation
+
+- Rendered against a live ITFlow 26.09.3 with the real stylesheet stack and
+  colour-mode script; every rule confirmed by computed style on the agent, client
+  and guest surfaces.
+
+## [4.1.0] - 2026-09-03
+
+Closes the known issue 4.0.0 shipped with: ITFlow 26.09 updates silently revert
+the Nexus overlay, and nothing told you.
+
+### Added
+
+- `manager.php reapply` restores managed files an ITFlow update reverted, then
+  verifies. It refuses when any managed file was changed to something that is
+  neither this package nor the supported ITFlow baseline — that is somebody's own
+  edit, and it is named rather than overwritten. `--force` overwrites anyway.
+- `manager.php status` now classifies drift three ways — reverted by an ITFlow
+  update, missing, or modified outside the manager — and says which action fits.
+  It also reports the detected ITFlow version and whether it is supported. The
+  JSON output carries `drift`, `drift_counts` and `reapply_recommended`.
+- Theme Studio's Updates & system workspace reports reverted surfaces by name,
+  with the command that restores them. The existing health card cannot see this:
+  every Nexus-owned file is still present after an ITFlow update, so it reported
+  perfect health while the login page and client portal had gone back to stock.
+- `nexusThemeOverlayDrift()` backs that check. It is a marker test rather than a
+  hash comparison because `manifest.json` ships with the package and is never
+  installed into the ITFlow tree, so the web layer has no hashes to compare
+  against. `manager.php verify` remains the exact check.
+
+### Changed
+
+- A compatibility failure caused by the wrong ITFlow release now leads with the
+  versions — "this installation is 26.08.9, this package supports 26.09" — instead
+  of sixteen identical hash-mismatch lines. A tampered tree at the supported
+  release keeps the original message.
+
+### Validation
+
+- New `tests/drift.php`: 23 assertions covering detection, restore, idempotence,
+  refusal, `--force`, the disabled-mode refusal, and both compatibility-gate
+  paths. Wired into CI. Lifecycle grows to 275.
+
+## [4.0.0] - 2026-09-03
+
+Nexus now targets ITFlow 26.09. This is a clean break: 4.0.0 does not install on
+26.08, and 3.9.1 remains the last release for installations still on it.
+
+### Breaking
+
+- Supported ITFlow moves from release 26.08 (`89b080b4`) to release 26.09
+  (`5dcc99d8`). All sixteen baselined ITFlow templates changed upstream, so the
+  package refuses to install on 26.08 exactly as it refuses any unsupported tree.
+- Custom CSS written against the Nexus 3.x class surface needs revisiting. The
+  AdminLTE 3 layout names Nexus styled (`content-wrapper`, `main-sidebar`,
+  `main-header`, `nav-sidebar`) are now `app-content`, `app-sidebar`,
+  `app-header` and `sidebar-menu`.
+
+### Changed
+
+- Migrated the whole managed surface to AdminLTE 4.9 and Bootstrap 5.3, matching
+  ITFlow 26.09: renamed layout skeleton, `data-bs-*` toggles, `form-select`,
+  input groups without `input-group-append`/`-prepend` wrappers, `text-bg-*`
+  badges, and the `me-*`/`ms-*`/`float-end`/`text-start` utility spellings.
+- Replaced the select2 and daterangepicker styling with Tom Select and Flatpickr
+  selectors, and dropped the jQuery and toastr script tags ITFlow no longer ships.
+- Nexus dark mode now drives `data-bs-theme`, `data-color-scheme` and the
+  `color-scheme` meta itself. 26.09 disables AdminLTE 4's colour-mode manager
+  (`data-lte-color-mode="off"`), and Bootstrap 5.3 reads only that attribute, so
+  without this the framework components stayed light while the Nexus palette
+  went dark. `nexusThemeInitialDarkMode()` resolves the server-rendered first
+  paint and defers to ITFlow's per-user setting when the mode is `system`.
+- Nexus stylesheets load after `css/itflow_custom.css`, the AdminLTE 3
+  compatibility layer 26.09 introduced, so the managed theme still wins.
+- Re-authored `client/profile.php` against the page ITFlow rebuilt upstream; its
+  own labels and inputs are now correctly associated, so Nexus only supplies the
+  heading treatment.
+- Theme Studio's runtime previews render the AdminLTE 4 shell, so preview and
+  live surfaces agree again.
+
+### Fixed
+
+- Added the `.input-group > .form-control-color` width rule at matching
+  specificity. Bootstrap 5's `.input-group > .form-control` at (0,2,0) otherwise
+  outranks `.form-control-color`'s `width:3rem` at (0,1,0) and collapses colour
+  swatches.
+- Restored explicit foreground colours on `bg-dark` cards, modal headers and the
+  user menu header, which Bootstrap 5 split out into `.text-bg-*`.
+
+### Validation
+
+- Lifecycle 272 assertions, updater 38, upgrade 8 — all passing against the
+  migrated package. Test fixtures updated for the AdminLTE 4 selectors and the
+  4.x version line.
+
 ## [3.9.1] - 2026-08-25
 
 ### Fixed

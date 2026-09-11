@@ -579,11 +579,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_POST['login']) || isset($_
                                 <input type='text' inputmode='numeric' pattern='[0-9]*' maxlength='6'
                                        class='form-control' id='current_code' autocomplete='one-time-code' placeholder='6-digit code'
                                        name='current_code' required autofocus>
-                                <div class='input-group-append'>
                                   <div class='input-group-text'>
                                     <span class='fas fa-key'></span>
                                   </div>
-                                </div>
                             </div>";
 
                         if ($mfa_locked) {
@@ -712,7 +710,7 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
 
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light" data-lte-color-mode="off">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -727,9 +725,11 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
     <?php } ?>
 
     <link rel="stylesheet" href="libs/adminlte/css/adminlte.min.css">
+    <link rel="stylesheet" href="css/itflow_custom.css">
     <?php if ($nexus_theme_enabled) { ?>
         <link rel="stylesheet" href="css/nexus-theme.css?v=<?= escapeHtml(NEXUS_THEME_VERSION) ?>">
         <link rel="stylesheet" href="css/nexus-theme-custom.php?v=<?= nexusThemeSettingsVersion() ?>">
+        <script><?= nexusThemeColorModeScript($nexus_theme_settings) ?></script>
     <?php } ?>
 </head>
 <body class="hold-transition login-page <?= $nexus_theme_enabled ? 'nexus-theme nexus-auth ' . $nexus_theme_presentation['body_classes'] : '' ?>">
@@ -739,11 +739,13 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
     $nexus_login_logo = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThemeLogoUrl($nexus_theme_settings, !empty($company_logo) ? "/uploads/settings/$company_logo" : '', nexusThemeLogoVariantForColor($nexus_theme_settings['colors']['auth_background'])), $nexus_theme_settings) : (!empty($company_logo) ? "uploads/settings/$company_logo" : '');
     $nexus_login_has_logo = $nexus_login_logo !== '' && (!$nexus_theme_enabled || $nexus_theme_settings['branding']['show_login_logo']);
     ?>
-    <div class="login-logo <?= $nexus_login_has_logo ? 'nexus-auth-brand--logo' : 'nexus-auth-brand--text' ?>">
+    <div class="login-logo <?= $nexus_theme_enabled ? ($nexus_login_has_logo ? 'nexus-auth-brand--logo' : 'nexus-auth-brand--text') : '' ?>">
         <?php if ($nexus_login_has_logo) { ?>
             <img alt="<?= escapeHtml($nexus_theme_enabled ? ($nexus_theme_settings['branding']['logo_alt'] ?: nexusThemeBrandName($company_name, $nexus_theme_settings) . ' logo') : $company_name . ' logo') ?>" height="110" width="380" class="img-fluid" <?= $nexus_theme_enabled ? 'data-nexus-color-logo' : '' ?> src="<?= escapeHtml($nexus_login_logo) ?>">
+        <?php } elseif ($nexus_theme_enabled) { ?>
+            <span class="nexus-fallback-logo"><i class="fas fa-layer-group me-2" aria-hidden="true"></i><?= escapeHtml($nexus_theme_presentation['brand']) ?></span>
         <?php } else { ?>
-            <span class="nexus-fallback-logo"><i class="fas fa-layer-group mr-2" aria-hidden="true"></i><?= escapeHtml($nexus_theme_enabled ? $nexus_theme_presentation['brand'] : $company_name) ?></span>
+            <span class="text-primary text-bold"><i class="fas fa-paper-plane me-2"></i>IT</span>Flow
         <?php } ?>
     </div>
 
@@ -752,32 +754,32 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
 
             <?php if ($nexus_theme_enabled) { ?>
                 <span class="nexus-eyebrow"><?= escapeHtml($nexus_theme_settings['content']['login_eyebrow']) ?></span>
+                <h1 class="nexus-auth-title">
+                    <?php if ($show_role_choice) { ?>Choose your workspace<?php } elseif ($show_mfa_form) { ?>Verify your identity<?php } else { ?><?= escapeHtml($nexus_theme_settings['content']['login_heading']) ?><?php } ?>
+                </h1>
+                <p class="nexus-auth-copy">
+                    <?php if ($show_role_choice) { ?>Select the workspace you need for this session.<?php } elseif ($show_mfa_form) { ?>Enter the code from your authenticator to continue securely.<?php } else { ?><?= nl2br(escapeHtml($nexus_theme_settings['content']['login_message'])) ?><?php } ?>
+                </p>
             <?php } ?>
-            <h1 class="nexus-auth-title">
-                <?php if ($show_role_choice) { ?>Choose your workspace<?php } elseif ($show_mfa_form) { ?>Verify your identity<?php } elseif ($nexus_theme_enabled) { ?><?= escapeHtml($nexus_theme_settings['content']['login_heading']) ?><?php } else { ?>Welcome back<?php } ?>
-            </h1>
-            <p class="nexus-auth-copy">
-                <?php if ($show_role_choice) { ?>Select the workspace you need for this session.<?php } elseif ($show_mfa_form) { ?>Enter the code from your authenticator to continue securely.<?php } elseif ($nexus_theme_enabled) { ?><?= nl2br(escapeHtml($nexus_theme_settings['content']['login_message'])) ?><?php } else { ?>Sign in to continue.<?php } ?>
-            </p>
 
             <?php if (!empty($config_login_message)){ ?>
                 <p class="login-box-msg px-0"><?= nl2br($config_login_message) ?></p>
             <?php } ?>
 
             <?php if (!empty($_SESSION['login_message'])) { ?>
-                <div class="alert alert-danger" role="alert"><?= escapeHtml($_SESSION['login_message']) ?></div>
+                <div class="alert alert-danger"><?= escapeHtml($_SESSION['login_message']) ?></div>
                 <?php unset($_SESSION['login_message']); ?>
             <?php } ?>
 
             <?php if (isset($response)) { ?>
-                <div aria-live="polite"><?= $response ?></div>
+                <p><?= $response ?></p>
             <?php } ?>
 
             <form method="post">
 
                 <?php if ($show_login_form): ?>
                     <!-- STEP 1: Email + Password -->
-                    <label class="nexus-field-label" for="login-email">Email address</label>
+                    <?php if ($nexus_theme_enabled) { ?><label class="nexus-field-label" for="login-email">Email address</label><?php } ?>
                     <div class="input-group mb-3">
                         <input type="email" class="form-control"
                             id="login-email"
@@ -786,24 +788,20 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
                             value="<?= htmlspecialchars($email ?? '', ENT_QUOTES) ?>"
                             autocomplete="username" required autofocus
                         >
-                        <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope" aria-hidden="true"></span>
                             </div>
-                        </div>
                     </div>
 
-                    <label class="nexus-field-label" for="login-password">Password</label>
+                    <?php if ($nexus_theme_enabled) { ?><label class="nexus-field-label" for="login-password">Password</label><?php } ?>
                     <div class="input-group mb-3">
                         <input type="password" class="form-control" id="login-password" placeholder="Password" name="password" autocomplete="current-password" required>
-                        <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-lock" aria-hidden="true"></span>
                             </div>
-                        </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block mb-3" name="login">Sign In</button>
+                    <button type="submit" class="btn btn-primary w-100 mb-3" name="login">Sign In</button>
                 <?php endif; ?>
 
                 <?php if ($show_role_choice): ?>
@@ -812,11 +810,11 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
                            value="<?= htmlspecialchars($_SESSION['pending_dual_login']['token'] ?? '', ENT_QUOTES) ?>">
 
                     <div class="mb-2 text-center">
-                        <button type="submit" class="btn btn-dark btn-block mb-2" name="role_choice" value="agent">
-                            <i class="fas fa-user-cog mr-2" aria-hidden="true"></i>Log in as Agent
+                        <button type="submit" class="btn btn-dark w-100 mb-2" name="role_choice" value="agent">
+                            <i class="fas fa-user-cog me-2" aria-hidden="true"></i>Log in as Agent
                         </button>
-                        <button type="submit" class="btn btn-light btn-block" name="role_choice" value="client">
-                            <i class="fas fa-building mr-2" aria-hidden="true"></i>Log in as Client
+                        <button type="submit" class="btn btn-light w-100" name="role_choice" value="client">
+                            <i class="fas fa-building me-2" aria-hidden="true"></i>Log in as Client
                         </button>
                     </div>
                 <?php endif; ?>
@@ -828,14 +826,14 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
                     <input type="hidden" name="pending_mfa_token"
                            value="<?= htmlspecialchars($_SESSION['pending_mfa_login']['token'] ?? '', ENT_QUOTES) ?>">
 
-                    <div class="form-group mb-3">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="remember_me" name="remember_me">
-                            <label class="custom-control-label" for="remember_me">Remember Me</label>
+                    <div class="mb-3 mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me">
+                            <label class="form-check-label" for="remember_me">Remember Me</label>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block mb-3" name="mfa_login">Verify &amp; Sign In</button>
+                    <button type="submit" class="btn btn-primary w-100 mb-3" name="mfa_login">Verify &amp; Sign In</button>
                 <?php endif; ?>
 
             </form>
@@ -846,16 +844,26 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
                     <a href="client/login_reset.php">Forgot password?</a>
                 <?php } ?>
                 <?php if (!empty($azure_client_id)) { ?>
+                    <?php if ($nexus_theme_enabled) { ?>
                     <div class="text-center mt-3">
-                        <a href="client/login_microsoft.php" class="btn btn-secondary btn-block"><i class="fab fa-microsoft mr-2" aria-hidden="true"></i>Login with Microsoft Entra</a>
+                        <a href="client/login_microsoft.php" class="btn btn-secondary w-100"><i class="fab fa-microsoft me-2" aria-hidden="true"></i>Login with Microsoft Entra</a>
                     </div>
+                    <?php } else { ?>
+                    <div class="col text-center mt-2">
+                        <a href="client/login_microsoft.php">
+                            <button type="button" class="btn btn-secondary">Login with Microsoft Entra</button>
+                        </a>
+                    </div>
+                    <?php } ?>
                 <?php } ?>
             <?php } ?>
 
+            <?php if ($nexus_theme_enabled) { ?>
             <div class="nexus-security-note">
                 <i class="fas fa-shield-alt" aria-hidden="true"></i>
                 <span>Your connection to this support portal is protected. Never share your password or authentication code.</span>
             </div>
+            <?php } ?>
 
         </div>
     </div>
@@ -865,11 +873,14 @@ $show_login_form = (!$show_role_choice && !$show_mfa_form);
     <?php } ?>
 
     <?php if (!$config_whitelabel_enabled) { ?>
-        <div class="nexus-auth-footer">Powered by ITFlow</div>
+        <?php if ($nexus_theme_enabled) { ?>
+            <div class="nexus-auth-footer">Powered by ITFlow</div>
+        <?php } else { ?>
+            <small class="text-muted">Powered by ITFlow</small>
+        <?php } ?>
     <?php } ?>
 </div>
 
-<script src="libs/jquery/jquery.min.js"></script>
 <script src="libs/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="libs/adminlte/js/adminlte.min.js"></script>
 <script src="js/login_prevent_resubmit.js"></script>

@@ -2,7 +2,7 @@
 
 ## Why this is a manager rather than a native ITFlow plugin
 
-The supported ITFlow 26.08 source exposes an administration color selector, but it does not provide a plugin loader, theme manifest, template override registry, or lifecycle hooks. The official project distributes the application as a source checkout, and the official installer deploys that checkout directly.
+The supported ITFlow 26.09 source exposes an administration color selector, but it does not provide a plugin loader, theme manifest, template override registry, or lifecycle hooks. The official project distributes the application as a source checkout, and the official installer deploys that checkout directly.
 
 A web-upload installer would have to introduce a PHP endpoint capable of replacing application code. Nexus does not do that. Installation, update execution, rollback, disable, and uninstall remain root-owned operations outside the web process. The installed administration page manages allow-listed presentation settings and raster branding assets and may queue only a fixed `check` or `update` request through ITFlow's administrator session, CSRF validation, audit log, and POST-handler conventions.
 

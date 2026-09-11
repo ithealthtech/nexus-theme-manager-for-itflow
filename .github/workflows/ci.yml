@@ -44,6 +44,9 @@ jobs:
       - name: Run command-line upgrade tests
         run: php tests/upgrade.php
 
+      - name: Run drift detection and reapply tests
+        run: php tests/drift.php
+
       - name: Run installer upgrade integration
         run: sudo sh tests/install_latest.sh
 

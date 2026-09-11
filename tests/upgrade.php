@@ -99,6 +99,29 @@ function upgradeFixture(string $package, string $fixture): void
     file_put_contents($fixture . DIRECTORY_SEPARATOR . 'config.php', "<?php\n// Upgrade test fixture.\n");
 }
 
+/*
+ * Fixture versions either side of the package's own, derived rather than
+ * hard-coded: the updater refuses to install a package older than the one in
+ * place, so a literal here silently turns into a downgrade-protection failure
+ * the next time the real version is bumped past it.
+ */
+function upgradeVersionOffset(string $package, int $offset): string
+{
+    $manifest = json_decode(
+        (string)file_get_contents($package . DIRECTORY_SEPARATOR . 'manifest.json'),
+        true,
+        512,
+        JSON_THROW_ON_ERROR
+    );
+    $parts = array_map('intval', explode('.', (string)$manifest['package_version']) + [0, 0, 0]);
+    $patch = $parts[2] + $offset;
+    if ($patch < 0) {
+        $parts[1]--;
+        $patch = 99;
+    }
+    return $parts[0] . '.' . $parts[1] . '.' . $patch;
+}
+
 function upgradeState(string $root, string $stateRoot): array
 {
     $resolved = realpath($root);
@@ -118,7 +141,7 @@ try {
     mkdir($testRoot, 0777, true);
     $currentPackage = $testRoot . DIRECTORY_SEPARATOR . 'current-package';
     upgradeCopyTree($packageRoot, $currentPackage);
-    upgradeWritePackageVersion($currentPackage, '3.9.0');
+    upgradeWritePackageVersion($currentPackage, upgradeVersionOffset($packageRoot, -1));
 
     $fixture = $testRoot . DIRECTORY_SEPARATOR . 'itflow';
     $stateRoot = $testRoot . DIRECTORY_SEPARATOR . 'state';
@@ -148,7 +171,7 @@ try {
     upgradeRun(array_merge([PHP_BINARY, $packageRoot . DIRECTORY_SEPARATOR . 'manager.php', 'disable'], $common, ['--yes']), 0);
     $failedPackage = $testRoot . DIRECTORY_SEPARATOR . 'failed-package';
     upgradeCopyTree($packageRoot, $failedPackage);
-    upgradeWritePackageVersion($failedPackage, '3.9.2');
+    upgradeWritePackageVersion($failedPackage, upgradeVersionOffset($packageRoot, 1));
     file_put_contents($failedPackage . DIRECTORY_SEPARATOR . 'baseline' . DIRECTORY_SEPARATOR . 'login.php', "<?php\n// Deliberate package-integrity failure.\n");
 
     [, $rollbackError] = upgradeRun([

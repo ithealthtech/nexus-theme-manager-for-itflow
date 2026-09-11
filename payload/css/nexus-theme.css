@@ -66,7 +66,7 @@
 @media (max-width:767.98px) {
     .nexus-asset-health-grid,.nexus-preview-comparison { grid-template-columns:1fr; }
     .nexus-navigation-row { grid-template-columns:auto auto 1fr; }
-    .nexus-navigation-row .form-control,.nexus-navigation-row .custom-select { grid-column:1/-1; }
+    .nexus-navigation-row .form-control,.nexus-navigation-row .form-select { grid-column:1/-1; }
 }
 
 .nexus-theme.dark-mode,
@@ -270,10 +270,9 @@
 }
 
 .nexus-theme .form-control,
-.nexus-theme .custom-select,
+.nexus-theme .form-select,
 .nexus-theme .input-group-text,
-.nexus-theme .select2-container--default .select2-selection--single,
-.nexus-theme .select2-container--default .select2-selection--multiple {
+.nexus-theme .ts-control {
     background: var(--nexus-surface-2);
     border-color: var(--nexus-border);
     border-radius: var(--nexus-radius);
@@ -287,8 +286,8 @@
 }
 
 .nexus-theme .form-control:focus,
-.nexus-theme .custom-select:focus,
-.nexus-theme .select2-container--focus .select2-selection {
+.nexus-theme .form-select:focus,
+.nexus-theme .ts-wrapper.focus .ts-control {
     background: var(--nexus-surface);
     border-color: var(--nexus-cyan);
     box-shadow: var(--nexus-focus);
@@ -301,12 +300,12 @@
     justify-content: center;
 }
 
-.nexus-theme .custom-control-label::before {
+.nexus-theme .form-check-input {
     background: var(--nexus-surface-2);
     border-color: var(--nexus-border);
 }
 
-.nexus-theme .custom-control-input:checked ~ .custom-control-label::before {
+.nexus-theme .form-check-input:checked {
     background: var(--nexus-cyan);
     border-color: var(--nexus-cyan);
 }
@@ -315,8 +314,8 @@
     color: var(--nexus-muted);
 }
 
-.nexus-theme .select2-dropdown,
-.nexus-theme .daterangepicker,
+.nexus-theme .ts-dropdown,
+.nexus-theme .flatpickr-calendar,
 .nexus-theme .dropdown-menu {
     background: var(--nexus-surface);
     border: 1px solid var(--nexus-border);
@@ -326,13 +325,13 @@
 }
 
 .nexus-theme .dropdown-item,
-.nexus-theme .select2-results__option {
+.nexus-theme .ts-dropdown .option {
     color: var(--nexus-text);
 }
 
 .nexus-theme .dropdown-item:hover,
 .nexus-theme .dropdown-item:focus,
-.nexus-theme .select2-results__option--highlighted[aria-selected] {
+.nexus-theme .ts-dropdown .option.active {
     background: rgba(105, 191, 245, 0.14);
     color: var(--nexus-text);
 }
@@ -382,8 +381,8 @@ body.nexus-theme .modal-backdrop.show {
 .nexus-theme .dropdown-menu.show,
 .nexus-theme .popover.show,
 .nexus-theme .tooltip.show,
-.nexus-theme .select2-container--open .select2-dropdown,
-.nexus-theme .daterangepicker.show-calendar {
+.nexus-theme .ts-dropdown,
+.nexus-theme .flatpickr-calendar.open {
     animation: nexus-popover-in var(--nexus-motion-duration) var(--nexus-motion-ease) both;
 }
 
@@ -463,28 +462,28 @@ body.nexus-theme .modal-backdrop.show {
     letter-spacing: 0.02em;
 }
 
-.nexus-theme .badge-primary,
-.nexus-theme .badge-info {
+.nexus-theme .text-bg-primary,
+.nexus-theme .text-bg-info {
     background: #176f9f;
     color: var(--nexus-white);
 }
 
-.nexus-theme .badge-success {
+.nexus-theme .text-bg-success {
     background: #147a58;
     color: var(--nexus-white);
 }
 
-.nexus-theme .badge-danger {
+.nexus-theme .text-bg-danger {
     background: #bd3042;
     color: var(--nexus-white);
 }
 
-.nexus-theme .badge-warning {
+.nexus-theme .text-bg-warning {
     background: var(--nexus-warning);
     color: var(--nexus-ink);
 }
 
-.nexus-theme .badge-light {
+.nexus-theme .text-bg-light {
     background: var(--nexus-surface-2);
     border: 1px solid var(--nexus-border);
     color: var(--nexus-text);
@@ -699,12 +698,12 @@ body.nexus-guest {
     min-height: 100vh;
 }
 
-.nexus-guest .wrapper,
-.nexus-guest .content-wrapper {
+.nexus-guest .app-wrapper,
+.nexus-guest .app-content {
     background: var(--nexus-page);
 }
 
-.nexus-guest .content-wrapper { min-height: calc(100vh - 7.5rem); }
+.nexus-guest .app-content { min-height: calc(100vh - 7.5rem); }
 .nexus-guest .content { padding: 1.75rem 0 2.5rem; }
 .nexus-guest .content > .container { max-width: 74rem; }
 
@@ -783,7 +782,7 @@ body.nexus-guest {
     .nexus-guest-tagline { text-align: center; }
     .nexus-guest .content { padding-top: 1rem; }
     .nexus-guest-invoice .card-header .row > div { flex: 0 0 100%; max-width: 100%; }
-    .nexus-guest-invoice .card-header .float-right { float: none !important; margin-top: 0.75rem; }
+    .nexus-guest-invoice .card-header .float-end { float: none !important; margin-top: 0.75rem; }
     .nexus-guest-invoice .card-body > .row:first-child > [class*="col-sm-"] { flex: 0 0 100%; max-width: 100%; text-align: center; }
     .nexus-guest-invoice .card-body > .row:first-child > .col-sm-2 { margin-bottom: 0.85rem; }
     .nexus-guest-invoice .card-body > .row:first-child > .col-sm-6 { margin-bottom: 1.35rem; }
@@ -797,7 +796,7 @@ body.nexus-guest {
     @page { margin: 11mm; }
     .nexus-guest { background: #fff !important; }
     .nexus-guest .content { padding: 0; }
-    .nexus-guest .content-wrapper { background: #fff !important; min-height: 0; }
+    .nexus-guest .app-content { background: #fff !important; min-height: 0; }
     .nexus-guest .content > .container { max-width: none; padding: 0; }
     .nexus-guest .nexus-guest-masthead.d-print-none {
         background: #fff !important;
@@ -961,46 +960,46 @@ body.nexus-client {
 }
 
 /* Agent and administrator shell */
-.nexus-agent .content-wrapper {
+.nexus-agent .app-content {
     background: var(--nexus-page);
     color: var(--nexus-copy);
 }
 
-.nexus-agent .main-header {
+.nexus-agent .app-header {
     background: var(--nexus-header, var(--nexus-night)) !important;
     border-bottom: 1px solid var(--nexus-border-dark);
 }
 
-.nexus-agent .main-header .nav-link,
-.nexus-agent .main-header .navbar-nav .nav-link {
+.nexus-agent .app-header .nav-link,
+.nexus-agent .app-header .navbar-nav .nav-link {
     color: var(--nexus-header-text, var(--nexus-cloud));
 }
 
-.nexus-agent.nexus-header-gradient .main-header {
+.nexus-agent.nexus-header-gradient .app-header {
     background: linear-gradient(110deg, var(--nexus-header) 0%, var(--nexus-violet) 52%, var(--nexus-cyan) 140%) !important;
     border-bottom-color: color-mix(in srgb, var(--nexus-cyan) 48%, transparent);
 }
 
-.nexus-agent.nexus-header-glass .main-header {
+.nexus-agent.nexus-header-glass .app-header {
     background: linear-gradient(105deg, color-mix(in srgb, var(--nexus-header) 76%, transparent), color-mix(in srgb, var(--nexus-cyan) 18%, transparent)) !important;
     backdrop-filter: blur(18px) saturate(145%);
     border-bottom-color: color-mix(in srgb, var(--nexus-cyan) 38%, transparent);
     box-shadow: 0 0.45rem 1.4rem rgba(0, 0, 0, 0.16);
 }
 
-.nexus-agent .main-header .form-control-navbar {
+.nexus-agent .app-header .form-control-navbar {
     background: rgba(255, 255, 255, 0.07);
     border-color: rgba(255, 255, 255, 0.12);
     color: var(--nexus-white);
 }
 
-.nexus-agent .main-header .btn-navbar {
+.nexus-agent .app-header .btn-navbar {
     background: rgba(255, 255, 255, 0.07);
     border-color: rgba(255, 255, 255, 0.12);
     color: var(--nexus-cyan);
 }
 
-.nexus-agent .main-sidebar {
+.nexus-agent .app-sidebar {
     background: var(--nexus-night);
     border-right: 1px solid var(--nexus-border-dark);
 }
@@ -1012,14 +1011,14 @@ body.nexus-client {
     min-height: 4.15rem;
 }
 
-.nexus-agent .main-sidebar .brand-link[href="/agent/dashboard.php"] {
+.nexus-agent .app-sidebar .brand-link[href="/agent/dashboard.php"] {
     align-items: center;
     display: flex;
     overflow: hidden;
     padding: 0.65rem 0.85rem;
 }
 
-.nexus-agent .main-sidebar .nexus-admin-back {
+.nexus-agent .app-sidebar .nexus-admin-back {
     align-items: center;
     background: rgba(255, 255, 255, 0.055);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -1032,8 +1031,8 @@ body.nexus-client {
     width: auto;
 }
 
-.nexus-agent .main-sidebar .nexus-admin-back:hover,
-.nexus-agent .main-sidebar .nexus-admin-back:focus {
+.nexus-agent .app-sidebar .nexus-admin-back:hover,
+.nexus-agent .app-sidebar .nexus-admin-back:focus {
     background: rgba(105, 191, 245, 0.12);
     border-color: rgba(105, 191, 245, 0.34);
     color: var(--nexus-white);
@@ -1104,7 +1103,7 @@ body.nexus-client {
     white-space: nowrap;
 }
 
-.nexus-agent .main-header [data-widget="pushmenu"] {
+.nexus-agent .app-header [data-widget="pushmenu"] {
     align-items: center;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -1117,8 +1116,8 @@ body.nexus-client {
     width: 2.35rem;
 }
 
-.nexus-agent .main-header [data-widget="pushmenu"]:hover,
-.nexus-agent .main-header [data-widget="pushmenu"]:focus {
+.nexus-agent .app-header [data-widget="pushmenu"]:hover,
+.nexus-agent .app-header [data-widget="pushmenu"]:focus {
     background: rgba(105, 191, 245, 0.14);
     border-color: rgba(105, 191, 245, 0.3);
     color: var(--nexus-white);
@@ -1138,36 +1137,36 @@ body.nexus-client {
     }
 }
 
-.nexus-agent .nav-sidebar .nav-header {
+.nexus-agent .sidebar-menu .nav-header {
     color: #8f96b5;
     font-size: 0.68rem;
     font-weight: 800;
     letter-spacing: 0.13em;
 }
 
-.nexus-agent .nav-sidebar .nav-link {
+.nexus-agent .sidebar-menu .nav-link {
     border-radius: var(--nexus-radius);
     color: #c8cad8;
     margin-bottom: 0.15rem;
 }
 
-.nexus-agent .nav-sidebar .nav-link:hover {
+.nexus-agent .sidebar-menu .nav-link:hover {
     background: rgba(105, 191, 245, 0.09);
     color: var(--nexus-white);
 }
 
-.nexus-agent .nav-sidebar > .nav-item > .nav-link.active {
+.nexus-agent .sidebar-menu > .nav-item > .nav-link.active {
     background: var(--nexus-gradient);
     box-shadow: none;
     color: var(--nexus-ink);
     font-weight: 700;
 }
 
-.nexus-agent .nav-sidebar > .nav-item > .nav-link.active .nav-icon {
+.nexus-agent .sidebar-menu > .nav-item > .nav-link.active .nav-icon {
     color: var(--nexus-ink);
 }
 
-.nexus-agent.nexus-navigation-pill .nav-sidebar .nav-link.active {
+.nexus-agent.nexus-navigation-pill .sidebar-menu .nav-link.active {
     background: var(--nexus-gradient) !important;
     border: 0 !important;
     box-shadow: none !important;
@@ -1175,11 +1174,11 @@ body.nexus-client {
     font-weight: 700;
 }
 
-.nexus-agent.nexus-navigation-pill .nav-sidebar .nav-link.active .nav-icon {
+.nexus-agent.nexus-navigation-pill .sidebar-menu .nav-link.active .nav-icon {
     color: var(--nexus-ink) !important;
 }
 
-.nexus-agent.nexus-navigation-rail .nav-sidebar .nav-link.active {
+.nexus-agent.nexus-navigation-rail .sidebar-menu .nav-link.active {
     background: color-mix(in srgb, var(--nexus-cyan) 14%, transparent) !important;
     border: 0 !important;
     border-left: 4px solid var(--nexus-cyan) !important;
@@ -1188,26 +1187,26 @@ body.nexus-client {
     color: var(--nexus-white) !important;
 }
 
-.nexus-agent.nexus-navigation-outline .nav-sidebar .nav-link.active {
+.nexus-agent.nexus-navigation-outline .sidebar-menu .nav-link.active {
     background: transparent !important;
     border: 2px solid var(--nexus-cyan) !important;
     box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--nexus-cyan) 18%, transparent) !important;
     color: var(--nexus-white) !important;
 }
 
-.nexus-agent.nexus-navigation-rail .nav-sidebar .nav-link.active .nav-icon,
-.nexus-agent.nexus-navigation-outline .nav-sidebar .nav-link.active .nav-icon {
+.nexus-agent.nexus-navigation-rail .sidebar-menu .nav-link.active .nav-icon,
+.nexus-agent.nexus-navigation-outline .sidebar-menu .nav-link.active .nav-icon {
     color: var(--nexus-cyan) !important;
 }
 
-.nexus-agent.nexus-menu-compact .nav-sidebar .nav-link { font-size: 0.82rem; line-height: 1.1; margin-bottom: 0; min-height: 2rem; padding: 0.3rem 0.55rem; }
-.nexus-agent.nexus-menu-compact .nav-sidebar .nav-header { padding-bottom: 0.2rem; padding-top: 0.4rem; }
-.nexus-agent.nexus-menu-spacious .nav-sidebar .nav-link { font-size: 1rem; line-height: 1.35; margin-bottom: 0.34rem; min-height: 3rem; padding: 0.78rem 0.8rem; }
-.nexus-agent.nexus-menu-spacious .nav-sidebar .nav-header { padding-bottom: 0.48rem; padding-top: 1rem; }
+.nexus-agent.nexus-menu-compact .sidebar-menu .nav-link { font-size: 0.82rem; line-height: 1.1; margin-bottom: 0; min-height: 2rem; padding: 0.3rem 0.55rem; }
+.nexus-agent.nexus-menu-compact .sidebar-menu .nav-header { padding-bottom: 0.2rem; padding-top: 0.4rem; }
+.nexus-agent.nexus-menu-spacious .sidebar-menu .nav-link { font-size: 1rem; line-height: 1.35; margin-bottom: 0.34rem; min-height: 3rem; padding: 0.78rem 0.8rem; }
+.nexus-agent.nexus-menu-spacious .sidebar-menu .nav-header { padding-bottom: 0.48rem; padding-top: 1rem; }
 .nexus-agent.nexus-sidebar-compact .sidebar { padding-left: 0.3rem; padding-right: 0.3rem; }
-.nexus-agent.nexus-sidebar-compact .nav-sidebar .nav-header { font-size: 0.56rem; letter-spacing: 0.09em; margin-top: 0; padding: 0.32rem 0.5rem 0.18rem; }
-.nexus-agent.nexus-sidebar-compact .nav-sidebar .nav-link { font-size: 0.78rem; gap: 0.25rem; line-height: 1.05; margin-bottom: 0; min-height: 1.9rem; padding: 0.28rem 0.45rem; }
-.nexus-agent.nexus-sidebar-compact .nav-sidebar .nav-icon { font-size: 0.8rem !important; margin-right: 0.2rem; width: 1.25rem; }
+.nexus-agent.nexus-sidebar-compact .sidebar-menu .nav-header { font-size: 0.56rem; letter-spacing: 0.09em; margin-top: 0; padding: 0.32rem 0.5rem 0.18rem; }
+.nexus-agent.nexus-sidebar-compact .sidebar-menu .nav-link { font-size: 0.78rem; gap: 0.25rem; line-height: 1.05; margin-bottom: 0; min-height: 1.9rem; padding: 0.28rem 0.45rem; }
+.nexus-agent.nexus-sidebar-compact .sidebar-menu .nav-icon { font-size: 0.8rem !important; margin-right: 0.2rem; width: 1.25rem; }
 
 .nexus-agent .content-header h1,
 .nexus-agent .content h1 {
@@ -1230,7 +1229,7 @@ body.nexus-client {
     color: var(--nexus-text);
 }
 
-.nexus-agent.dark-mode .content-wrapper,
+.nexus-agent.dark-mode .app-content,
 .nexus-agent.dark-mode .main-footer {
     background: var(--nexus-page);
     color: var(--nexus-copy);
@@ -1455,7 +1454,7 @@ body.nexus-client {
 .nexus-theme.nexus-density-compact .card-header { padding: 0.55rem 0.75rem; }
 .nexus-theme.nexus-density-compact .card-body { padding: 0.7rem; }
 .nexus-theme.nexus-density-compact .card-footer { padding: 0.5rem 0.7rem; }
-.nexus-theme.nexus-density-compact .form-group { margin-bottom: 0.55rem; }
+.nexus-theme.nexus-density-compact .mb-3 { margin-bottom: 0.55rem; }
 .nexus-theme.nexus-density-compact .table td,
 .nexus-theme.nexus-density-compact .table th { padding: 0.36rem 0.48rem; }
 .nexus-theme.nexus-density-compact .btn { padding-bottom: 0.3rem; padding-top: 0.3rem; }
@@ -1465,7 +1464,7 @@ body.nexus-client {
 .nexus-theme.nexus-density-spacious .card-header { padding: 1.25rem 1.5rem; }
 .nexus-theme.nexus-density-spacious .card-body { padding: 1.65rem; }
 .nexus-theme.nexus-density-spacious .card-footer { padding: 1rem 1.5rem; }
-.nexus-theme.nexus-density-spacious .form-group { margin-bottom: 1.35rem; }
+.nexus-theme.nexus-density-spacious .mb-3 { margin-bottom: 1.35rem; }
 .nexus-theme.nexus-density-spacious .table td,
 .nexus-theme.nexus-density-spacious .table th { padding: 0.95rem 1rem; }
 .nexus-theme.nexus-density-spacious .btn { padding-bottom: 0.62rem; padding-top: 0.62rem; }
@@ -2341,7 +2340,7 @@ body.nexus-client {
     .nexus-theme .modal-footer .btn { margin: 0 0 0.5rem !important; width: 100%; }
     .nexus-studio .btn,
     .nexus-studio .form-control,
-    .nexus-studio .custom-select { min-height: 2.75rem; }
+    .nexus-studio .form-select { min-height: 2.75rem; }
 }
 
 @media (max-width: 575.98px) {
@@ -2382,7 +2381,298 @@ body.nexus-client {
 
     .nexus-theme .card,
     .nexus-theme .table,
-    .nexus-theme .content-wrapper {
+    .nexus-theme .app-content {
         box-shadow: none !important;
     }
+}
+
+/* ---------------------------------------------------------------------------
+   ITFlow 26.09 compatibility (AdminLTE 4.9 / Bootstrap 5.3)
+   --------------------------------------------------------------------------- */
+
+/* Bootstrap 5's .input-group > .form-control is specificity (0,2,0) and outranks
+   .form-control-color's width:3rem at (0,1,0), which collapses every colour
+   swatch to the full field width. Matched at the same specificity rather than
+   overridden with a utility - w-auto only hands the width back to the UA
+   default, which is not 3rem. */
+.nexus-theme .input-group > .form-control-color {
+    flex: 0 0 auto;
+    width: 3rem;
+}
+
+/* Bootstrap 5 split .bg-* from .text-bg-*, so a .bg-dark card or modal header no
+   longer carries a foreground colour with it. Restored for the surfaces Nexus
+   paints, where the dark ground is ours rather than AdminLTE's. */
+.nexus-theme .card-header.bg-dark,
+.nexus-theme .modal-header.bg-dark,
+.nexus-theme .user-header.bg-dark {
+    color: var(--bs-light, #f8f9fa);
+}
+
+/* Nexus drives data-bs-theme itself: 26.09 sets data-lte-color-mode="off", which
+   disables AdminLTE 4's colour-mode manager, and Bootstrap 5.3 reads only that
+   attribute. Keeping the Nexus dark palette keyed to both means the managed
+   theme and the framework components never disagree about which mode is on. */
+:root[data-bs-theme="dark"] .nexus-theme,
+.nexus-theme.nexus-color-mode-dark {
+    color-scheme: dark;
+}
+
+/* Reverted-overlay notice (Updates & system workspace). Only rendered after an
+   ITFlow update has rewritten managed templates, so it is styled to read as a
+   standing condition to act on rather than an error. */
+.nexus-studio .nexus-drift-list {
+    list-style: none;
+    margin: 0 0 1rem;
+    padding: 0;
+    display: grid;
+    gap: 0.35rem;
+}
+
+.nexus-studio .nexus-drift-list li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: var(--nexus-radius);
+    background: var(--nexus-surface-2);
+}
+
+.nexus-studio .nexus-drift-list code {
+    color: var(--nexus-muted);
+    font-size: 0.85em;
+}
+
+.nexus-studio .nexus-drift-command {
+    margin: 0 0 0.5rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--nexus-border);
+    border-radius: var(--nexus-radius);
+    background: var(--nexus-surface-2);
+    overflow-x: auto;
+}
+
+.nexus-studio .nexus-drift-command code {
+    color: var(--nexus-text);
+    white-space: pre;
+}
+
+/* ---------------------------------------------------------------------------
+   ITFlow 26.09 surfaces
+   ---------------------------------------------------------------------------
+   Canned responses, SLA holidays, the subnet IP section, account statements,
+   Quick Send and Mark Sent, the rebuilt guest approval page and the portal
+   activity page are all assembled from stock Bootstrap 5 and AdminLTE 4 parts
+   rather than bespoke markup. They are covered here at component level instead
+   of with per-page overlays: no new ITFlow template to rebase each release, and
+   the next surface built from the same parts is themed on arrival. */
+
+/* Page ground. ITFlow 26.09 puts bg-body-tertiary on <body> in the agent, client
+   and guest headers - a Bootstrap utility declared !important - so the Nexus page
+   colour never reached the page: measured on a live install, the body painted
+   Bootstrap's dark tertiary #2b3035 under Nexus navy cards on all three surfaces.
+   Only .app-content in the agent shell was ever covered, and body.nexus-guest lost
+   to the utility.
+
+   Bootstrap's own lever is --bs-tertiary-bg-rgb, an RGB triplet, and cannot be
+   used: --nexus-page is a hex colour Theme Studio sets at runtime, and CSS has no
+   way to split one into the other. Matching the utility's !important at higher
+   specificity follows whatever palette and mode are live instead. */
+.nexus-theme.bg-body-tertiary {
+    background-color: var(--nexus-page) !important;
+}
+
+/* Bootstrap 5 tables paint every cell with --bs-table-bg, which sits above the
+   row. Tinting the <tr> - as the striped and hover rules further up do - is
+   therefore invisible under 26.09, and a thead.table-dark sets its own palette
+   through the same variables. Drive the variables instead of the elements. */
+.nexus-theme .table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--nexus-text);
+    --bs-table-border-color: var(--nexus-border);
+    --bs-table-striped-bg: rgba(120, 136, 255, 0.055);
+    --bs-table-striped-color: var(--nexus-text);
+    --bs-table-hover-bg: rgba(120, 136, 255, 0.09);
+    --bs-table-hover-color: var(--nexus-text);
+    --bs-table-active-bg: rgba(105, 191, 245, 0.14);
+}
+
+.nexus-theme .table-dark,
+.nexus-theme .table > thead.table-dark {
+    --bs-table-bg: var(--nexus-elevated);
+    --bs-table-color: var(--nexus-white);
+    --bs-table-border-color: var(--nexus-border);
+    --bs-table-striped-bg: var(--nexus-elevated);
+    --bs-table-hover-bg: var(--nexus-elevated);
+}
+
+.nexus-theme .table > thead.table-dark th {
+    color: var(--nexus-white);
+}
+
+/* Money and account columns on statements, IP addresses and hostnames on the
+   subnet view, and the portal activity log all lean on these utilities. */
+.nexus-theme .font-monospace {
+    font-family: var(--nexus-font-data) !important;
+    font-size: 0.92em;
+    font-variant-numeric: tabular-nums;
+}
+
+.nexus-theme .table .text-end {
+    font-variant-numeric: tabular-nums;
+}
+
+/* SweetAlert2 now backs every confirm-link dialog: Quick Send, Mark Sent,
+   payment deletion and the guest approve/decline actions. ITFlow already passes
+   the light or dark mode through and styles the buttons with Bootstrap classes,
+   so only the popup surface itself needs the Nexus treatment. */
+.nexus-theme .swal2-popup {
+    background: var(--nexus-surface);
+    border: 1px solid var(--nexus-border);
+    border-radius: var(--nexus-radius-lg);
+    box-shadow: var(--nexus-shadow);
+    color: var(--nexus-copy);
+    font-family: var(--nexus-font-interface);
+}
+
+.nexus-theme .swal2-title {
+    color: var(--nexus-text);
+    font-family: var(--nexus-font-display);
+    font-weight: 750;
+}
+
+.nexus-theme .swal2-html-container {
+    color: var(--nexus-copy);
+}
+
+.nexus-theme .swal2-icon.swal2-question,
+.nexus-theme .swal2-icon.swal2-info {
+    border-color: var(--nexus-cyan);
+    color: var(--nexus-cyan);
+}
+
+.nexus-theme .swal2-icon.swal2-warning {
+    border-color: var(--nexus-warning);
+    color: var(--nexus-warning);
+}
+
+.nexus-theme .swal2-container.swal2-backdrop-show {
+    background: rgba(11, 10, 23, 0.55);
+}
+
+.nexus-theme .swal2-show {
+    animation: nexus-popover-in var(--nexus-motion-duration) var(--nexus-motion-ease) both;
+}
+
+/* intl-tel-input: 26.09 puts it on every phone field, agent and portal alike. */
+.nexus-theme .iti {
+    width: 100%;
+}
+
+.nexus-theme .iti__dropdown-content,
+.nexus-theme .iti__country-list {
+    background: var(--nexus-surface);
+    border: 1px solid var(--nexus-border);
+    border-radius: var(--nexus-radius);
+    box-shadow: var(--nexus-shadow);
+    color: var(--nexus-text);
+}
+
+.nexus-theme .iti__search-input {
+    background: var(--nexus-surface-2);
+    border-bottom: 1px solid var(--nexus-border);
+    color: var(--nexus-text);
+}
+
+.nexus-theme .iti__country.iti__highlight {
+    background: rgba(105, 191, 245, 0.14);
+}
+
+.nexus-theme .iti__dial-code {
+    color: var(--nexus-muted);
+}
+
+/* Paginated lists (filter_footer.php), the statement modal's tabs, and
+   list groups. */
+.nexus-theme .pagination {
+    --bs-pagination-bg: var(--nexus-surface);
+    --bs-pagination-color: var(--nexus-copy);
+    --bs-pagination-border-color: var(--nexus-border);
+    --bs-pagination-hover-bg: var(--nexus-surface-2);
+    --bs-pagination-hover-color: var(--nexus-text);
+    --bs-pagination-hover-border-color: var(--nexus-border);
+    --bs-pagination-focus-box-shadow: var(--nexus-focus);
+    --bs-pagination-active-bg: var(--nexus-cyan);
+    --bs-pagination-active-border-color: var(--nexus-cyan);
+    --bs-pagination-active-color: var(--nexus-primary-contrast);
+    --bs-pagination-disabled-bg: var(--nexus-surface-2);
+    --bs-pagination-disabled-color: var(--nexus-muted);
+    --bs-pagination-disabled-border-color: var(--nexus-border);
+}
+
+.nexus-theme .nav-tabs {
+    --bs-nav-tabs-border-color: var(--nexus-border);
+    --bs-nav-tabs-link-hover-border-color: var(--nexus-border) var(--nexus-border) transparent;
+    --bs-nav-tabs-link-active-bg: var(--nexus-surface);
+    --bs-nav-tabs-link-active-color: var(--nexus-text);
+    --bs-nav-tabs-link-active-border-color: var(--nexus-border) var(--nexus-border) var(--nexus-surface);
+}
+
+.nexus-theme .nav-tabs .nav-link {
+    color: var(--nexus-copy);
+}
+
+.nexus-theme .nav-tabs .nav-link.active {
+    box-shadow: inset 0 2px 0 var(--nexus-cyan);
+}
+
+.nexus-theme .list-group {
+    --bs-list-group-bg: var(--nexus-surface);
+    --bs-list-group-color: var(--nexus-copy);
+    --bs-list-group-border-color: var(--nexus-border);
+    --bs-list-group-action-hover-bg: var(--nexus-surface-2);
+    --bs-list-group-action-hover-color: var(--nexus-text);
+    --bs-list-group-active-bg: var(--nexus-cyan);
+    --bs-list-group-active-border-color: var(--nexus-cyan);
+    --bs-list-group-active-color: var(--nexus-primary-contrast);
+}
+
+/* Quick Send leads the invoice and quote action menus with a bolt; give it the
+   accent so it reads as the one-click path rather than just another item. */
+.nexus-theme .dropdown-item .fa-bolt {
+    color: var(--nexus-warning) !important;
+}
+
+/* Dark header surfaces - a card-dark header, anything bg-dark, the user-menu
+   header - set a white foreground on the header element, but the titles inside
+   carry colours of their own: .card-title takes --nexus-text and headings take
+   Bootstrap's heading colour. Both are dark in light mode, so the title went dark
+   on the dark bar. Measured on a live install in light mode: 1.39:1 against a
+   4.5:1 requirement, on every such header - the agent ticket queue among them,
+   not only the 26.09 surfaces. Dark mode hid it because the text token is light
+   there. Titles, headings and bare icons now inherit the header's foreground;
+   buttons, badges and explicit colour utilities keep their own. */
+.nexus-theme .card-dark > .card-header :is(.card-title, h1, h2, h3, h4, h5, h6, .modal-title),
+.nexus-theme .card-dark > .card-header > :is(i, .fa, .fas, .far, .fab),
+.nexus-theme :is(.card-header, .modal-header, .user-header).bg-dark :is(.card-title, h1, h2, h3, h4, h5, h6, .modal-title),
+.nexus-theme :is(.card-header, .modal-header, .user-header).bg-dark :is(.card-title, h1, h2, h3, h4, h5, h6) > :is(i, .fa, .fas, .far, .fab):not([class*="text-"]) {
+    color: inherit;
+}
+
+/* The rebuilt guest approval page leads with a dark card header and a large
+   approve action; its confirmation screens are bare alerts. */
+.nexus-theme.nexus-guest .card-header.bg-dark :is(.card-title, h3, h4) {
+    font-family: var(--nexus-font-display);
+}
+
+.nexus-theme .alert.d-inline-block {
+    border-radius: var(--nexus-radius-lg);
+    padding: 0.85rem 1.25rem;
+}
+
+.nexus-theme .btn-lg {
+    border-radius: var(--nexus-radius-lg);
+    font-weight: 750;
+    padding: 0.7rem 1.6rem;
 }
