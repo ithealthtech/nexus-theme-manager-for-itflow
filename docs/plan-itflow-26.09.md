@@ -2,8 +2,9 @@
 
 Status: Stages B, C and D plus the §4 housekeeping shipped as 4.0.0
 (`docs/release-v4.0.0.md`). Stage A (drift detection and re-apply, §2.4) shipped as
-4.1.0 (`docs/release-v4.1.0.md`). Stage E (the new 26.09 surfaces, §2.5) is the
-only one still outstanding.
+4.1.0 (`docs/release-v4.1.0.md`). Stage E (the new 26.09 surfaces, §2.5) shipped as
+4.2.0 (`docs/release-v4.2.0.md`), themed at component level rather than as new
+overlays. Every stage in this plan is now complete.
 
 **Decisions taken (2026-09-03):**
 
