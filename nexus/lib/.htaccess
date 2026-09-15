@@ -1,0 +1,2 @@
+# Engine code. Included by Nexus entry points only, never requested directly.
+Require all denied

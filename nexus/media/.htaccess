@@ -1,0 +1,6 @@
+# Uploaded logos, favicons and backgrounds. Images only - nothing here may execute.
+# Kept to Require only: php_flag or Options lines return HTTP 500 on servers that
+# do not allow those overrides, which would break every image in this folder.
+<FilesMatch "\.(?i:php\d?|phtml|phar|cgi|pl|py|sh)$">
+    Require all denied
+</FilesMatch>
