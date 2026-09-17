@@ -527,6 +527,11 @@ function nexusThemeNavigationScript(array $settings, string $role = 'tech'): str
     return '(function(){"use strict";var c=' . $payload . ';function apply(items){var nav=document.querySelector(".sidebar-menu,.sidebar-menu");if(!nav)return;var links=Array.prototype.slice.call(nav.querySelectorAll("a.nav-link[href]")),byId={};links.forEach(function(a){var h=a.getAttribute("href")||"",hb=h.split(/[?#]/)[0].split("/").pop();items.forEach(function(i){var ib=i.href.split("/").pop();if(h===i.href||hb===ib)byId[i.id]=a.closest("li.nav-item");});});var group=nav.querySelector("[data-nexus-nav-group]");if(!group){group=document.createElement("li");group.className="nav-header";group.dataset.nexusNavGroup="1";group.textContent="CUSTOM NAVIGATION";nav.appendChild(group);}items.forEach(function(i){var li=byId[i.id];if(!li)return;li.hidden=false;var p=li.querySelector("p");if(p&&p.childNodes.length)p.childNodes[0].nodeValue=i.label+" ";var icon=li.querySelector(".nav-icon");if(icon)icon.className="nav-icon "+i.icon;nav.appendChild(li);});Object.keys(byId).forEach(function(id){if(!items.some(function(i){return i.id===id;}))byId[id].hidden=true;});}function run(){apply(matchMedia("(max-width: 991px)").matches?c.mobile:c.desktop);}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",run):run();matchMedia("(max-width: 991px)").addEventListener&&matchMedia("(max-width: 991px)").addEventListener("change",run);})();';
 }
 
+function nexusThemeStudioLinkScript(): string
+{
+    return '(function(){"use strict";function run(){var nav=document.querySelector(".sidebar-menu");if(!nav)return;if(nav.querySelector("[href=\'/nexus/studio/\']"))return;var maint=null;var headers=nav.querySelectorAll(".nav-header");for(var i=0;i<headers.length;i++){if(headers[i].textContent.trim()==="MAINTENANCE"){maint=headers[i];break;}}if(!maint)return;var li=document.createElement("li");li.className="nav-item";var a=document.createElement("a");a.href="/nexus/studio/";a.className="nav-link"+(location.pathname.indexOf("/nexus/studio")===0?" active":"");a.innerHTML=\'<i class="nav-icon fas fa-layer-group"></i><p>Theme Studio</p>\';li.appendChild(a);maint.parentNode.insertBefore(li,maint);}document.readyState==="loading"?document.addEventListener("DOMContentLoaded",run):run();})();';
+}
+
 function nexusThemeColorModeScript(array $settings): string
 {
     $settings = nexusThemeValidateSettings($settings);
@@ -1444,7 +1449,7 @@ function nexusThemeCustomCss(?array $settings = null): string
     ];
     $css .= '.nexus-theme.nexus-color-mode-dark,.nexus-theme[data-nexus-color-mode="dark"]{' . implode(';', $darkDeclarations) . "}\n";
     if ($settings['dark_mode']['mode'] === 'system') $css .= '@media (prefers-color-scheme:dark){.nexus-theme.nexus-color-mode-system{' . implode(';', $darkDeclarations) . '}}' . "\n";
-    $css .= '@media (min-width:992px){.nexus-agent:not(.sidebar-collapse) .app-sidebar{width:var(--nexus-sidebar-width)}.nexus-agent:not(.sidebar-collapse) .app-content,.nexus-agent:not(.sidebar-collapse) .app-header,.nexus-agent:not(.sidebar-collapse) .main-footer{margin-left:var(--nexus-sidebar-width)}}' . "\n";
+    $css .= '@media (min-width:992px){.nexus-agent:not(.sidebar-collapse) .app-sidebar{width:var(--nexus-sidebar-width)}}' . "\n";
     return $css;
 }
 

@@ -50,6 +50,7 @@ try {
 
     if ($surface === 'technician') {
         echo nexusThemeNavigationScript($settings, $role) . "\n";
+        echo nexusThemeStudioLinkScript() . "\n";
     }
 } catch (Throwable $error) {
     error_log('Nexus Theme Manager: runtime skipped - ' . $error->getMessage());

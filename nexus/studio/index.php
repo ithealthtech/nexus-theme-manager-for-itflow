@@ -491,7 +491,20 @@ $nexusExportJson = json_encode($nexusSettings, JSON_PRETTY_PRINT | JSON_UNESCAPE
             reindexNavigation(builder);
         });
     });
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('[onclick*="confirm"]');
+        if (!btn) return;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        var match = btn.getAttribute('onclick').match(/confirm\(['"](.+?)['"]\)/);
+        if (!match) return;
+        Swal.fire({ title: 'Confirm', text: match[1], icon: 'question', showCancelButton: true, confirmButtonText: 'Yes, continue', confirmButtonColor: '#0d6efd' }).then(function (result) {
+            if (!result.isConfirmed) return;
+            btn.removeAttribute('onclick');
+            btn.click();
+        });
+    }, true);
 })();
 </script>
 
-<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php'; ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/footer.php'; ?>

@@ -10,9 +10,13 @@
  * Requires ITFlow admin authentication.
  */
 
-// Bootstrap ITFlow admin session from the web root.
-chdir($_SERVER['DOCUMENT_ROOT'] . '/admin');
-require_once 'includes/inc_all_admin.php';
+// Bootstrap ITFlow admin session without rendering the admin layout.
+// inc_all_admin.php outputs HTML (header, sidebar, etc.) which prevents
+// header('Location: ...') redirects. We include only what we need.
+require_once $_SERVER['DOCUMENT_ROOT'] . '/config.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functions.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/includes/check_login.php';
+enforceAdminPermission();
 require_once dirname(__DIR__) . '/lib/engine.php';
 
 $nexusRedirect = static function (): never {

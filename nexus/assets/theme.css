@@ -735,14 +735,14 @@
     min-height: 4.15rem;
 }
 
-.nexus-agent .app-sidebar .brand-link[href="/agent/dashboard.php"] {
+.nexus-agent .app-sidebar .brand-link {
     align-items: center;
     display: flex;
     overflow: hidden;
     padding: 0.65rem 0.85rem;
 }
 
-.nexus-agent .brand-link[href="/agent/dashboard.php"] .brand-image {
+.nexus-agent .brand-link .brand-image {
     align-items: center;
     background: var(--nexus-gradient);
     border: 0;
@@ -760,7 +760,7 @@
     width: 2rem;
 }
 
-.nexus-agent .brand-link[href="/agent/dashboard.php"] .brand-image::before {
+.nexus-agent .brand-link .brand-image::before {
     content: "\f5fd";
     font-family: "Font Awesome 5 Free";
     font-size: 0.9rem;
@@ -768,15 +768,12 @@
 }
 
 .nexus-agent .brand-link .brand-text {
+    flex: 1 1 auto;
     font-family: var(--nexus-font-display);
+    font-size: 1rem;
     font-style: italic;
     font-weight: 800 !important;
     letter-spacing: 0.01em;
-}
-
-.nexus-agent .brand-link[href="/agent/dashboard.php"] .brand-text {
-    flex: 1 1 auto;
-    font-size: 1rem;
     line-height: 1.25;
     min-width: 0;
     overflow: hidden;
@@ -784,7 +781,7 @@
     white-space: nowrap;
 }
 
-.nexus-agent .app-header [data-widget="pushmenu"] {
+.nexus-agent .app-header [data-lte-toggle="sidebar"] {
     align-items: center;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -797,21 +794,21 @@
     width: 2.35rem;
 }
 
-.nexus-agent .app-header [data-widget="pushmenu"]:hover,
-.nexus-agent .app-header [data-widget="pushmenu"]:focus {
+.nexus-agent .app-header [data-lte-toggle="sidebar"]:hover,
+.nexus-agent .app-header [data-lte-toggle="sidebar"]:focus {
     background: rgba(105, 191, 245, 0.14);
     border-color: rgba(105, 191, 245, 0.3);
     color: var(--nexus-white);
 }
 
 @media (min-width: 992px) {
-.nexus-agent.sidebar-collapse .brand-link[href="/agent/dashboard.php"] {
+.nexus-agent.sidebar-collapse .brand-link {
         justify-content: center;
         padding-left: 0.5rem;
         padding-right: 0.5rem;
     }
 
-.nexus-agent.sidebar-collapse .brand-link[href="/agent/dashboard.php"] .brand-image {
+.nexus-agent.sidebar-collapse .brand-link .brand-image {
         flex-basis: 2rem;
         margin-right: 0;
         width: 2rem;
