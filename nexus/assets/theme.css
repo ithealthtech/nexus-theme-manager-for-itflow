@@ -58,10 +58,12 @@
 .nexus-theme ::-webkit-scrollbar-thumb:hover { background: var(--nexus-muted); border: 2px solid transparent; background-clip: padding-box; }
 .nexus-theme ::-webkit-scrollbar-corner { background: transparent; }
 
-.nexus-theme .app-sidebar { scrollbar-width: none; }
+.nexus-theme .app-sidebar,
+.nexus-theme .app-sidebar .sidebar-wrapper { scrollbar-width: thin; scrollbar-color: transparent transparent; }
 .nexus-theme .app-sidebar ::-webkit-scrollbar { width: 6px; background: transparent; }
-.nexus-theme .app-sidebar ::-webkit-scrollbar-thumb { background: transparent; border-radius: 999px; transition: background 0.2s; }
-.nexus-theme .app-sidebar:hover { scrollbar-width: thin; scrollbar-color: var(--nexus-border-dark) transparent; }
+.nexus-theme .app-sidebar ::-webkit-scrollbar-thumb { background: transparent; border-radius: 999px; }
+.nexus-theme .app-sidebar:hover,
+.nexus-theme .app-sidebar:hover .sidebar-wrapper { scrollbar-color: var(--nexus-border-dark) transparent; }
 .nexus-theme .app-sidebar:hover ::-webkit-scrollbar-thumb { background: var(--nexus-border-dark); }
 .nexus-theme .app-sidebar:hover ::-webkit-scrollbar-thumb:hover { background: var(--nexus-elevated); }
 
