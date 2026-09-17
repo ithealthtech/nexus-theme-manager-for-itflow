@@ -48,7 +48,22 @@
     font-family: var(--nexus-font-interface);
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    scrollbar-color: var(--nexus-border) transparent;
+    scrollbar-width: thin;
 }
+
+.nexus-theme ::-webkit-scrollbar { width: 8px; height: 8px; }
+.nexus-theme ::-webkit-scrollbar-track { background: transparent; }
+.nexus-theme ::-webkit-scrollbar-thumb { background: var(--nexus-border); border: 2px solid transparent; background-clip: padding-box; border-radius: 999px; }
+.nexus-theme ::-webkit-scrollbar-thumb:hover { background: var(--nexus-muted); border: 2px solid transparent; background-clip: padding-box; }
+.nexus-theme ::-webkit-scrollbar-corner { background: transparent; }
+
+.nexus-theme .app-sidebar { scrollbar-width: none; }
+.nexus-theme .app-sidebar ::-webkit-scrollbar { width: 6px; background: transparent; }
+.nexus-theme .app-sidebar ::-webkit-scrollbar-thumb { background: transparent; border-radius: 999px; transition: background 0.2s; }
+.nexus-theme .app-sidebar:hover { scrollbar-width: thin; scrollbar-color: var(--nexus-border-dark) transparent; }
+.nexus-theme .app-sidebar:hover ::-webkit-scrollbar-thumb { background: var(--nexus-border-dark); }
+.nexus-theme .app-sidebar:hover ::-webkit-scrollbar-thumb:hover { background: var(--nexus-elevated); }
 
 .nexus-navigation-builder { display:grid; gap:.5rem; margin-top:.65rem; }
 
@@ -770,9 +785,9 @@
 .nexus-agent .brand-link .brand-text {
     flex: 1 1 auto;
     font-family: var(--nexus-font-display);
-    font-size: 1rem;
-    font-style: italic;
-    font-weight: 800 !important;
+    font-size: 0.85rem;
+    font-style: normal;
+    font-weight: 400 !important;
     letter-spacing: 0.01em;
     line-height: 1.25;
     min-width: 0;
