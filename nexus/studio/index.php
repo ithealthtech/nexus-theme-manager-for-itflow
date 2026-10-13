@@ -49,7 +49,7 @@ $nexusExportJson = json_encode($nexusSettings, JSON_PRETTY_PRINT | JSON_UNESCAPE
 <link rel="stylesheet" href="/nexus/assets/studio.css">
 
 <div class="nexus-manager-page nexus-studio" id="nexus-theme-studio">
-    <section class="card border-0 nexus-manager-hero overflow-hidden">
+    <section class="card border-0 nexus-manager-hero nexus-card-brand overflow-hidden">
         <div class="card-body p-4 p-lg-5">
             <div class="row align-items-center">
                 <div class="col-lg-8">

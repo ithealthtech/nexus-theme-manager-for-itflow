@@ -69,7 +69,13 @@
 
 .nexus-navigation-builder { display:grid; gap:.5rem; margin-top:.65rem; }
 
+.nexus-theme {
+    --nexus-warm-neutral: #eee8e2;
+    --nexus-warm-card: #f0efe8;
+}
+
 .nexus-theme.dark-mode,
+.nexus-theme[data-bs-theme="dark"],
 .nexus-theme.nexus-auth,
 .nexus-theme.nexus-client {
     color-scheme: dark;
@@ -115,6 +121,7 @@
 }
 
 .nexus-theme.dark-mode a,
+.nexus-theme[data-bs-theme="dark"] a,
 .nexus-theme.nexus-auth a,
 .nexus-theme.nexus-client a {
     color: var(--nexus-cyan);
@@ -199,6 +206,7 @@
 }
 
 .nexus-theme.dark-mode .btn-outline-primary,
+.nexus-theme[data-bs-theme="dark"] .btn-outline-primary,
 .nexus-theme.nexus-client .btn-outline-primary {
     border-color: var(--nexus-cyan);
     color: var(--nexus-cyan);
@@ -408,6 +416,14 @@
     color: var(--nexus-copy);
 }
 
+.nexus-theme[data-bs-theme="light"] .card:not(.nexus-card-brand),
+.nexus-theme[data-bs-theme="light"] .modal-content,
+.nexus-theme[data-bs-theme="light"] .info-box,
+.nexus-theme[data-bs-theme="light"] .small-box {
+    background: color-mix(in srgb, var(--nexus-surface) 94%, var(--nexus-warm-card));
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
 .nexus-theme .card-header,
 .nexus-theme .modal-header,
 .nexus-theme .modal-footer {
@@ -525,6 +541,7 @@
 }
 
 .nexus-theme.dark-mode .page-link,
+.nexus-theme[data-bs-theme="dark"] .page-link,
 .nexus-theme.nexus-client .page-link {
     color: var(--nexus-cyan);
 }
@@ -704,6 +721,10 @@
 .nexus-agent .app-content {
     background: var(--nexus-page);
     color: var(--nexus-copy);
+}
+
+.nexus-agent[data-bs-theme="light"] .app-content {
+    background: color-mix(in srgb, var(--nexus-page) 72%, var(--nexus-warm-neutral));
 }
 
 .nexus-agent .app-header {
@@ -933,13 +954,17 @@
 }
 
 .nexus-agent.dark-mode .app-content,
-.nexus-agent.dark-mode .main-footer {
+.nexus-agent[data-bs-theme="dark"] .app-content,
+.nexus-agent.dark-mode .main-footer,
+.nexus-agent[data-bs-theme="dark"] .main-footer {
     background: var(--nexus-page);
     color: var(--nexus-copy);
 }
 
-.nexus-agent.dark-mode .card,
-.nexus-agent.dark-mode .modal-content {
+.nexus-agent.dark-mode .card:not(.nexus-card-brand),
+.nexus-agent[data-bs-theme="dark"] .card:not(.nexus-card-brand),
+.nexus-agent.dark-mode .modal-content,
+.nexus-agent[data-bs-theme="dark"] .modal-content {
     background: var(--nexus-surface);
     color: var(--nexus-copy);
 }
@@ -1179,6 +1204,10 @@
    specificity follows whatever palette and mode are live instead. */
 .nexus-theme body.bg-body-tertiary {
     background-color: var(--nexus-page) !important;
+}
+
+.nexus-theme[data-bs-theme="light"] body.bg-body-tertiary {
+    background-color: color-mix(in srgb, var(--nexus-page) 72%, var(--nexus-warm-neutral)) !important;
 }
 
 /* Bootstrap 5 tables paint every cell with --bs-table-bg, which sits above the
