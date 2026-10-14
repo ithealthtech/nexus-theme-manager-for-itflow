@@ -100,7 +100,7 @@ $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThe
             <?php } ?>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle portal navigation">
-            <span class="navbar-toggler-icon"></span>
+            <i class="fas fa-bars text-white"></i>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -216,8 +216,8 @@ $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThe
 <!-- Page content container -->
 <main id="main-content" class="container mt-4 <?= $nexus_theme_enabled ? 'nexus-client-shell' : '' ?>">
 
-    <div class="row mb-3 <?= $nexus_theme_enabled ? 'nexus-client-welcome' : '' ?>">
-        <div class="col-md-1 text-center <?= $nexus_theme_enabled ? 'nexus-avatar' : '' ?>">
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-3 <?= $nexus_theme_enabled ? 'nexus-client-welcome' : '' ?>">
+        <div class="flex-shrink-0 text-center <?= $nexus_theme_enabled ? 'nexus-avatar' : '' ?>">
             <?php if (!empty($session_contact_photo)) { ?>
                 <img src="/uploads/clients/<?= $session_client_id ?>/<?= $session_contact_photo ?>" alt="<?= escapeHtml($session_contact_name) ?> profile photo" height="50" width="50" class="rounded-circle img-fluid">
 
@@ -229,7 +229,7 @@ $nexus_favicon_url = $nexus_theme_enabled ? nexusThemeVersionedAssetUrl(nexusThe
             <?php } ?>
         </div>
 
-        <div class="col-md-11 p-0">
+        <div class="flex-grow-1 p-0">
                 <?php if (!$nexus_theme_enabled && $session_company_logo) { ?>
                     <img height="48" width="142" class="img-fluid float-end nexus-client-logo" src="<?= "/uploads/settings/$session_company_logo" ?>" alt="<?= escapeHtml($session_company_name) ?> logo">
                 <?php } ?>

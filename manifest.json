@@ -6,8 +6,8 @@
     "name": "Nexus Theme Manager for IT Flow",
     "vendor": "Nexus Theme Manager contributors",
     "compatible_itflow": {
-        "release": "26.09",
-        "commit": "5dcc99d8802ccb28970cd51a49d635e3e0a4908b"
+        "release": "26.10",
+        "commit": "c05ccb738a5628519dcf8124391c9944aa09b891"
     },
     "files": [
         {
@@ -54,8 +54,8 @@
         },
         {
             "path": "agent/tickets.php",
-            "payload_sha256": "b16f7928b15a8e26fd9842eec044fae0de1c27b766be0b74b3754bb95337a880",
-            "baseline_sha256": "e85842d99225c3f0db1d9295b2b799cd9fb3320ca870e694115b4fec0462b43f",
+            "payload_sha256": "ed1c1ae6719d399d18d2a289e5cce44ccbb62aa27ec33c30b2eee8b2aa1c6401",
+            "baseline_sha256": "96183d0e59c88f3912b780f93265e2a2e1b6abce4e2b55127e299e2bda35dd4e",
             "php": true
         },
         {
@@ -66,8 +66,8 @@
         },
         {
             "path": "client/includes/header.php",
-            "payload_sha256": "c771c782e9a4048b9e438ed732d9c07deed62ae6259bb00bfa015858409180a3",
-            "baseline_sha256": "2b03a8a9da24e7eecfb2484f15b9d10402acd30ab9cc7df9867d9241cc2e72d7",
+            "payload_sha256": "0677ec91cfd4108f0025c4ecd605d14a03f9ef70d3c37ba3badf218b5b090890",
+            "baseline_sha256": "b093fa61281cbf74f23f9f8038f6afd8a16f5552e261026ab4565d2804bd2028",
             "php": true
         },
         {
