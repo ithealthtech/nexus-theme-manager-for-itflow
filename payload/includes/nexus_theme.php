@@ -1587,7 +1587,7 @@ function nexusThemeCustomCss(?array $settings = null): string
     ];
     $css .= '.nexus-theme.nexus-color-mode-dark,.nexus-theme[data-nexus-color-mode="dark"]{' . implode(';', $darkDeclarations) . "}\n";
     if ($settings['dark_mode']['mode'] === 'system') $css .= '@media (prefers-color-scheme:dark){.nexus-theme.nexus-color-mode-system{' . implode(';', $darkDeclarations) . '}}' . "\n";
-    $css .= '@media (min-width:992px){.nexus-agent:not(.sidebar-collapse) .app-sidebar{width:var(--nexus-sidebar-width)}.nexus-agent:not(.sidebar-collapse) .app-content,.nexus-agent:not(.sidebar-collapse) .app-header,.nexus-agent:not(.sidebar-collapse) .main-footer{margin-left:var(--nexus-sidebar-width)}}' . "\n";
+    $css .= '@media (min-width:992px){.nexus-agent:not(.sidebar-collapse) .app-sidebar{width:var(--nexus-sidebar-width)}}' . "\n";
     return $css;
 }
 

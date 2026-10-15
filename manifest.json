@@ -12,7 +12,7 @@
     "files": [
         {
             "path": "includes/nexus_theme.php",
-            "payload_sha256": "ecf1a61b28fb95df7d4fb720b779699c5ebe916f917f6360961b36636e5672f1",
+            "payload_sha256": "9e9e6858fce470f8476e6f6c52368d7f640ba8cf9361c0ea9441f84d8ee073f7",
             "baseline_sha256": null,
             "php": true
         },
